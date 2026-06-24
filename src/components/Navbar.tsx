@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Sun, LogOut, BarChart3, LayoutGrid, Menu, X } from 'lucide-react'
+import { LogOut, BarChart3, LayoutGrid, Menu, X } from 'lucide-react'
 
 interface NavbarProps {
   currentView: string
