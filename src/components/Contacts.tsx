@@ -71,15 +71,13 @@ export default function Contacts({ currentUser }: ContactsProps) {
             <h1 className="text-3xl font-bold text-gray-800">Adresář Kontaktů</h1>
             <p className="text-gray-600 mt-1">Spravuj obchodní partnery a jejich obraty</p>
           </div>
-          {currentUser.role === 'admin' && (
-            <button
-              onClick={handleAddContact}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Nový Kontakt
-            </button>
-          )}
+          <button
+            onClick={handleAddContact}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Nový Kontakt
+          </button>
         </div>
 
         {/* Filters */}
@@ -150,23 +148,21 @@ export default function Contacts({ currentUser }: ContactsProps) {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
+                          <button
+                            onClick={() => handleEditContact(contact)}
+                            className="p-1 text-gray-600 hover:text-blue-600 transition-colors"
+                            title="Editovat"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
                           {currentUser.role === 'admin' && (
-                            <>
-                              <button
-                                onClick={() => handleEditContact(contact)}
-                                className="p-1 text-gray-600 hover:text-blue-600 transition-colors"
-                                title="Editovat"
-                              >
-                                <Edit2 className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteContact(contact.id)}
-                                className="p-1 text-gray-600 hover:text-red-600 transition-colors"
-                                title="Smazat"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </>
+                            <button
+                              onClick={() => handleDeleteContact(contact.id)}
+                              className="p-1 text-gray-600 hover:text-red-600 transition-colors"
+                              title="Smazat"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           )}
                         </div>
                       </td>
