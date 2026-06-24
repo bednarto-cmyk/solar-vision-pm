@@ -21,8 +21,8 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-4">
+      <div className="glass rounded-3xl p-8 max-w-md w-full shadow-2xl">
         <div className="flex items-center justify-center mb-8">
           <img src="/logo.svg" alt="Solar Vision" className="h-24" />
         </div>
@@ -34,7 +34,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             <button
               key={user.id}
               onClick={() => handleLogin(user.id)}
-              className="w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-green-600 hover:bg-green-50 transition-all"
+              className="w-full p-4 text-left glass rounded-2xl hover:shadow-lg transition-all hover:bg-white/80"
             >
               <div className="font-semibold text-gray-800">{user.name}</div>
               <div className="text-sm text-gray-500">{user.email}</div>

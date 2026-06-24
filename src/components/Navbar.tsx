@@ -16,7 +16,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-50 safe-top">
+    <nav className="fixed top-0 left-0 right-0 glass z-50 safe-top border-b border-gray-200">
       <div className="px-4 md:px-6 py-3 md:py-4">
         {/* Desktop Layout */}
         <div className="hidden md:flex items-center justify-between max-w-7xl mx-auto">
