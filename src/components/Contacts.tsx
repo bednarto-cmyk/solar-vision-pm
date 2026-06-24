@@ -23,12 +23,25 @@ export default function Contacts({ currentUser }: ContactsProps) {
   const [editingContact, setEditingContact] = useState<any>(null)
   const [historyContact, setHistoryContact] = useState<any>(null)
   const [filterObchodnik, setFilterObchodnik] = useState<string>('')
+  const [searchQuery, setSearchQuery] = useState<string>('')
 
-  const filteredContacts = filterObchodnik
+  const filteredContacts = (filterObchodnik
     ? contacts.filter(c => c.assignedTo === filterObchodnik)
     : currentUser.role === 'admin'
     ? contacts
     : contacts.filter(c => c.assignedTo === currentUser.id)
+  ).filter(c => {
+    if (!searchQuery) return true
+    const query = searchQuery.toLowerCase()
+    return (
+      c.name.toLowerCase().includes(query) ||
+      c.company.toLowerCase().includes(query) ||
+      c.email.toLowerCase().includes(query) ||
+      c.phone.toLowerCase().includes(query) ||
+      c.type.toLowerCase().includes(query) ||
+      c.notes.toLowerCase().includes(query)
+    )
+  })
 
   const handleAddContact = () => {
     setEditingContact(null)
@@ -83,6 +96,16 @@ export default function Contacts({ currentUser }: ContactsProps) {
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">🔍 Hledat</label>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Jméno, společnost, email, telefon..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2">Filtr podle Obchodníka</label>
               <select
