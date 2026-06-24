@@ -1,4 +1,3 @@
-import { Sun } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface LoginPageProps {
@@ -22,11 +21,10 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <Sun className="w-8 h-8 text-blue-600" />
-          <h1 className="text-3xl font-bold text-gray-800">SOLAR VISION</h1>
+        <div className="flex items-center justify-center mb-8">
+          <img src="/logo.svg" alt="Solar Vision" className="h-24" />
         </div>
 
         <h2 className="text-center text-gray-600 mb-6">Projektové řízení & CRM</h2>
@@ -36,7 +34,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
             <button
               key={user.id}
               onClick={() => handleLogin(user.id)}
-              className="w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-all"
+              className="w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-green-600 hover:bg-green-50 transition-all"
             >
               <div className="font-semibold text-gray-800">{user.name}</div>
               <div className="text-sm text-gray-500">{user.email}</div>

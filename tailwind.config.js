@@ -7,7 +7,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#0066CC',
+        'solar-yellow': '#FFD700',
+        'solar-green': '#2D5016',
+        'solar-blue': '#A8B8D8',
+        primary: '#2D5016',
         secondary: '#F5F5F5',
       }
     },

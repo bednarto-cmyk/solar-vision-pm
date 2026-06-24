@@ -22,8 +22,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
         <div className="hidden md:flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2">
-              <Sun className="w-6 h-6 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-800">SOLAR VISION PM</h1>
+              <img src="/logo.svg" alt="Solar Vision" className="h-16" />
             </div>
 
             <div className="flex gap-4">
@@ -31,7 +30,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
                 onClick={() => handleNavChange('kanban')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                   currentView === 'kanban'
-                    ? 'bg-blue-100 text-blue-600'
+                    ? 'bg-yellow-100 text-yellow-700'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -64,8 +63,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
         {/* Mobile Layout */}
         <div className="md:hidden flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sun className="w-5 h-5 text-blue-600" />
-            <h1 className="text-lg font-bold text-gray-800">SOLAR VISION</h1>
+            <img src="/logo.svg" alt="Solar Vision" className="h-12" />
           </div>
 
           <button

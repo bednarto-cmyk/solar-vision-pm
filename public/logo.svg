@@ -1,0 +1,20 @@
+<svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Yellow Circle -->
+  <circle cx="80" cy="80" r="50" fill="#FFD700"/>
+
+  <!-- Dark Green Circle -->
+  <circle cx="130" cy="80" r="50" fill="#2D5016"/>
+
+  <!-- Light Blue Circle -->
+  <circle cx="180" cy="80" r="50" fill="#A8B8D8"/>
+
+  <!-- Text: Solar Vision -->
+  <text x="280" y="100" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#000000">
+    Solar Vision
+  </text>
+
+  <!-- Subtitle: ENERGETICKÁ SOBĚSTAČNOST -->
+  <text x="280" y="135" font-family="Arial, sans-serif" font-size="18" font-weight="normal" fill="#2D5016" letter-spacing="2">
+    ENERGETICKÁ SOBĚSTAČNOST
+  </text>
+</svg>
