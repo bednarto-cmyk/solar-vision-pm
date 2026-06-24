@@ -122,19 +122,21 @@ export default function Kanban({ user }: KanbanProps) {
 
                   <div className="space-y-2 text-sm bg-gray-50 p-3 rounded-lg my-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-700 font-medium">⚡ Výkon:</span>
-                      <span className="font-bold text-blue-600 text-lg">{project.power} kWp</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-700 font-medium">💰 Výnos:</span>
+                      <span className="text-gray-700 font-medium">💰 Obrat:</span>
                       <span className="font-bold text-green-600 text-lg">
-                        {(project.revenue / 1000).toFixed(0)}k Kč
+                        {project.revenue.toLocaleString('cs-CZ')} Kč
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-700 font-medium">📊 Náklady:</span>
+                      <span className="text-gray-700 font-medium">📊 Náklad:</span>
                       <span className="font-bold text-red-600 text-lg">
-                        {(project.cost / 1000).toFixed(0)}k Kč
+                        {project.cost.toLocaleString('cs-CZ')} Kč
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-700 font-medium">⚡ Výnos:</span>
+                      <span className="font-bold text-blue-600 text-lg">
+                        {(project.revenue - project.cost).toLocaleString('cs-CZ')} Kč
                       </span>
                     </div>
                     <div className="flex justify-between items-center pt-2 border-t border-gray-300">
