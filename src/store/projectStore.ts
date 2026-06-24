@@ -9,6 +9,7 @@ export interface Project {
   customer: string
   status: ProjectStatus
   assignedTo: string
+  contactId?: string
   power: number // kWp
   cost: number
   revenue: number
@@ -43,6 +44,7 @@ export const useProjectStore = create<ProjectStore>()(
           customer: 'Jan Novotný',
           status: 'leads',
           assignedTo: '1',
+          contactId: '1',
           power: 10,
           cost: 250000,
           revenue: 350000,
@@ -59,6 +61,7 @@ export const useProjectStore = create<ProjectStore>()(
           customer: 'Jana Kovářová',
           status: 'leads',
           assignedTo: '3',
+          contactId: '4',
           power: 8,
           cost: 200000,
           revenue: 300000,
@@ -76,6 +79,7 @@ export const useProjectStore = create<ProjectStore>()(
           customer: 'BOZP s.r.o.',
           status: 'prep',
           assignedTo: '2',
+          contactId: '3',
           power: 50,
           cost: 1200000,
           revenue: 1600000,
@@ -93,6 +97,7 @@ export const useProjectStore = create<ProjectStore>()(
           customer: 'Automechanika Švadlena',
           status: 'purchase',
           assignedTo: '1',
+          contactId: '1',
           power: 30,
           cost: 750000,
           revenue: 1050000,
@@ -110,6 +115,7 @@ export const useProjectStore = create<ProjectStore>()(
           customer: 'Pavel Pavlíčka',
           status: 'execution',
           assignedTo: '2',
+          contactId: '3',
           power: 12,
           cost: 300000,
           revenue: 420000,
@@ -127,6 +133,7 @@ export const useProjectStore = create<ProjectStore>()(
           customer: 'Milan Holubář',
           status: 'revision',
           assignedTo: '3',
+          contactId: '4',
           power: 5,
           cost: 125000,
           revenue: 175000,
@@ -144,6 +151,7 @@ export const useProjectStore = create<ProjectStore>()(
           customer: 'Restaurace u Třech Lípů',
           status: 'distribution',
           assignedTo: '1',
+          contactId: '1',
           power: 15,
           cost: 375000,
           revenue: 525000,
@@ -161,6 +169,7 @@ export const useProjectStore = create<ProjectStore>()(
           customer: 'Eva Novotná',
           status: 'service',
           assignedTo: '2',
+          contactId: '3',
           power: 6,
           cost: 150000,
           revenue: 210000,

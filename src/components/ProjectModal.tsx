@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { useProjectStore, type ProjectStatus } from '../store/projectStore'
+import { useContactStore } from '../store/contactStore'
 import toast from 'react-hot-toast'
 
 interface ProjectModalProps {
@@ -36,12 +37,14 @@ const FormField = ({ label, required, children }: any) => (
 
 export default function ProjectModal({ project, onClose, user }: ProjectModalProps) {
   const { addProject, updateProject } = useProjectStore()
+  const { contacts } = useContactStore()
   const [formData, setFormData] = useState(
     project || {
       name: '',
       customer: '',
       status: 'leads' as ProjectStatus,
       assignedTo: user.role === 'admin' ? '1' : user.id,
+      contactId: '',
       power: 0,
       cost: 0,
       revenue: 0,
@@ -119,6 +122,21 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
               >
                 {STATUSES.map(s => (
                   <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
+            </FormField>
+
+            <FormField label="Kontakt">
+              <select
+                value={formData.contactId || ''}
+                onChange={(e) => setFormData({ ...formData, contactId: e.target.value })}
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">-- Vyber kontakt --</option>
+                {contacts.map(contact => (
+                  <option key={contact.id} value={contact.id}>
+                    {contact.name} ({contact.company})
+                  </option>
                 ))}
               </select>
             </FormField>

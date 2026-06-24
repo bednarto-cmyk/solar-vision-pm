@@ -4,9 +4,10 @@ import './index.css'
 import Navbar from './components/Navbar'
 import Kanban from './components/Kanban'
 import EnterpriseDashboard from './components/EnterpriseDashboard'
+import Contacts from './components/Contacts'
 import LoginPage from './components/LoginPage'
 
-type View = 'kanban' | 'dashboard' | 'login'
+type View = 'kanban' | 'dashboard' | 'contacts' | 'login'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('login')
@@ -41,6 +42,7 @@ function App() {
       <Navbar currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} />
       <div className="pt-20">
         {currentView === 'kanban' && <Kanban user={user} />}
+        {currentView === 'contacts' && <Contacts currentUser={user} />}
         {currentView === 'dashboard' && <EnterpriseDashboard user={user} />}
       </div>
       <Toaster position="top-right" />

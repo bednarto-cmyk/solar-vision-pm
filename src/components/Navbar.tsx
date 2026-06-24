@@ -1,16 +1,16 @@
 import { useState } from 'react'
-import { LogOut, BarChart3, LayoutGrid, Menu, X } from 'lucide-react'
+import { LogOut, BarChart3, LayoutGrid, Menu, X, Users } from 'lucide-react'
 
 interface NavbarProps {
   currentView: string
-  onViewChange: (view: 'kanban' | 'dashboard') => void
+  onViewChange: (view: 'kanban' | 'dashboard' | 'contacts') => void
   onLogout: () => void
 }
 
 export default function Navbar({ currentView, onViewChange, onLogout }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const handleNavChange = (view: 'kanban' | 'dashboard') => {
+  const handleNavChange = (view: 'kanban' | 'dashboard' | 'contacts') => {
     onViewChange(view)
     setIsMenuOpen(false)
   }
@@ -38,10 +38,21 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
                 Projekty
               </button>
               <button
+                onClick={() => handleNavChange('contacts')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  currentView === 'contacts'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                Kontakty
+              </button>
+              <button
                 onClick={() => handleNavChange('dashboard')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                   currentView === 'dashboard'
-                    ? 'bg-blue-100 text-blue-600'
+                    ? 'bg-yellow-100 text-yellow-700'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -93,10 +104,21 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
               Projekty
             </button>
             <button
+              onClick={() => handleNavChange('contacts')}
+              className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-left ${
+                currentView === 'contacts'
+                  ? 'bg-yellow-100 text-yellow-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Users className="w-5 h-5" />
+              Kontakty
+            </button>
+            <button
               onClick={() => handleNavChange('dashboard')}
               className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-left ${
                 currentView === 'dashboard'
-                  ? 'bg-blue-100 text-blue-600'
+                  ? 'bg-yellow-100 text-yellow-700'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
