@@ -187,8 +187,8 @@ export const useContactStore = create<ContactStore>((set, get) => ({
   },
 
   deleteContact: (id, deletedBy) => {
-    set(state => ({
-      contacts: state.contacts.map(contact => {
+    set(state => {
+      const updated = state.contacts.map(contact => {
         if (contact.id === id) {
           return {
             ...contact,
@@ -196,7 +196,7 @@ export const useContactStore = create<ContactStore>((set, get) => ({
               ...contact.history,
               {
                 id: `h${Date.now()}`,
-                action: 'deleted',
+                action: 'deleted' as const,
                 timestamp: new Date().toISOString(),
                 changedBy: deletedBy,
               }
@@ -204,8 +204,10 @@ export const useContactStore = create<ContactStore>((set, get) => ({
           }
         }
         return contact
-      }).filter(c => !c.history.some(h => h.action === 'deleted' && h.timestamp === c.updatedAt))
-    }))
+      }).filter(c => !c.history.some(h => h.action === 'deleted'))
+
+      return { contacts: updated }
+    })
   },
 
   getContactsByObchodnik: (obchodnikId) => {
