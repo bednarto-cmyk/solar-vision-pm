@@ -44,7 +44,7 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+      <div className="glass rounded-2xl shadow-xl max-w-md w-full">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-800">
             {contact ? 'Editovat Kontakt' : 'Nový Kontakt'}
@@ -65,7 +65,7 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Jméno kontaktu"
             />
           </div>
@@ -77,7 +77,7 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
               name="company"
               value={formData.company}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Název společnosti"
             />
           </div>
@@ -89,7 +89,7 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="email@example.cz"
             />
           </div>
@@ -101,7 +101,7 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="+420 123 456 789"
             />
           </div>
@@ -112,7 +112,7 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
               name="type"
               value={formData.type}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               {CONTACT_TYPES.map(type => (
                 <option key={type} value={type}>{type}</option>
@@ -126,7 +126,7 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
               name="assignedTo"
               value={formData.assignedTo}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               {OBCHODNICI.map(ob => (
                 <option key={ob.id} value={ob.id}>{ob.name}</option>
@@ -141,22 +141,22 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
               value={formData.notes}
               onChange={handleChange}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Poznámky k tomuto kontaktu..."
             />
           </div>
         </form>
 
-        <div className="flex gap-3 p-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex gap-3 p-6 border-t border-gray-200 glass-sm">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-2xl text-gray-700 hover:glass-sm transition-colors"
           >
             Zrušit
           </button>
           <button
             onClick={handleSubmit}
-            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors font-medium"
           >
             {contact ? 'Aktualizovat' : 'Přidat'}
           </button>

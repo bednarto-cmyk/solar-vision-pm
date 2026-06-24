@@ -80,7 +80,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
   const yearlyData = getYearlyData()
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 glass-sm min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -90,7 +90,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
         {user.role === 'admin' && (
           <button
             onClick={() => setShowTargetModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold text-lg"
+            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 font-bold text-lg"
           >
             <Settings className="w-5 h-5" />
             Nastavit plány
@@ -100,7 +100,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-blue-500">
+        <div className="glass p-6 rounded-2xl shadow-lg border-l-4 border-blue-500">
           <p className="text-gray-600 text-sm font-bold">ROČNÍ PLÁN</p>
           <p className="text-4xl font-bold text-blue-600 mt-2">
             {(selectedStats.target / 1000000).toFixed(1)}M Kč
@@ -108,7 +108,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
           <p className="text-xs text-gray-500 mt-2">Obchodník: {USERS.find(u => u.id === selectedUser)?.name}</p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-green-500">
+        <div className="glass p-6 rounded-2xl shadow-lg border-l-4 border-green-500">
           <p className="text-gray-600 text-sm font-bold">SPLNĚNÍ</p>
           <p className="text-4xl font-bold text-green-600 mt-2">
             {(selectedStats.revenue / 1000000).toFixed(1)}M Kč
@@ -116,7 +116,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
           <p className="text-xs text-gray-500 mt-2">Dosavadní výnos</p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-purple-500">
+        <div className="glass p-6 rounded-2xl shadow-lg border-l-4 border-purple-500">
           <p className="text-gray-600 text-sm font-bold">PROCENTA PLÁNU</p>
           <p className="text-4xl font-bold text-purple-600 mt-2">
             {Math.round(selectedStats.percentageOfTarget)}%
@@ -124,7 +124,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
           <p className="text-xs text-gray-500 mt-2">Z ročního cíle</p>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-orange-500">
+        <div className="glass p-6 rounded-2xl shadow-lg border-l-4 border-orange-500">
           <p className="text-gray-600 text-sm font-bold">POČET PROJEKTŮ</p>
           <p className="text-4xl font-bold text-orange-600 mt-2">
             {selectedStats.projects.length}
@@ -142,10 +142,10 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
               <button
                 key={u.id}
                 onClick={() => setSelectedUser(u.id)}
-                className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                className={`px-6 py-3 rounded-2xl font-bold transition-all ${
                   selectedUser === u.id
                     ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white text-gray-800 border-2 border-gray-300 hover:border-blue-400'
+                    : 'glass text-gray-800 border-2 border-gray-300 hover:border-blue-400'
                 }`}
               >
                 {u.name}
@@ -157,7 +157,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
 
       {/* Info for non-admin users */}
       {user.role !== 'admin' && (
-        <div className="mb-8 p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
+        <div className="mb-8 p-4 bg-blue-50 border-2 border-blue-300 rounded-2xl">
           <p className="text-sm font-bold text-blue-900">
             👤 Zobrazuješ svou desku: <span className="text-blue-600">{USERS.find(u => u.id === user.id)?.name}</span>
           </p>
@@ -167,7 +167,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
       {/* Charts Grid */}
       <div className="grid grid-cols-2 gap-8 mb-8">
         {/* Monthly Performance Chart */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="glass p-6 rounded-2xl shadow-lg">
           <h3 className="text-xl font-bold text-gray-800 mb-4">📈 Měsíční Výkon vs Plán</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={monthlyData}>
@@ -183,7 +183,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
         </div>
 
         {/* Yearly Target Comparison */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="glass p-6 rounded-2xl shadow-lg">
           <h3 className="text-xl font-bold text-gray-800 mb-4">🎯 Plnění Ročního Cíle</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={yearlyData}>
@@ -199,7 +199,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
         </div>
 
         {/* Yearly Progress Line Chart */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="glass p-6 rounded-2xl shadow-lg">
           <h3 className="text-xl font-bold text-gray-800 mb-4">📊 Plnění Během Roku (%)</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={monthlyData}>
@@ -219,7 +219,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
         </div>
 
         {/* Progress Bars - All Users */}
-        <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="glass p-6 rounded-2xl shadow-lg">
           <h3 className="text-xl font-bold text-gray-800 mb-6">👥 Porovnání Všech Obchodníků</h3>
           <div className="space-y-6">
             {yearlyData.map((user, idx) => (
@@ -249,7 +249,7 @@ export default function EnterpriseDashboard({ user }: EnterpriseProps) {
       {/* Detail Cards */}
       <div className="grid grid-cols-3 gap-6 mb-8">
         {selectedStats.projects.map((project) => (
-          <div key={project.id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+          <div key={project.id} className="glass p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow">
             <h4 className="font-bold text-gray-800 text-sm mb-2 line-clamp-2">{project.name}</h4>
             <p className="text-xs text-gray-600 mb-3">{project.customer}</p>
             <div className="flex justify-between text-sm">

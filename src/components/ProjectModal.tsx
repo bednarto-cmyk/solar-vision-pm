@@ -81,12 +81,12 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto">
+      <div className="glass rounded-2xl shadow-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto">
         <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-blue-100 border-b-2 border-blue-200 px-8 py-6 flex items-center justify-between">
           <h2 className="text-3xl font-bold text-gray-900">
             {project ? '✏️ Editovat projekt' : '➕ Nový projekt'}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-blue-200 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-blue-200 rounded-2xl transition-colors">
             <X className="w-7 h-7 text-gray-600" />
           </button>
         </div>
@@ -99,7 +99,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Např. Panely na střechu"
               />
             </FormField>
@@ -109,7 +109,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                 type="text"
                 value={formData.customer}
                 onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Jméno zákazníka"
               />
             </FormField>
@@ -118,7 +118,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as ProjectStatus })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {STATUSES.map(s => (
                   <option key={s.value} value={s.value}>{s.label}</option>
@@ -130,7 +130,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
               <select
                 value={formData.contactId || ''}
                 onChange={(e) => setFormData({ ...formData, contactId: e.target.value })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">-- Vyber kontakt --</option>
                 {contacts.map(contact => (
@@ -149,7 +149,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                 <select
                   value={formData.assignedTo}
                   onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-                  className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {USERS.map(u => (
                     <option key={u.id} value={u.id}>{u.name}</option>
@@ -163,7 +163,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                 type="number"
                 value={formData.power}
                 onChange={(e) => setFormData({ ...formData, power: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="10"
               />
             </FormField>
@@ -173,7 +173,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                 type="number"
                 value={formData.revenue}
                 onChange={(e) => setFormData({ ...formData, revenue: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="350000"
               />
             </FormField>
@@ -186,7 +186,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                 type="number"
                 value={formData.cost}
                 onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="250000"
               />
             </FormField>
@@ -196,7 +196,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </FormField>
 
@@ -205,7 +205,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </FormField>
           </div>
@@ -215,7 +215,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               rows={5}
               placeholder="Přidej jakékoliv dodatečné informace o projektu..."
             />
@@ -226,13 +226,13 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
             <button
               type="button"
               onClick={onClose}
-              className="px-8 py-3 rounded-lg bg-gray-200 text-gray-800 font-bold text-lg hover:bg-gray-300 transition-colors"
+              className="px-8 py-3 rounded-2xl bg-gray-200 text-gray-800 font-bold text-lg hover:bg-gray-300 transition-colors"
             >
               Zrušit
             </button>
             <button
               type="submit"
-              className="px-8 py-3 rounded-lg bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition-colors"
+              className="px-8 py-3 rounded-2xl bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition-colors"
             >
               {project ? '💾 Aktualizovat' : '✅ Vytvořit'}
             </button>

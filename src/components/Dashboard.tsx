@@ -61,7 +61,7 @@ export default function Dashboard({ user }: DashboardProps) {
         <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-2xl hover:bg-gray-300 transition-colors font-semibold"
         >
           <Settings className="w-5 h-5" />
           Nastavení widgetů
@@ -70,11 +70,11 @@ export default function Dashboard({ user }: DashboardProps) {
 
       {/* Widget Settings Panel */}
       {showSettings && (
-        <div className="mb-6 p-6 bg-blue-50 border-2 border-blue-200 rounded-lg">
+        <div className="mb-6 p-6 bg-blue-50 border-2 border-blue-200 rounded-2xl">
           <h3 className="text-lg font-bold text-gray-800 mb-4">Přizpůsobení Dashboard</h3>
           <div className="grid grid-cols-2 gap-4 mb-4">
             {widgets.map(widget => (
-              <label key={widget.id} className="flex items-center gap-3 p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-50">
+              <label key={widget.id} className="flex items-center gap-3 p-3 glass rounded-2xl cursor-pointer hover:glass-sm">
                 <input
                   type="checkbox"
                   checked={widget.enabled}
@@ -148,7 +148,7 @@ export default function Dashboard({ user }: DashboardProps) {
               {USERS.map(u => {
                 const stats = getUserStats(u.id)
                 return (
-                  <div key={u.id} className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                  <div key={u.id} className="border-2 border-gray-200 rounded-2xl p-4 hover:border-blue-300 transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <div className={`w-4 h-4 rounded-full ${u.color}`}></div>
@@ -195,7 +195,7 @@ export default function Dashboard({ user }: DashboardProps) {
                 { label: 'Distribuce', key: 'distribution', color: 'text-pink-600' },
                 { label: 'Servis', key: 'service', color: 'text-indigo-600' },
               ].map(s => (
-                <div key={s.key} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div key={s.key} className="flex justify-between items-center p-3 glass-sm rounded-2xl">
                   <span className="text-gray-700 font-medium">{s.label}</span>
                   <span className={`font-bold text-xl ${s.color}`}>{getStatusCount(s.key)}</span>
                 </div>
@@ -210,19 +210,19 @@ export default function Dashboard({ user }: DashboardProps) {
         <div className="card p-6 mt-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">💵 Finanční přehled</h3>
           <div className="grid grid-cols-3 gap-6">
-            <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+            <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl">
               <p className="text-gray-600 text-sm font-semibold">Celkový výnos</p>
               <p className="text-3xl font-bold text-green-600 mt-2">
                 {(totalRevenue / 1000000).toFixed(2)}M Kč
               </p>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-lg">
+            <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl">
               <p className="text-gray-600 text-sm font-semibold">Celkové náklady</p>
               <p className="text-3xl font-bold text-red-600 mt-2">
                 {(totalCost / 1000000).toFixed(2)}M Kč
               </p>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
+            <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
               <p className="text-gray-600 text-sm font-semibold">Celkový zisk</p>
               <p className="text-3xl font-bold text-blue-600 mt-2">
                 {(totalProfit / 1000000).toFixed(2)}M Kč

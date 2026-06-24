@@ -78,7 +78,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
   }
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen pb-24">
+    <div className="p-4 md:p-6 glass-sm min-h-screen pb-24">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
@@ -88,7 +88,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
           </div>
           <button
             onClick={handleAddContact}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             Nový Kontakt
@@ -96,7 +96,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="glass rounded-2xl shadow p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2">🔍 Hledat</label>
@@ -105,7 +105,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Jméno, společnost, email, telefon..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
             <div className="flex-1">
@@ -113,7 +113,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
               <select
                 value={filterObchodnik}
                 onChange={(e) => setFilterObchodnik(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="">Všichni obchodníci</option>
                 {OBCHODNICI.map(ob => (
@@ -131,7 +131,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="glass rounded-2xl shadow overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -150,7 +150,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
                 {filteredContacts.map(contact => {
                   const revenue = getContactRevenue(contact.id, projects)
                   return (
-                    <tr key={contact.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                    <tr key={contact.id} className="border-b border-gray-200 hover:glass-sm transition-colors">
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">{contact.name}</td>
                       <td className="px-4 py-3 text-sm text-gray-600">{contact.company}</td>
                       <td className="px-4 py-3 text-sm text-gray-600">{contact.email}</td>
