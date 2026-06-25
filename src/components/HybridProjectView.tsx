@@ -90,7 +90,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
               </select>
             </div>
 
-            <div className="space-y-2.5 max-h-96 overflow-y-auto">
+            <div className="space-y-2.5">
               {filteredProjects.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-sm">Žádné projekty</p>
