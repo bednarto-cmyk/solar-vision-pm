@@ -88,6 +88,61 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                 <option value="distribution">🔷 Distribuce</option>
                 <option value="service">🟦 Servis</option>
               </select>
+
+              <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
+                <p className="text-xs font-semibold text-gray-700">Popis fází:</p>
+                <div className="grid grid-cols-1 gap-2 text-xs">
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟣</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Příležitosti</p>
+                      <p className="text-gray-500">Nový projekt, počáteční kontakt</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🔵</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Příprava</p>
+                      <p className="text-gray-500">Plánování a příprava nabídky</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟠</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Nákup</p>
+                      <p className="text-gray-500">Výběr materiálů a dodavatelů</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟢</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Realizace</p>
+                      <p className="text-gray-500">Instalace a montáž probíhá</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟡</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Revize</p>
+                      <p className="text-gray-500">Kontrola a testování systému</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🔷</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Distribuce</p>
+                      <p className="text-gray-500">Příprava na spuštění</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟦</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Servis</p>
+                      <p className="text-gray-500">Projekt hotov, údržba a podpora</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2.5">
@@ -116,19 +171,6 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                         <span className={`px-2 py-1 rounded-lg text-xs font-bold whitespace-nowrap flex-shrink-0 ${statusInfo.color}`}>
                           {statusInfo.emoji}
                         </span>
-                      </div>
-
-                      <div className="mb-2.5 p-2 bg-gray-50 rounded-lg border border-gray-200">
-                        <p className="text-xs font-medium text-gray-700 mb-1">{statusInfo.cs}</p>
-                        <p className="text-xs text-gray-600">
-                          {project.status === 'leads' && 'Nový projekt, počáteční kontakt'}
-                          {project.status === 'prep' && 'Plánování a příprava nabídky'}
-                          {project.status === 'purchase' && 'Výběr materiálů a dodavatelů'}
-                          {project.status === 'execution' && 'Instalace a montáž probíhá'}
-                          {project.status === 'revision' && 'Kontrola a testování systému'}
-                          {project.status === 'distribution' && 'Příprava na spuštění'}
-                          {project.status === 'service' && 'Projekt hotov, údržba a podpora'}
-                        </p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 text-xs mb-2.5 pt-2 border-t border-gray-200">
