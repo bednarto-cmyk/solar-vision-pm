@@ -90,10 +90,10 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
               </select>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {filteredProjects.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500 text-sm">Žádné projekty</p>
+                  <p className="text-gray-400 text-sm">Žádné projekty</p>
                 </div>
               ) : (
                 filteredProjects.map(project => {
@@ -102,44 +102,48 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                     <button
                       key={project.id}
                       onClick={() => setSelectedProjectId(project.id)}
-                      className={`w-full p-4 text-left rounded-xl transition-all ${
+                      className={`w-full text-left rounded-2xl transition-all duration-200 ${
                         selectedProjectId === project.id
-                          ? 'glass shadow-lg border-2 border-green-400 bg-white'
-                          : 'glass-sm hover:glass border border-transparent'
+                          ? 'glass shadow-xl border border-green-200 bg-white'
+                          : 'glass-sm hover:glass border border-gray-100'
                       }`}
                     >
-                      <div className="mb-3">
-                        <h3 className="font-semibold text-gray-900 line-clamp-2 text-sm">{project.name}</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">{project.customer}</p>
-                      </div>
-
-                      <div className={`mb-3 p-3 rounded-lg ${statusInfo.color} border-2 ${statusInfo.color.includes('100') ? 'border-opacity-30' : 'border-opacity-50'}`}>
-                        <p className="text-sm font-bold">{statusInfo.emoji} {statusInfo.cs}</p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2 text-xs mb-2.5 pt-2 border-t border-gray-200">
-                        <div>
-                          <span className="text-gray-500">Obrat:</span>
-                          <p className="font-semibold text-green-600">{(project.revenue / 1000).toFixed(0)}k</p>
+                      <div className="px-5 py-4 space-y-3.5">
+                        {/* Status Badge */}
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${statusInfo.color} w-fit`}>
+                          <span className="text-base">{statusInfo.emoji}</span>
+                          <span>{statusInfo.cs}</span>
                         </div>
-                        <div>
-                          <span className="text-gray-500">Úkoly:</span>
-                          <p className="font-semibold text-blue-600">{(project.tasks || []).length}</p>
-                        </div>
-                      </div>
 
-                      <div className="flex gap-1 pt-2">
-                        {selectedProjectId === project.id && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleDeleteProject(project.id)
-                            }}
-                            className="flex-1 px-2 py-1.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
-                          >
-                            <Trash2 className="w-3 h-3" /> Smazat
-                          </button>
-                        )}
+                        {/* Title & Customer */}
+                        <div>
+                          <h3 className="font-semibold text-gray-900 line-clamp-2 text-sm leading-snug">{project.name}</h3>
+                          <p className="text-xs text-gray-500 mt-1">{project.customer}</p>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                          <div>
+                            <p className="text-xs text-gray-500 mb-0.5">Obrat</p>
+                            <p className="text-sm font-semibold text-green-600">{(project.revenue / 1000000).toFixed(2)}M</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 mb-0.5">Úkoly</p>
+                            <p className="text-sm font-semibold text-blue-600">{(project.tasks || []).length}</p>
+                          </div>
+                          {selectedProjectId === project.id && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteProject(project.id)
+                              }}
+                              className="ml-auto p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Smazat"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </button>
                   )

@@ -48,36 +48,36 @@ export default function ProjectDetail({ projectId, onEditProject }: ProjectDetai
 
   return (
     <div className="glass rounded-2xl p-6 h-full overflow-y-auto">
-      <div className="mb-6">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">{project.name}</h2>
-            <p className="text-sm text-gray-600 mt-1">{project.customer}</p>
+      <div className="mb-8">
+        <div className="flex items-start justify-between gap-4 mb-6">
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-gray-900 leading-tight">{project.name}</h2>
+            <p className="text-sm text-gray-500 mt-2">{project.customer}</p>
           </div>
           <button
             onClick={() => onEditProject(project)}
-            className="px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors flex-shrink-0"
           >
             Editovat
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-          <div>
-            <span className="text-gray-600">Obrat:</span>
-            <p className="font-bold text-green-600">{project.revenue.toLocaleString('cs-CZ')} Kč</p>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Obrat</p>
+            <p className="text-lg font-semibold text-green-600">{(project.revenue / 1000000).toFixed(2)}M Kč</p>
           </div>
-          <div>
-            <span className="text-gray-600">Náklad:</span>
-            <p className="font-bold text-red-600">{project.cost.toLocaleString('cs-CZ')} Kč</p>
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Náklad</p>
+            <p className="text-lg font-semibold text-red-600">{(project.cost / 1000000).toFixed(2)}M Kč</p>
           </div>
-          <div>
-            <span className="text-gray-600">Výnos:</span>
-            <p className="font-bold text-blue-600">{(project.revenue - project.cost).toLocaleString('cs-CZ')} Kč</p>
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Výnos</p>
+            <p className="text-lg font-semibold text-blue-600">{((project.revenue - project.cost) / 1000000).toFixed(2)}M Kč</p>
           </div>
-          <div>
-            <span className="text-gray-600">Marže:</span>
-            <p className="font-bold text-purple-600">
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Marže</p>
+            <p className="text-lg font-semibold text-purple-600">
               {((((project.revenue - project.cost) / project.revenue) * 100) || 0).toFixed(0)}%
             </p>
           </div>
