@@ -133,10 +133,10 @@ export default function ProjectDetail({ projectId, onEditProject }: ProjectDetai
         <h3 className="font-bold text-sm mb-4 text-gray-800">✅ TODO LIST</h3>
 
         <div className="space-y-2 mb-4">
-          {project.tasks.length === 0 ? (
+          {(project.tasks || []).length === 0 ? (
             <p className="text-sm text-gray-500 italic">Žádné úkoly. Přidej si nějaké!</p>
           ) : (
-            project.tasks.map(task => (
+            (project.tasks || []).map(task => (
               <div key={task.id} className="flex items-center gap-3 p-2 glass-sm rounded-lg">
                 <input
                   type="checkbox"

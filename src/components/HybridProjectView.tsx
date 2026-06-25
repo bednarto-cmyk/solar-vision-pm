@@ -116,7 +116,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                         {' '}
                         {project.status}
                       </span>
-                      <span className="text-xs text-gray-500">{project.tasks.length} úkolů</span>
+                      <span className="text-xs text-gray-500">{(project.tasks || []).length} úkolů</span>
                     </div>
                   </button>
                 ))
