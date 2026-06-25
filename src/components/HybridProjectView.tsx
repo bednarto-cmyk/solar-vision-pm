@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { useProjectStore } from '../store/projectStore'
 import ProjectDetail from './ProjectDetail'
 import ProjectModal from './ProjectModal'
@@ -7,6 +7,16 @@ import toast from 'react-hot-toast'
 
 interface HybridProjectViewProps {
   user: any
+}
+
+const STATUS_LABELS: { [key: string]: { cs: string; emoji: string; color: string } } = {
+  leads: { cs: 'Příležitosti', emoji: '🟣', color: 'bg-purple-100 text-purple-800' },
+  prep: { cs: 'Příprava', emoji: '🔵', color: 'bg-blue-100 text-blue-800' },
+  purchase: { cs: 'Nákup', emoji: '🟠', color: 'bg-amber-100 text-amber-800' },
+  execution: { cs: 'Realizace', emoji: '🟢', color: 'bg-green-100 text-green-800' },
+  revision: { cs: 'Revize', emoji: '🟡', color: 'bg-yellow-100 text-yellow-800' },
+  distribution: { cs: 'Distribuce', emoji: '🔷', color: 'bg-cyan-100 text-cyan-800' },
+  service: { cs: 'Servis', emoji: '🟦', color: 'bg-indigo-100 text-indigo-800' },
 }
 
 export default function HybridProjectView({ user }: HybridProjectViewProps) {
@@ -40,19 +50,6 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
     }
   }
 
-  const getStatusColor = (status: string) => {
-    const colors: { [key: string]: string } = {
-      leads: 'bg-purple-100 text-purple-700',
-      prep: 'bg-blue-100 text-blue-700',
-      purchase: 'bg-amber-100 text-amber-700',
-      execution: 'bg-green-100 text-green-700',
-      revision: 'bg-orange-100 text-orange-700',
-      distribution: 'bg-cyan-100 text-cyan-700',
-      service: 'bg-indigo-100 text-indigo-700',
-    }
-    return colors[status] || 'bg-gray-100 text-gray-700'
-  }
-
   return (
     <div className="p-4 md:p-6 min-h-screen pb-24">
       <div className="max-w-7xl mx-auto">
@@ -69,57 +66,85 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Levá část: Seznam projektů */}
-          <div className="glass rounded-2xl p-4">
-            <h2 className="font-bold text-sm mb-4 text-gray-800">SEZNAM PROJEKTŮ ({filteredProjects.length})</h2>
+          <div className="glass rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-bold text-gray-800">📋 PROJEKTY</h2>
+              <span className="bg-green-100 text-green-700 px-2.5 py-1 rounded-lg text-sm font-semibold">{filteredProjects.length}</span>
+            </div>
 
-            <div className="mb-4">
+            <div className="mb-5">
+              <label className="block text-xs font-medium text-gray-600 mb-2">Filtr podle fáze</label>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
               >
-                <option value="">Všechny statusy</option>
-                <option value="leads">Příležitosti</option>
-                <option value="prep">Příprava</option>
-                <option value="purchase">Nákup</option>
-                <option value="execution">Realizace</option>
-                <option value="revision">Revize</option>
-                <option value="distribution">Distribuce</option>
-                <option value="service">Servis</option>
+                <option value="">✨ Všechny fáze</option>
+                <option value="leads">🟣 Příležitosti</option>
+                <option value="prep">🔵 Příprava</option>
+                <option value="purchase">🟠 Nákup</option>
+                <option value="execution">🟢 Realizace</option>
+                <option value="revision">🟡 Revize</option>
+                <option value="distribution">🔷 Distribuce</option>
+                <option value="service">🟦 Servis</option>
               </select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2.5 max-h-96 overflow-y-auto">
               {filteredProjects.length === 0 ? (
-                <p className="text-sm text-gray-500 italic text-center py-8">Žádné projekty</p>
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-sm">Žádné projekty</p>
+                </div>
               ) : (
-                filteredProjects.map(project => (
-                  <button
-                    key={project.id}
-                    onClick={() => setSelectedProjectId(project.id)}
-                    className={`w-full p-3 text-left rounded-lg transition-all text-sm ${
-                      selectedProjectId === project.id
-                        ? 'glass shadow-lg border border-green-300'
-                        : 'glass-sm hover:glass'
-                    }`}
-                  >
-                    <div className="font-medium text-gray-800 line-clamp-2 mb-1">{project.name}</div>
-                    <div className="flex items-center justify-between">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(project.status)}`}>
-                        {project.status === 'leads' && '🟣'}
-                        {project.status === 'prep' && '🔵'}
-                        {project.status === 'purchase' && '🟠'}
-                        {project.status === 'execution' && '🟢'}
-                        {project.status === 'revision' && '🟡'}
-                        {project.status === 'distribution' && '🔷'}
-                        {project.status === 'service' && '🟦'}
-                        {' '}
-                        {project.status}
-                      </span>
-                      <span className="text-xs text-gray-500">{(project.tasks || []).length} úkolů</span>
-                    </div>
-                  </button>
-                ))
+                filteredProjects.map(project => {
+                  const statusInfo = STATUS_LABELS[project.status] || { cs: project.status, emoji: '⚙️', color: 'bg-gray-100 text-gray-800' }
+                  return (
+                    <button
+                      key={project.id}
+                      onClick={() => setSelectedProjectId(project.id)}
+                      className={`w-full p-4 text-left rounded-xl transition-all ${
+                        selectedProjectId === project.id
+                          ? 'glass shadow-lg border-2 border-green-400 bg-white'
+                          : 'glass-sm hover:glass border border-transparent'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-2.5">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 line-clamp-2 text-sm">{project.name}</h3>
+                          <p className="text-xs text-gray-500 mt-0.5">{project.customer}</p>
+                        </div>
+                        <span className={`px-2 py-1 rounded-lg text-xs font-bold whitespace-nowrap flex-shrink-0 ${statusInfo.color}`}>
+                          {statusInfo.emoji}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 text-xs mb-2.5 pt-2 border-t border-gray-200">
+                        <div>
+                          <span className="text-gray-500">Obrat:</span>
+                          <p className="font-semibold text-green-600">{(project.revenue / 1000).toFixed(0)}k</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Úkoly:</span>
+                          <p className="font-semibold text-blue-600">{(project.tasks || []).length}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-1 pt-2">
+                        {selectedProjectId === project.id && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteProject(project.id)
+                            }}
+                            className="flex-1 px-2 py-1.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
+                          >
+                            <Trash2 className="w-3 h-3" /> Smazat
+                          </button>
+                        )}
+                      </div>
+                    </button>
+                  )
+                })
               )}
             </div>
           </div>
