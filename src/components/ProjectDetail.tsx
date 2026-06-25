@@ -65,15 +65,15 @@ export default function ProjectDetail({ projectId, onEditProject }: ProjectDetai
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-gray-50 rounded-xl p-4">
             <p className="text-xs text-gray-500 mb-1">Obrat</p>
-            <p className="text-lg font-semibold text-green-600">{(project.revenue / 1000000).toFixed(2)}M Kč</p>
+            <p className="text-lg font-semibold text-green-600">{project.revenue.toLocaleString('cs-CZ')} Kč</p>
           </div>
           <div className="bg-gray-50 rounded-xl p-4">
             <p className="text-xs text-gray-500 mb-1">Náklad</p>
-            <p className="text-lg font-semibold text-red-600">{(project.cost / 1000000).toFixed(2)}M Kč</p>
+            <p className="text-lg font-semibold text-red-600">{project.cost.toLocaleString('cs-CZ')} Kč</p>
           </div>
           <div className="bg-gray-50 rounded-xl p-4">
             <p className="text-xs text-gray-500 mb-1">Výnos</p>
-            <p className="text-lg font-semibold text-blue-600">{((project.revenue - project.cost) / 1000000).toFixed(2)}M Kč</p>
+            <p className="text-lg font-semibold text-blue-600">{(project.revenue - project.cost).toLocaleString('cs-CZ')} Kč</p>
           </div>
           <div className="bg-gray-50 rounded-xl p-4">
             <p className="text-xs text-gray-500 mb-1">Marže</p>
