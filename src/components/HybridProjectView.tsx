@@ -88,6 +88,61 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                 <option value="distribution">🔷 Distribuce</option>
                 <option value="service">🟦 Servis</option>
               </select>
+
+              <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
+                <p className="text-xs font-semibold text-gray-700">Popis fází:</p>
+                <div className="grid grid-cols-1 gap-2 text-xs">
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟣</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Příležitosti</p>
+                      <p className="text-gray-500">Nový projekt, počáteční kontakt</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🔵</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Příprava</p>
+                      <p className="text-gray-500">Plánování a příprava nabídky</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟠</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Nákup</p>
+                      <p className="text-gray-500">Výběr materiálů a dodavatelů</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟢</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Realizace</p>
+                      <p className="text-gray-500">Instalace a montáž probíhá</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟡</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Revize</p>
+                      <p className="text-gray-500">Kontrola a testování systému</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🔷</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Distribuce</p>
+                      <p className="text-gray-500">Příprava na spuštění</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-lg">🟦</span>
+                    <div>
+                      <p className="font-medium text-gray-800">Servis</p>
+                      <p className="text-gray-500">Projekt hotov, údržba a podpora</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2.5">
