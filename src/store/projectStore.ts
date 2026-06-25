@@ -235,12 +235,12 @@ export const useProjectStore = create<ProjectStore>()(
               ? {
                   ...p,
                   tasks: [
-                    ...p.tasks,
+                    ...(p.tasks || []),
                     {
                       id: `task-${Date.now()}`,
                       title: taskTitle,
                       completed: false,
-                    },
+                    } as ProjectTask,
                   ],
                 }
               : p
@@ -253,7 +253,7 @@ export const useProjectStore = create<ProjectStore>()(
             p.id === projectId
               ? {
                   ...p,
-                  tasks: p.tasks.map((t) =>
+                  tasks: (p.tasks || []).map((t) =>
                     t.id === taskId ? { ...t, completed } : t
                   ),
                 }
@@ -267,7 +267,7 @@ export const useProjectStore = create<ProjectStore>()(
             p.id === projectId
               ? {
                   ...p,
-                  tasks: p.tasks.filter((t) => t.id !== taskId),
+                  tasks: (p.tasks || []).filter((t) => t.id !== taskId),
                 }
               : p
           ),
