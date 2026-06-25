@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2, X } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { useProjectStore, type ProjectStatus } from '../store/projectStore'
 import toast from 'react-hot-toast'
 

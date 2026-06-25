@@ -25,9 +25,8 @@ export interface Project {
     [key: string]: boolean
   }
   documents: string[]
-  tasks: [],
-          notes: string
   tasks: ProjectTask[]
+  notes: string
   createdAt: string
 }
 
