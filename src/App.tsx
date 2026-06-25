@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast'
 import './index.css'
 import Navbar from './components/Navbar'
 import Kanban from './components/Kanban'
+import HybridProjectView from './components/HybridProjectView'
 import EnterpriseDashboard from './components/EnterpriseDashboard'
 import Contacts from './components/Contacts'
 import LoginPage from './components/LoginPage'
@@ -41,7 +42,7 @@ function App() {
     <div className="min-h-screen bg-gray-100">
       <Navbar currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} />
       <div className="pt-20">
-        {currentView === 'kanban' && <Kanban user={user} />}
+        {currentView === 'kanban' && <HybridProjectView user={user} />}
         {currentView === 'contacts' && <Contacts currentUser={user} />}
         {currentView === 'dashboard' && <EnterpriseDashboard user={user} />}
       </div>

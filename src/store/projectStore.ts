@@ -3,6 +3,12 @@ import { persist } from 'zustand/middleware'
 
 export type ProjectStatus = 'leads' | 'prep' | 'purchase' | 'execution' | 'revision' | 'distribution' | 'service'
 
+export interface ProjectTask {
+  id: string
+  title: string
+  completed: boolean
+}
+
 export interface Project {
   id: string
   name: string
@@ -19,7 +25,9 @@ export interface Project {
     [key: string]: boolean
   }
   documents: string[]
-  notes: string
+  tasks: [],
+          notes: string
+  tasks: ProjectTask[]
   createdAt: string
 }
 
@@ -31,6 +39,9 @@ interface ProjectStore {
   moveProject: (id: string, newStatus: ProjectStatus) => void
   getProjectsByUser: (userId: string) => Project[]
   getProjectsByStatus: (status: ProjectStatus) => Project[]
+  addTask: (projectId: string, taskTitle: string) => void
+  updateTask: (projectId: string, taskId: string, completed: boolean) => void
+  deleteTask: (projectId: string, taskId: string) => void
 }
 
 export const useProjectStore = create<ProjectStore>()(
@@ -52,6 +63,7 @@ export const useProjectStore = create<ProjectStore>()(
           endDate: '2026-07-24',
           phases: {},
           documents: [],
+          tasks: [],
           notes: 'Zájemce z webového formuláře',
           createdAt: new Date().toISOString(),
         },
@@ -69,6 +81,7 @@ export const useProjectStore = create<ProjectStore>()(
           endDate: '2026-08-15',
           phases: {},
           documents: [],
+          tasks: [],
           notes: 'Zajímavá klientka, druhý kontakt za týden',
           createdAt: new Date().toISOString(),
         },
@@ -87,6 +100,7 @@ export const useProjectStore = create<ProjectStore>()(
           endDate: '2026-08-01',
           phases: {},
           documents: [],
+          tasks: [],
           notes: 'Připojení na 3×400V',
           createdAt: new Date().toISOString(),
         },
@@ -105,6 +119,7 @@ export const useProjectStore = create<ProjectStore>()(
           endDate: '2026-09-15',
           phases: {},
           documents: [],
+          tasks: [],
           notes: 'Výběrové řízení probíhá',
           createdAt: new Date().toISOString(),
         },
@@ -123,6 +138,7 @@ export const useProjectStore = create<ProjectStore>()(
           endDate: '2026-07-15',
           phases: {},
           documents: [],
+          tasks: [],
           notes: 'Montáž probíhá, pokládka kabelů',
           createdAt: new Date().toISOString(),
         },
@@ -141,6 +157,7 @@ export const useProjectStore = create<ProjectStore>()(
           endDate: '2026-06-30',
           phases: {},
           documents: [],
+          tasks: [],
           notes: 'Probíhá finální kontrola',
           createdAt: new Date().toISOString(),
         },
@@ -159,6 +176,7 @@ export const useProjectStore = create<ProjectStore>()(
           endDate: '2026-06-15',
           phases: {},
           documents: [],
+          tasks: [],
           notes: 'Čeká na schválení UTP',
           createdAt: new Date().toISOString(),
         },
@@ -177,6 +195,7 @@ export const useProjectStore = create<ProjectStore>()(
           endDate: '2026-05-15',
           phases: {},
           documents: [],
+          tasks: [],
           notes: 'Instalace hotova, 2. rok záruky',
           createdAt: new Date().toISOString(),
         },
@@ -208,6 +227,51 @@ export const useProjectStore = create<ProjectStore>()(
       getProjectsByStatus: (status) => {
         const state = get()
         return state.projects.filter((p) => p.status === status)
+      },
+      addTask: (projectId, taskTitle) => {
+        set((state) => ({
+          projects: state.projects.map((p) =>
+            p.id === projectId
+              ? {
+                  ...p,
+                  tasks: [
+                    ...p.tasks,
+                    {
+                      id: `task-${Date.now()}`,
+                      title: taskTitle,
+                      completed: false,
+                    },
+                  ],
+                }
+              : p
+          ),
+        }))
+      },
+      updateTask: (projectId, taskId, completed) => {
+        set((state) => ({
+          projects: state.projects.map((p) =>
+            p.id === projectId
+              ? {
+                  ...p,
+                  tasks: p.tasks.map((t) =>
+                    t.id === taskId ? { ...t, completed } : t
+                  ),
+                }
+              : p
+          ),
+        }))
+      },
+      deleteTask: (projectId, taskId) => {
+        set((state) => ({
+          projects: state.projects.map((p) =>
+            p.id === projectId
+              ? {
+                  ...p,
+                  tasks: p.tasks.filter((t) => t.id !== taskId),
+                }
+              : p
+          ),
+        }))
       },
     }),
     {
