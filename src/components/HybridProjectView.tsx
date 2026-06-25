@@ -88,61 +88,6 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                 <option value="distribution">🔷 Distribuce</option>
                 <option value="service">🟦 Servis</option>
               </select>
-
-              <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
-                <p className="text-xs font-semibold text-gray-700">Popis fází:</p>
-                <div className="grid grid-cols-1 gap-2 text-xs">
-                  <div className="flex items-start gap-2">
-                    <span className="text-lg">🟣</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Příležitosti</p>
-                      <p className="text-gray-500">Nový projekt, počáteční kontakt</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-lg">🔵</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Příprava</p>
-                      <p className="text-gray-500">Plánování a příprava nabídky</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-lg">🟠</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Nákup</p>
-                      <p className="text-gray-500">Výběr materiálů a dodavatelů</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-lg">🟢</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Realizace</p>
-                      <p className="text-gray-500">Instalace a montáž probíhá</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-lg">🟡</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Revize</p>
-                      <p className="text-gray-500">Kontrola a testování systému</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-lg">🔷</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Distribuce</p>
-                      <p className="text-gray-500">Příprava na spuštění</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="text-lg">🟦</span>
-                    <div>
-                      <p className="font-medium text-gray-800">Servis</p>
-                      <p className="text-gray-500">Projekt hotov, údržba a podpora</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div className="space-y-2.5">
@@ -163,14 +108,13 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                           : 'glass-sm hover:glass border border-transparent'
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-2 mb-2.5">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 line-clamp-2 text-sm">{project.name}</h3>
-                          <p className="text-xs text-gray-500 mt-0.5">{project.customer}</p>
-                        </div>
-                        <span className={`px-2 py-1 rounded-lg text-xs font-bold whitespace-nowrap flex-shrink-0 ${statusInfo.color}`}>
-                          {statusInfo.emoji}
-                        </span>
+                      <div className="mb-3">
+                        <h3 className="font-semibold text-gray-900 line-clamp-2 text-sm">{project.name}</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">{project.customer}</p>
+                      </div>
+
+                      <div className={`mb-3 p-3 rounded-lg ${statusInfo.color} border-2 ${statusInfo.color.includes('100') ? 'border-opacity-30' : 'border-opacity-50'}`}>
+                        <p className="text-sm font-bold">{statusInfo.emoji} {statusInfo.cs}</p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-2 text-xs mb-2.5 pt-2 border-t border-gray-200">
