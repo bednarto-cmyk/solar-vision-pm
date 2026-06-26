@@ -28,6 +28,7 @@ export interface Project {
   tasks: ProjectTask[]
   tags: string[]
   notes: string
+  isUrgentAcknowledged?: boolean
   createdAt: string
 }
 
@@ -37,6 +38,7 @@ interface ProjectStore {
   updateProject: (id: string, project: Partial<Project>) => void
   deleteProject: (id: string) => void
   moveProject: (id: string, newStatus: ProjectStatus) => void
+  acknowledgeUrgent: (id: string) => void
   getProjectsByUser: (userId: string) => Project[]
   getProjectsByStatus: (status: ProjectStatus) => Project[]
   addTask: (projectId: string, taskTitle: string) => void
@@ -218,6 +220,12 @@ export const useProjectStore = create<ProjectStore>()(
         set((state) => ({
           projects: state.projects.map((p) =>
             p.id === id ? { ...p, status: newStatus } : p
+          ),
+        })),
+      acknowledgeUrgent: (id) =>
+        set((state) => ({
+          projects: state.projects.map((p) =>
+            p.id === id ? { ...p, isUrgentAcknowledged: true } : p
           ),
         })),
       getProjectsByUser: (userId) => {

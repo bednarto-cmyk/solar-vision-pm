@@ -14,7 +14,18 @@ const STATUS_LABELS: { [key: string]: { cs: string; emoji: string } } = {
 }
 
 export default function DashboardView() {
-  const { projects } = useProjectStore()
+  const { projects, acknowledgeUrgent } = useProjectStore()
+
+  const urgentProjects = projects.filter(p => {
+    if (p.isUrgentAcknowledged) return false
+    const daysLeft = Math.ceil((new Date(p.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    return daysLeft >= 0 && daysLeft <= 7
+  })
+
+  const overdueProjects = projects.filter(p => {
+    if (p.isUrgentAcknowledged) return false
+    return new Date(p.endDate) < new Date()
+  })
 
   const handleExportToExcel = () => {
     try {
@@ -199,6 +210,72 @@ export default function DashboardView() {
             </div>
           </div>
         </div>
+
+        {/* Urgent Projects Alert */}
+        {(urgentProjects.length > 0 || overdueProjects.length > 0) && (
+          <div className="glass rounded-2xl p-6 mb-6 border-l-4 border-red-500 bg-red-50">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <h2 className="font-bold text-gray-800 text-lg">
+                🚨 {urgentProjects.length + overdueProjects.length} Urgentních Projektů
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {overdueProjects.length > 0 && (
+                <div>
+                  <p className="text-sm font-semibold text-red-700 mb-3">⚠️ Zpoždělé Projekty ({overdueProjects.length})</p>
+                  <div className="space-y-2">
+                    {overdueProjects.map(p => {
+                      const daysOverdue = Math.ceil((new Date().getTime() - new Date(p.endDate).getTime()) / (1000 * 60 * 60 * 24))
+                      return (
+                        <div key={p.id} className="flex items-start justify-between gap-2 p-3 bg-white rounded-lg border border-red-200">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 text-sm line-clamp-1">{p.name}</p>
+                            <p className="text-xs text-gray-600">{p.customer}</p>
+                          </div>
+                          <button
+                            onClick={() => acknowledgeUrgent(p.id)}
+                            className="text-xs font-medium px-2 py-1 bg-red-200 text-red-700 hover:bg-red-300 rounded transition-colors whitespace-nowrap"
+                          >
+                            Viděno
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              {urgentProjects.length > 0 && (
+                <div>
+                  <p className="text-sm font-semibold text-orange-700 mb-3">⏰ Blížící se Termín ({urgentProjects.length})</p>
+                  <div className="space-y-2">
+                    {urgentProjects.map(p => {
+                      const daysLeft = Math.ceil((new Date(p.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                      return (
+                        <div key={p.id} className="flex items-start justify-between gap-2 p-3 bg-white rounded-lg border border-orange-200">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 text-sm line-clamp-1">{p.name}</p>
+                            <p className="text-xs text-gray-600">{p.customer}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold px-2 py-1 bg-orange-100 text-orange-700 rounded whitespace-nowrap">
+                              {daysLeft} dní
+                            </span>
+                            <button
+                              onClick={() => acknowledgeUrgent(p.id)}
+                              className="text-xs font-medium px-2 py-1 bg-orange-200 text-orange-700 hover:bg-orange-300 rounded transition-colors"
+                            >
+                              Viděno
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Upcoming Deadlines */}

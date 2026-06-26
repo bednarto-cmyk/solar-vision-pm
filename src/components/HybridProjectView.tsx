@@ -29,9 +29,15 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
   const [searchQuery, setSearchQuery] = useState<string>('')
   const { moveProject } = useProjectStore()
 
-  let filteredProjects = filterStatus
-    ? projects.filter(p => p.status === filterStatus)
-    : projects
+  let filteredProjects = filterStatus === 'urgent'
+    ? projects.filter(p => {
+        if (p.isUrgentAcknowledged) return false
+        const daysLeft = Math.ceil((new Date(p.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+        return (daysLeft >= 0 && daysLeft <= 7) || new Date(p.endDate) < new Date()
+      })
+    : filterStatus
+      ? projects.filter(p => p.status === filterStatus)
+      : projects
 
   if (searchQuery) {
     const query = searchQuery.toLowerCase()
@@ -162,6 +168,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                 className="w-full px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
               >
                 <option value="">✨ Všechny fáze</option>
+                <option value="urgent">🚨 Jen urgentní</option>
                 <option value="leads">🟣 Příležitosti</option>
                 <option value="prep">🔵 Příprava</option>
                 <option value="purchase">🟠 Nákup</option>

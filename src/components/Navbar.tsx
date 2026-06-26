@@ -13,11 +13,15 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
   const { projects } = useProjectStore()
 
   const urgentDeadlines = projects.filter(p => {
+    if (p.isUrgentAcknowledged) return false
     const daysLeft = Math.ceil((new Date(p.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     return daysLeft >= 0 && daysLeft <= 7
   }).length
 
-  const overdueProjects = projects.filter(p => new Date(p.endDate) < new Date()).length
+  const overdueProjects = projects.filter(p => {
+    if (p.isUrgentAcknowledged) return false
+    return new Date(p.endDate) < new Date()
+  }).length
   const totalAlerts = urgentDeadlines + overdueProjects
 
   const handleNavChange = (view: 'kanban' | 'dashboard' | 'contacts') => {
