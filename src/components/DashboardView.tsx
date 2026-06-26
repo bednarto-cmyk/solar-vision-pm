@@ -1,5 +1,7 @@
 import { useProjectStore } from '../store/projectStore'
-import { TrendingUp, Target, AlertCircle, CheckCircle } from 'lucide-react'
+import { TrendingUp, Target, AlertCircle, CheckCircle, Download } from 'lucide-react'
+import * as XLSX from 'xlsx'
+import toast from 'react-hot-toast'
 
 const STATUS_LABELS: { [key: string]: { cs: string; emoji: string } } = {
   leads: { cs: 'Příležitosti', emoji: '🟣' },
@@ -13,6 +15,69 @@ const STATUS_LABELS: { [key: string]: { cs: string; emoji: string } } = {
 
 export default function DashboardView() {
   const { projects } = useProjectStore()
+
+  const handleExportToExcel = () => {
+    try {
+      const workbook = XLSX.utils.book_new()
+
+      // Sheet 1: Overview
+      const overviewData = [
+        ['SOLAR VISION - Výkaz Projektů'],
+        ['Datum:', new Date().toLocaleDateString('cs-CZ')],
+        [],
+        ['Celkový Obrat:', `${(totalRevenue / 1000000).toFixed(2)}M Kč`],
+        ['Celkové Náklady:', `${(totalCost / 1000000).toFixed(2)}M Kč`],
+        ['Celkový Zisk:', `${(totalProfit / 1000000).toFixed(2)}M Kč`],
+        ['Průměrná Marže:', `${avgMargin.toFixed(0)}%`],
+      ]
+      const overviewSheet = XLSX.utils.aoa_to_sheet(overviewData)
+      XLSX.utils.book_append_sheet(workbook, overviewSheet, 'Přehled')
+
+      // Sheet 2: Projects
+      const projectsData = [
+        ['Název', 'Zákazník', 'Fáze', 'Obrat', 'Náklady', 'Zisk', 'Marže', 'Počátek', 'Termín', 'Tagy']
+      ]
+      projects.forEach(p => {
+        const profit = p.revenue - p.cost
+        const margin = ((profit / p.revenue) * 100 || 0).toFixed(0)
+        projectsData.push([
+          p.name,
+          p.customer,
+          p.status,
+          p.revenue,
+          p.cost,
+          profit,
+          `${margin}%`,
+          p.startDate,
+          p.endDate,
+          (p.tags || []).join(', ')
+        ])
+      })
+      const projectsSheet = XLSX.utils.aoa_to_sheet(projectsData)
+      XLSX.utils.book_append_sheet(workbook, projectsSheet, 'Projekty')
+
+      // Sheet 3: Pipeline
+      const pipelineData = [
+        ['Fáze', 'Počet', 'Obrat', '% z Celku']
+      ]
+      projectsByStatus.forEach(({ cs, count, revenue }) => {
+        pipelineData.push([
+          cs,
+          count,
+          revenue,
+          `${((revenue / totalRevenue) * 100).toFixed(1)}%`
+        ])
+      })
+      const pipelineSheet = XLSX.utils.aoa_to_sheet(pipelineData)
+      XLSX.utils.book_append_sheet(workbook, pipelineSheet, 'Pipeline')
+
+      XLSX.writeFile(workbook, `Solar-Vision-Export-${new Date().toISOString().split('T')[0]}.xlsx`)
+      toast.success('Export do Excelu hotov!')
+    } catch (error) {
+      console.error(error)
+      toast.error('Chyba při exportu')
+    }
+  }
 
   const totalRevenue = projects.reduce((sum, p) => sum + p.revenue, 0)
   const totalCost = projects.reduce((sum, p) => sum + p.cost, 0)
@@ -39,7 +104,16 @@ export default function DashboardView() {
   return (
     <div className="p-4 md:p-6 min-h-screen pb-24">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">📊 Dashboard</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">📊 Dashboard</h1>
+          <button
+            onClick={handleExportToExcel}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors font-medium"
+          >
+            <Download className="w-5 h-5" />
+            Export Excel
+          </button>
+        </div>
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
