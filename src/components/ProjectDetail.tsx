@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Plus, Trash2, Check } from 'lucide-react'
 import { useProjectStore, type ProjectStatus } from '../store/projectStore'
 import toast from 'react-hot-toast'
 
@@ -19,10 +19,40 @@ const PHASES: { value: ProjectStatus; label: string; order: number }[] = [
 ]
 
 export default function ProjectDetail({ projectId, onEditProject }: ProjectDetailProps) {
-  const { projects, addTask, updateTask, deleteTask } = useProjectStore()
+  const { projects, addTask, updateTask, deleteTask, updateProject } = useProjectStore()
   const [newTaskTitle, setNewTaskTitle] = useState('')
+  const [notes, setNotes] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const project = projectId ? projects.find(p => p.id === projectId) : null
+
+  // Auto-save notes
+  useEffect(() => {
+    if (project && notes !== project.notes) {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+      setIsSaving(true)
+      saveTimeoutRef.current = setTimeout(() => {
+        updateProject(project.id, { notes })
+        setIsSaving(false)
+        toast.success('Uloženo', { duration: 1500 })
+      }, 1500)
+    }
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
+  }, [notes, project])
+
+  // Load notes when project changes
+  useEffect(() => {
+    if (project) {
+      setNotes(project.notes)
+    }
+  }, [projectId])
 
   if (!project) {
     return (
@@ -181,6 +211,32 @@ export default function ProjectDetail({ projectId, onEditProject }: ProjectDetai
             <Plus className="w-4 h-4" />
           </button>
         </div>
+      </div>
+
+      {/* Notes with Auto-save */}
+      <div className="border-t border-gray-200 pt-6 mt-6">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <h3 className="font-bold text-sm text-gray-800">📝 Poznámky</h3>
+          {isSaving ? (
+            <span className="text-xs text-blue-500 flex items-center gap-1">
+              <span className="animate-spin">⚙️</span> Ukládám...
+            </span>
+          ) : notes !== project.notes ? (
+            <span className="text-xs text-orange-500">Zmítnuto</span>
+          ) : (
+            <span className="text-xs text-green-500 flex items-center gap-1">
+              <Check className="w-3 h-3" /> Uloženo
+            </span>
+          )}
+        </div>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Přidej poznámky k projektu..."
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+          rows={4}
+        />
+        <p className="text-xs text-gray-400 mt-2">Auto-save je zapnutý 💾</p>
       </div>
     </div>
   )
