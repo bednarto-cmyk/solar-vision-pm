@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2, Lightbulb, ClipboardList, ShoppingCart, Zap, CheckCircle, Truck, Wrench } from 'lucide-react'
+import { Plus, Trash2, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings } from 'lucide-react'
 import { useProjectStore } from '../store/projectStore'
 import ProjectDetail from './ProjectDetail'
 import ProjectModal from './ProjectModal'
@@ -10,13 +10,13 @@ interface HybridProjectViewProps {
 }
 
 const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string; iconColor: string; accentColor: string } } = {
-  leads: { cs: 'Příležitosti', icon: Lightbulb, gradient: 'from-purple-500/10 to-purple-600/5', iconColor: 'text-purple-600', accentColor: 'bg-purple-500/20' },
-  prep: { cs: 'Příprava', icon: ClipboardList, gradient: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-600', accentColor: 'bg-blue-500/20' },
+  leads: { cs: 'Příležitosti', icon: Sun, gradient: 'from-yellow-500/10 to-orange-600/5', iconColor: 'text-yellow-600', accentColor: 'bg-yellow-500/20' },
+  prep: { cs: 'Příprava', icon: PencilLine, gradient: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-600', accentColor: 'bg-blue-500/20' },
   purchase: { cs: 'Nákup', icon: ShoppingCart, gradient: 'from-amber-500/10 to-amber-600/5', iconColor: 'text-amber-600', accentColor: 'bg-amber-500/20' },
   execution: { cs: 'Realizace', icon: Zap, gradient: 'from-green-500/10 to-green-600/5', iconColor: 'text-green-600', accentColor: 'bg-green-500/20' },
-  revision: { cs: 'Revize', icon: CheckCircle, gradient: 'from-yellow-500/10 to-yellow-600/5', iconColor: 'text-yellow-600', accentColor: 'bg-yellow-500/20' },
-  distribution: { cs: 'Distribuce', icon: Truck, gradient: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-600', accentColor: 'bg-cyan-500/20' },
-  service: { cs: 'Servis', icon: Wrench, gradient: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-600', accentColor: 'bg-indigo-500/20' },
+  revision: { cs: 'Revize', icon: CheckCircle, gradient: 'from-teal-500/10 to-teal-600/5', iconColor: 'text-teal-600', accentColor: 'bg-teal-500/20' },
+  distribution: { cs: 'Distribuce', icon: Plug, gradient: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-600', accentColor: 'bg-cyan-500/20' },
+  service: { cs: 'Servis', icon: Settings, gradient: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-600', accentColor: 'bg-indigo-500/20' },
 }
 
 export default function HybridProjectView({ user }: HybridProjectViewProps) {

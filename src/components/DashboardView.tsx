@@ -1,16 +1,16 @@
 import { useProjectStore } from '../store/projectStore'
-import { TrendingUp, Target, AlertCircle, CheckCircle, Download, Lightbulb, ClipboardList, ShoppingCart, Zap, Truck, Wrench } from 'lucide-react'
+import { TrendingUp, Target, AlertCircle, CheckCircle, Download, Sun, PencilLine, ShoppingCart, Zap, Plug, Settings } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import toast from 'react-hot-toast'
 
 const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string; color: string } } = {
-  leads: { cs: 'Příležitosti', icon: Lightbulb, gradient: 'from-purple-500/20 to-purple-600/10', color: 'text-purple-700' },
-  prep: { cs: 'Příprava', icon: ClipboardList, gradient: 'from-blue-500/20 to-blue-600/10', color: 'text-blue-700' },
+  leads: { cs: 'Příležitosti', icon: Sun, gradient: 'from-yellow-500/20 to-orange-600/10', color: 'text-yellow-700' },
+  prep: { cs: 'Příprava', icon: PencilLine, gradient: 'from-blue-500/20 to-blue-600/10', color: 'text-blue-700' },
   purchase: { cs: 'Nákup', icon: ShoppingCart, gradient: 'from-amber-500/20 to-amber-600/10', color: 'text-amber-700' },
   execution: { cs: 'Realizace', icon: Zap, gradient: 'from-green-500/20 to-green-600/10', color: 'text-green-700' },
-  revision: { cs: 'Revize', icon: CheckCircle, gradient: 'from-yellow-500/20 to-yellow-600/10', color: 'text-yellow-700' },
-  distribution: { cs: 'Distribuce', icon: Truck, gradient: 'from-cyan-500/20 to-cyan-600/10', color: 'text-cyan-700' },
-  service: { cs: 'Servis', icon: Wrench, gradient: 'from-indigo-500/20 to-indigo-600/10', color: 'text-indigo-700' },
+  revision: { cs: 'Revize', icon: CheckCircle, gradient: 'from-teal-500/20 to-teal-600/10', color: 'text-teal-700' },
+  distribution: { cs: 'Distribuce', icon: Plug, gradient: 'from-cyan-500/20 to-cyan-600/10', color: 'text-cyan-700' },
+  service: { cs: 'Servis', icon: Settings, gradient: 'from-indigo-500/20 to-indigo-600/10', color: 'text-indigo-700' },
 }
 
 export default function DashboardView() {
