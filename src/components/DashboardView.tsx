@@ -103,6 +103,10 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
     ? projects.reduce((sum, p) => sum + ((p.revenue - p.cost) / p.revenue || 0), 0) / projects.length * 100
     : 0
 
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('cs-CZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' Kč'
+  }
+
   const upcomingDeadlines = projects
     .filter(p => new Date(p.endDate) > new Date())
     .sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
@@ -138,7 +142,7 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 mb-1">Celkový Obrat</p>
-                <p className="text-2xl font-bold text-green-600">{(totalRevenue / 1000000).toFixed(2)}M Kč</p>
+                <p className="text-2xl font-bold text-green-600">{formatCurrency(totalRevenue)}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-green-500 opacity-50" />
             </div>
@@ -148,7 +152,7 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 mb-1">Celkové Náklady</p>
-                <p className="text-2xl font-bold text-red-600">{(totalCost / 1000000).toFixed(2)}M Kč</p>
+                <p className="text-2xl font-bold text-red-600">{formatCurrency(totalCost)}</p>
               </div>
               <AlertCircle className="w-8 h-8 text-red-500 opacity-50" />
             </div>
@@ -158,7 +162,7 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 mb-1">Celkový Zisk</p>
-                <p className="text-2xl font-bold text-blue-600">{(totalProfit / 1000000).toFixed(2)}M Kč</p>
+                <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalProfit)}</p>
               </div>
               <CheckCircle className="w-8 h-8 text-blue-500 opacity-50" />
             </div>
@@ -190,7 +194,7 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
                       {cs}
                     </span>
                     <span className="text-xs text-gray-500 font-medium">
-                      {count} • {(revenue / 1000000).toFixed(1)}M
+                      {count} • {formatCurrency(revenue)}
                     </span>
                   </div>
                   <div className="w-full bg-gray-100/50 rounded-full h-2.5 overflow-hidden">
@@ -385,7 +389,7 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-600">
-                          💰 {(project.revenue / 1000000).toFixed(2)}M Kč
+                          💰 {formatCurrency(project.revenue)}
                         </span>
                         <span className="text-gray-500">
                           📅 {new Date(project.endDate).toLocaleDateString('cs-CZ')}

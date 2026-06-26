@@ -241,7 +241,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                           <div>
                             <p className="text-xs text-gray-500 mb-0.5">Obrat</p>
-                            <p className="text-sm font-semibold text-green-600">{(project.revenue / 1000000).toFixed(2)}M</p>
+                            <p className="text-sm font-semibold text-green-600">{project.revenue.toLocaleString('cs-CZ', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Kč</p>
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 mb-0.5">Úkoly</p>

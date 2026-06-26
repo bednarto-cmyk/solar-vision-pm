@@ -162,7 +162,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">{getObchodnikName(contact.assignedTo)}</td>
                       <td className="px-4 py-3 text-sm font-semibold text-green-600 text-right">
-                        {(revenue / 1000000).toFixed(2)}M Kč
+                        {revenue.toLocaleString('cs-CZ', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} Kč
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <div className="flex gap-2 justify-center">
