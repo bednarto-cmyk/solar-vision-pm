@@ -1,16 +1,16 @@
 import { useProjectStore } from '../store/projectStore'
-import { TrendingUp, Target, AlertCircle, CheckCircle, Download } from 'lucide-react'
+import { TrendingUp, Target, AlertCircle, CheckCircle, Download, Lightbulb, ClipboardList, ShoppingCart, Zap, Truck, Wrench } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import toast from 'react-hot-toast'
 
-const STATUS_LABELS: { [key: string]: { cs: string; emoji: string } } = {
-  leads: { cs: 'Příležitosti', emoji: '🟣' },
-  prep: { cs: 'Příprava', emoji: '🔵' },
-  purchase: { cs: 'Nákup', emoji: '🟠' },
-  execution: { cs: 'Realizace', emoji: '🟢' },
-  revision: { cs: 'Revize', emoji: '🟡' },
-  distribution: { cs: 'Distribuce', emoji: '🔷' },
-  service: { cs: 'Servis', emoji: '🟦' },
+const STATUS_LABELS: { [key: string]: { cs: string; icon: any; color: string } } = {
+  leads: { cs: 'Příležitosti', icon: Lightbulb, color: 'text-purple-700' },
+  prep: { cs: 'Příprava', icon: ClipboardList, color: 'text-blue-700' },
+  purchase: { cs: 'Nákup', icon: ShoppingCart, color: 'text-amber-700' },
+  execution: { cs: 'Realizace', icon: Zap, color: 'text-green-700' },
+  revision: { cs: 'Revize', icon: CheckCircle, color: 'text-yellow-700' },
+  distribution: { cs: 'Distribuce', icon: Truck, color: 'text-cyan-700' },
+  service: { cs: 'Servis', icon: Wrench, color: 'text-indigo-700' },
 }
 
 export default function DashboardView() {
@@ -104,12 +104,12 @@ export default function DashboardView() {
 
   const overduedProjects = projects.filter(p => new Date(p.endDate) < new Date())
 
-  const projectsByStatus = Object.entries(STATUS_LABELS).map(([key, { cs, emoji }]) => {
+  const projectsByStatus = Object.entries(STATUS_LABELS).map(([key, { cs, icon, color }]) => {
     const count = projects.filter(p => p.status === key).length
     const revenue = projects
       .filter(p => p.status === key)
       .reduce((sum, p) => sum + p.revenue, 0)
-    return { key, cs, emoji, count, revenue }
+    return { key, cs, icon, color, count, revenue }
   })
 
   return (
@@ -174,11 +174,12 @@ export default function DashboardView() {
           <div className="glass rounded-2xl p-6">
             <h2 className="font-bold text-gray-800 mb-4">📈 Pipeline podle Fází</h2>
             <div className="space-y-3">
-              {projectsByStatus.map(({ key, cs, emoji, count, revenue }) => (
+              {projectsByStatus.map(({ key, cs, icon: Icon, color, count, revenue }) => (
                 <div key={key}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-700">
-                      {emoji} {cs}
+                    <span className={`flex items-center gap-2 text-sm font-medium ${color}`}>
+                      <Icon className="w-4 h-4" />
+                      {cs}
                     </span>
                     <span className="text-sm text-gray-500">
                       {count} projektů • {(revenue / 1000000).toFixed(1)}M Kč
@@ -199,12 +200,13 @@ export default function DashboardView() {
           <div className="glass rounded-2xl p-6">
             <h2 className="font-bold text-gray-800 mb-4">📊 Počet Projektů</h2>
             <div className="grid grid-cols-2 gap-3">
-              {projectsByStatus.map(({ key, cs, emoji, count }) => (
+              {projectsByStatus.map(({ key, cs, icon: Icon, color, count }) => (
                 <div key={key} className="bg-gray-50 rounded-xl p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-800 mb-1">{count}</p>
-                  <p className="text-xs text-gray-600">
-                    {emoji} {cs}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-800 mb-2">{count}</p>
+                  <div className={`flex items-center justify-center gap-1 text-xs font-medium ${color}`}>
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{cs}</span>
+                  </div>
                 </div>
               ))}
             </div>
