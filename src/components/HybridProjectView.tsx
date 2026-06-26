@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, Lightbulb, ClipboardList, ShoppingCart, Zap, CheckCircle, Truck, Wrench } from 'lucide-react'
 import { useProjectStore } from '../store/projectStore'
 import ProjectDetail from './ProjectDetail'
 import ProjectModal from './ProjectModal'
@@ -9,14 +9,14 @@ interface HybridProjectViewProps {
   user: any
 }
 
-const STATUS_LABELS: { [key: string]: { cs: string; emoji: string; color: string } } = {
-  leads: { cs: 'Příležitosti', emoji: '🟣', color: 'bg-purple-100 text-purple-800' },
-  prep: { cs: 'Příprava', emoji: '🔵', color: 'bg-blue-100 text-blue-800' },
-  purchase: { cs: 'Nákup', emoji: '🟠', color: 'bg-amber-100 text-amber-800' },
-  execution: { cs: 'Realizace', emoji: '🟢', color: 'bg-green-100 text-green-800' },
-  revision: { cs: 'Revize', emoji: '🟡', color: 'bg-yellow-100 text-yellow-800' },
-  distribution: { cs: 'Distribuce', emoji: '🔷', color: 'bg-cyan-100 text-cyan-800' },
-  service: { cs: 'Servis', emoji: '🟦', color: 'bg-indigo-100 text-indigo-800' },
+const STATUS_LABELS: { [key: string]: { cs: string; icon: any; bgColor: string; borderColor: string; textColor: string } } = {
+  leads: { cs: 'Příležitosti', icon: Lightbulb, bgColor: 'bg-purple-50', borderColor: 'border-purple-300', textColor: 'text-purple-700' },
+  prep: { cs: 'Příprava', icon: ClipboardList, bgColor: 'bg-blue-50', borderColor: 'border-blue-300', textColor: 'text-blue-700' },
+  purchase: { cs: 'Nákup', icon: ShoppingCart, bgColor: 'bg-amber-50', borderColor: 'border-amber-300', textColor: 'text-amber-700' },
+  execution: { cs: 'Realizace', icon: Zap, bgColor: 'bg-green-50', borderColor: 'border-green-300', textColor: 'text-green-700' },
+  revision: { cs: 'Revize', icon: CheckCircle, bgColor: 'bg-yellow-50', borderColor: 'border-yellow-300', textColor: 'text-yellow-700' },
+  distribution: { cs: 'Distribuce', icon: Truck, bgColor: 'bg-cyan-50', borderColor: 'border-cyan-300', textColor: 'text-cyan-700' },
+  service: { cs: 'Servis', icon: Wrench, bgColor: 'bg-indigo-50', borderColor: 'border-indigo-300', textColor: 'text-indigo-700' },
 }
 
 export default function HybridProjectView({ user }: HybridProjectViewProps) {
@@ -105,16 +105,17 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
         <div className="glass rounded-2xl p-4 lg:p-5 mb-6">
           <h2 className="font-bold text-gray-800 mb-4">📊 Přetáhni projekt mezi fázemi</h2>
           <div className="grid grid-cols-2 lg:grid-cols-7 gap-2 lg:gap-3">
-            {Object.entries(STATUS_LABELS).map(([key, { cs, emoji, color }]) => (
+            {Object.entries(STATUS_LABELS).map(([key, { cs, icon: Icon, bgColor, borderColor, textColor }]) => (
               <div
                 key={key}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, key)}
-                className="bg-gray-50 rounded-xl p-3 min-h-32 border-2 border-dashed border-gray-300 hover:border-green-400 transition-colors"
+                className={`rounded-xl p-3 min-h-32 border-2 border-dashed transition-all hover:shadow-md ${bgColor} ${borderColor} hover:border-opacity-100`}
               >
-                <p className="text-xs lg:text-sm font-semibold text-gray-700 mb-2">
-                  {emoji} <span className="hidden lg:inline">{cs}</span>
-                </p>
+                <div className={`flex items-center gap-1.5 mb-2 ${textColor}`}>
+                  <Icon className="w-4 h-4 lg:w-5 lg:h-5" />
+                  <p className="text-xs lg:text-sm font-semibold hidden lg:inline">{cs}</p>
+                </div>
                 <div className="space-y-1.5">
                   {projects
                     .filter(p => p.status === key)
@@ -186,7 +187,8 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                 </div>
               ) : (
                 filteredProjects.map(project => {
-                  const statusInfo = STATUS_LABELS[project.status] || { cs: project.status, emoji: '⚙️', color: 'bg-gray-100 text-gray-800' }
+                  const statusInfo = STATUS_LABELS[project.status] || { cs: project.status, icon: Wrench, bgColor: 'bg-gray-50', borderColor: 'border-gray-300', textColor: 'text-gray-700' }
+                  const StatusIcon = statusInfo.icon
                   return (
                     <button
                       key={project.id}
@@ -201,8 +203,8 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                     >
                       <div className="px-4 lg:px-5 py-3 lg:py-4 space-y-2.5 lg:space-y-3.5">
                         {/* Status Badge */}
-                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full text-xs lg:text-sm font-medium ${statusInfo.color} w-fit`}>
-                          <span className="text-base">{statusInfo.emoji}</span>
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium border ${statusInfo.bgColor} ${statusInfo.borderColor} ${statusInfo.textColor} w-fit`}>
+                          <StatusIcon className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
                           <span>{statusInfo.cs}</span>
                         </div>
 
