@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { LogOut, BarChart3, LayoutGrid, Menu, X, Users } from 'lucide-react'
+import { LogOut, BarChart3, LayoutGrid, Menu, X, Users, Bell } from 'lucide-react'
+import { useProjectStore } from '../store/projectStore'
 
 interface NavbarProps {
   currentView: string
@@ -9,6 +10,15 @@ interface NavbarProps {
 
 export default function Navbar({ currentView, onViewChange, onLogout }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { projects } = useProjectStore()
+
+  const urgentDeadlines = projects.filter(p => {
+    const daysLeft = Math.ceil((new Date(p.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    return daysLeft >= 0 && daysLeft <= 7
+  }).length
+
+  const overdueProjects = projects.filter(p => new Date(p.endDate) < new Date()).length
+  const totalAlerts = urgentDeadlines + overdueProjects
 
   const handleNavChange = (view: 'kanban' | 'dashboard' | 'contacts') => {
     onViewChange(view)
@@ -50,7 +60,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
               </button>
               <button
                 onClick={() => handleNavChange('dashboard')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors relative ${
                   currentView === 'dashboard'
                     ? 'bg-yellow-100 text-yellow-700'
                     : 'text-gray-600 hover:bg-gray-100'
@@ -58,6 +68,11 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
               >
                 <BarChart3 className="w-5 h-5" />
                 Dashboard
+                {totalAlerts > 0 && (
+                  <span className="absolute top-1 right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white rounded-full text-xs font-bold">
+                    {totalAlerts}
+                  </span>
+                )}
               </button>
             </div>
           </div>
