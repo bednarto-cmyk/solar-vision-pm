@@ -95,6 +95,46 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
           </button>
         </div>
 
+        {/* Drag & Drop Kanban Board */}
+        <div className="glass rounded-2xl p-4 lg:p-5 mb-6">
+          <h2 className="font-bold text-gray-800 mb-4">📊 Přetáhni projekt mezi fázemi</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-7 gap-2 lg:gap-3">
+            {Object.entries(STATUS_LABELS).map(([key, { cs, emoji, color }]) => (
+              <div
+                key={key}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, key)}
+                className="bg-gray-50 rounded-xl p-3 min-h-32 border-2 border-dashed border-gray-300 hover:border-green-400 transition-colors"
+              >
+                <p className="text-xs lg:text-sm font-semibold text-gray-700 mb-2">
+                  {emoji} <span className="hidden lg:inline">{cs}</span>
+                </p>
+                <div className="space-y-1.5">
+                  {projects
+                    .filter(p => p.status === key)
+                    .slice(0, 2)
+                    .map(p => (
+                      <div
+                        key={p.id}
+                        className="text-xs bg-white p-1.5 rounded border border-gray-200 truncate cursor-move hover:bg-green-50"
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, p)}
+                        title={p.name}
+                      >
+                        {p.name.substring(0, 15)}
+                      </div>
+                    ))}
+                  {projects.filter(p => p.status === key).length > 2 && (
+                    <div className="text-xs text-gray-500 p-1">
+                      +{projects.filter(p => p.status === key).length - 2}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
           {/* Levá část: Seznam projektů (mobile: full width, desktop: 1 col) */}
           <div className="lg:col-span-1 glass rounded-2xl p-4 lg:p-5">
@@ -207,48 +247,9 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
             </div>
           </div>
 
-          {/* Pravá část: Detail projektu + Status Columns (mobile: full width, desktop: 3 cols) */}
-          <div className="lg:col-span-3 space-y-4 lg:space-y-6">
+          {/* Pravá část: Detail projektu (mobile: full width, desktop: 3 cols) */}
+          <div className="lg:col-span-3">
             <ProjectDetail projectId={selectedProjectId} onEditProject={handleEditProject} />
-
-            {/* Drag & Drop status columns */}
-            <div className="glass rounded-2xl p-4 lg:p-5">
-              <h3 className="font-bold text-gray-800 mb-4">📊 Přetáhni projekt mezi fázemi</h3>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-3 overflow-x-auto pb-2">
-                {Object.entries(STATUS_LABELS).map(([key, { cs, emoji, color }]) => (
-                  <div
-                    key={key}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, key)}
-                    className="bg-gray-50 rounded-xl p-4 min-h-32 border-2 border-dashed border-gray-300 hover:border-green-400 transition-colors"
-                  >
-                    <p className="text-sm font-semibold text-gray-700 mb-2">
-                      {emoji} {cs}
-                    </p>
-                    <div className="space-y-2">
-                      {projects
-                        .filter(p => p.status === key)
-                        .slice(0, 3)
-                        .map(p => (
-                          <div
-                            key={p.id}
-                            className="text-xs bg-white p-2 rounded border border-gray-200 truncate cursor-move hover:bg-green-50"
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, p)}
-                          >
-                            {p.name}
-                          </div>
-                        ))}
-                      {projects.filter(p => p.status === key).length > 3 && (
-                        <div className="text-xs text-gray-500 p-2">
-                          +{projects.filter(p => p.status === key).length - 3} více
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>
