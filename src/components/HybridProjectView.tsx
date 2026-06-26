@@ -87,14 +87,6 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
     }
   }
 
-  // Load filter from sessionStorage when component mounts
-  useEffect(() => {
-    const savedFilter = sessionStorage.getItem('projectFilter')
-    if (savedFilter) {
-      setFilterStatus(savedFilter)
-      sessionStorage.removeItem('projectFilter')
-    }
-  }, [])
 
   return (
     <div className="p-4 md:p-6 min-h-screen pb-24">

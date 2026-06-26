@@ -43,17 +43,7 @@ function App() {
       <div className="pt-20">
         {currentView === 'kanban' && <HybridProjectView user={user} />}
         {currentView === 'contacts' && <Contacts currentUser={user} />}
-        {currentView === 'dashboard' && (
-          <DashboardView
-            onNavigateToProjects={(filterStatus) => {
-              setCurrentView('kanban')
-              // Store the filter in sessionStorage for HybridProjectView to pick up
-              if (filterStatus) {
-                sessionStorage.setItem('projectFilter', filterStatus)
-              }
-            }}
-          />
-        )}
+        {currentView === 'dashboard' && <DashboardView />}
       </div>
       <Toaster position="top-right" />
     </div>

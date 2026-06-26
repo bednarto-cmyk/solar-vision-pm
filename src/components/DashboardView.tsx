@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { useProjectStore } from '../store/projectStore'
-import { TrendingUp, Target, AlertCircle, CheckCircle, Download, Sun, PencilLine, ShoppingCart, Zap, Plug, Settings } from 'lucide-react'
+import { TrendingUp, Target, AlertCircle, CheckCircle, Download, Sun, PencilLine, ShoppingCart, Zap, Plug, Settings, X } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import toast from 'react-hot-toast'
 
@@ -19,6 +20,7 @@ interface DashboardViewProps {
 
 export default function DashboardView({ onNavigateToProjects }: DashboardViewProps = {}) {
   const { projects, acknowledgeUrgent } = useProjectStore()
+  const [selectedPhase, setSelectedPhase] = useState<string | null>(null)
 
   const urgentProjects = projects.filter(p => {
     if (p.isUrgentAcknowledged) return false
@@ -209,7 +211,7 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
               {projectsByStatus.map(({ key, cs, icon: Icon, gradient, color, count }) => (
                 <button
                   key={key}
-                  onClick={() => onNavigateToProjects?.(key)}
+                  onClick={() => setSelectedPhase(key)}
                   className={`bg-gradient-to-br ${gradient} border border-white/30 backdrop-blur-sm rounded-2xl p-4 text-center transition-all hover:border-white/50 hover:shadow-lg cursor-pointer`}
                 >
                   <p className="text-3xl font-bold text-gray-800 mb-2">{count}</p>
@@ -350,6 +352,54 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
             </div>
           </div>
         </div>
+
+        {/* Phase Projects Modal */}
+        {selectedPhase && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="glass rounded-2xl max-w-2xl w-full max-h-96 overflow-y-auto">
+              <div className="sticky top-0 glass-sm p-6 border-b border-white/20 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">
+                  {STATUS_LABELS[selectedPhase]?.cs} ({projects.filter(p => p.status === selectedPhase).length})
+                </h2>
+                <button
+                  onClick={() => setSelectedPhase(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-3">
+                {projects
+                  .filter(p => p.status === selectedPhase)
+                  .map(project => (
+                    <div
+                      key={project.id}
+                      className="p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 line-clamp-1">{project.name}</h3>
+                          <p className="text-sm text-gray-600 mt-0.5">{project.customer}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">
+                          💰 {(project.revenue / 1000000).toFixed(2)}M Kč
+                        </span>
+                        <span className="text-gray-500">
+                          📅 {new Date(project.endDate).toLocaleDateString('cs-CZ')}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                {projects.filter(p => p.status === selectedPhase).length === 0 && (
+                  <p className="text-center text-gray-500 py-8">Žádné projekty v této fázi</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
