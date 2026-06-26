@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Trash2, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings } from 'lucide-react'
 import { useProjectStore } from '../store/projectStore'
 import ProjectDetail from './ProjectDetail'
@@ -86,6 +86,15 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
       toast.success('Projekt smazán')
     }
   }
+
+  // Load filter from sessionStorage when component mounts
+  useEffect(() => {
+    const savedFilter = sessionStorage.getItem('projectFilter')
+    if (savedFilter) {
+      setFilterStatus(savedFilter)
+      sessionStorage.removeItem('projectFilter')
+    }
+  }, [])
 
   return (
     <div className="p-4 md:p-6 min-h-screen pb-24">

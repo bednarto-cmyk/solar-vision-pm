@@ -13,7 +13,11 @@ const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string;
   service: { cs: 'Servis', icon: Settings, gradient: 'from-indigo-500/20 to-indigo-600/10', color: 'text-indigo-700' },
 }
 
-export default function DashboardView() {
+interface DashboardViewProps {
+  onNavigateToProjects?: (filterStatus?: string) => void
+}
+
+export default function DashboardView({ onNavigateToProjects }: DashboardViewProps = {}) {
   const { projects, acknowledgeUrgent } = useProjectStore()
 
   const urgentProjects = projects.filter(p => {
@@ -203,13 +207,17 @@ export default function DashboardView() {
             <h2 className="font-bold text-gray-800 mb-4">📊 Počet Projektů</h2>
             <div className="grid grid-cols-2 gap-3">
               {projectsByStatus.map(({ key, cs, icon: Icon, gradient, color, count }) => (
-                <div key={key} className={`bg-gradient-to-br ${gradient} border border-white/30 backdrop-blur-sm rounded-2xl p-4 text-center transition-all hover:border-white/50 hover:shadow-lg`}>
+                <button
+                  key={key}
+                  onClick={() => onNavigateToProjects?.(key)}
+                  className={`bg-gradient-to-br ${gradient} border border-white/30 backdrop-blur-sm rounded-2xl p-4 text-center transition-all hover:border-white/50 hover:shadow-lg cursor-pointer`}
+                >
                   <p className="text-3xl font-bold text-gray-800 mb-2">{count}</p>
                   <div className={`flex items-center justify-center gap-2 text-xs font-semibold ${color}`}>
                     <Icon className="w-4 h-4" />
                     <span className="text-gray-700">{cs}</span>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
