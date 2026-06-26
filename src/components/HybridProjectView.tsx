@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Plus, Trash2, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings } from 'lucide-react'
+import { useState } from 'react'
+import { Plus, Trash2, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings, Wrench } from 'lucide-react'
 import { useProjectStore } from '../store/projectStore'
 import ProjectDetail from './ProjectDetail'
 import ProjectModal from './ProjectModal'

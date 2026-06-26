@@ -14,11 +14,7 @@ const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string;
   service: { cs: 'Servis', icon: Settings, gradient: 'from-indigo-500/20 to-indigo-600/10', color: 'text-indigo-700' },
 }
 
-interface DashboardViewProps {
-  onNavigateToProjects?: (filterStatus?: string) => void
-}
-
-export default function DashboardView({ onNavigateToProjects }: DashboardViewProps = {}) {
+export default function DashboardView() {
   const { projects, acknowledgeUrgent } = useProjectStore()
   const [selectedPhase, setSelectedPhase] = useState<string | null>(null)
 
@@ -38,20 +34,20 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
       const workbook = XLSX.utils.book_new()
 
       // Sheet 1: Overview
-      const overviewData = [
+      const overviewData: string[][] = [
         ['SOLAR VISION - Výkaz Projektů'],
         ['Datum:', new Date().toLocaleDateString('cs-CZ')],
         [],
-        ['Celkový Obrat:', `${(totalRevenue / 1000000).toFixed(2)}M Kč`],
-        ['Celkové Náklady:', `${(totalCost / 1000000).toFixed(2)}M Kč`],
-        ['Celkový Zisk:', `${(totalProfit / 1000000).toFixed(2)}M Kč`],
+        ['Celkový Obrat:', formatCurrency(totalRevenue)],
+        ['Celkové Náklady:', formatCurrency(totalCost)],
+        ['Celkový Zisk:', formatCurrency(totalProfit)],
         ['Průměrná Marže:', `${avgMargin.toFixed(0)}%`],
       ]
       const overviewSheet = XLSX.utils.aoa_to_sheet(overviewData)
       XLSX.utils.book_append_sheet(workbook, overviewSheet, 'Přehled')
 
       // Sheet 2: Projects
-      const projectsData = [
+      const projectsData: string[][] = [
         ['Název', 'Zákazník', 'Fáze', 'Obrat', 'Náklady', 'Zisk', 'Marže', 'Počátek', 'Termín', 'Tagy']
       ]
       projects.forEach(p => {
@@ -61,9 +57,9 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
           p.name,
           p.customer,
           p.status,
-          p.revenue,
-          p.cost,
-          profit,
+          p.revenue.toString(),
+          p.cost.toString(),
+          profit.toString(),
           `${margin}%`,
           p.startDate,
           p.endDate,
@@ -74,14 +70,14 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
       XLSX.utils.book_append_sheet(workbook, projectsSheet, 'Projekty')
 
       // Sheet 3: Pipeline
-      const pipelineData = [
+      const pipelineData: string[][] = [
         ['Fáze', 'Počet', 'Obrat', '% z Celku']
       ]
       projectsByStatus.forEach(({ cs, count, revenue }) => {
         pipelineData.push([
           cs,
-          count,
-          revenue,
+          count.toString(),
+          revenue.toString(),
           `${((revenue / totalRevenue) * 100).toFixed(1)}%`
         ])
       })
@@ -249,6 +245,9 @@ export default function DashboardView({ onNavigateToProjects }: DashboardViewPro
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-gray-900 text-sm line-clamp-1">{p.name}</p>
                             <p className="text-xs text-gray-600">{p.customer}</p>
+                          </div>
+                          <div className="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 rounded whitespace-nowrap">
+                            -{daysOverdue} dní
                           </div>
                           <button
                             onClick={() => acknowledgeUrgent(p.id)}

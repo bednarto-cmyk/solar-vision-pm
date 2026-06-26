@@ -250,13 +250,13 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
               </div>
               {(formData.tags || []).length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {formData.tags.map(tag => (
+                  {formData.tags.map((tag: string) => (
                     <button
                       key={tag}
                       type="button"
                       onClick={() => setFormData({
                         ...formData,
-                        tags: (formData.tags || []).filter(t => t !== tag)
+                        tags: (formData.tags || []).filter((t: string) => t !== tag)
                       })}
                       className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors"
                     >

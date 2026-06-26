@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LogOut, BarChart3, LayoutGrid, Menu, X, Users, Bell } from 'lucide-react'
+import { LogOut, BarChart3, LayoutGrid, Menu, X, Users } from 'lucide-react'
 import { useProjectStore } from '../store/projectStore'
 
 interface NavbarProps {

@@ -23,7 +23,7 @@ export default function ProjectDetail({ projectId, onEditProject }: ProjectDetai
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [notes, setNotes] = useState('')
   const [isSaving, setIsSaving] = useState(false)
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const project = projectId ? projects.find(p => p.id === projectId) : null
 
