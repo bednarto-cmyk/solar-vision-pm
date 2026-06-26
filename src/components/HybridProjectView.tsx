@@ -95,9 +95,9 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Levá část: Seznam projektů */}
-          <div className="glass rounded-2xl p-5">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-6">
+          {/* Levá část: Seznam projektů (mobile: full width, desktop: 1 col) */}
+          <div className="lg:col-span-1 glass rounded-2xl p-4 lg:p-5">
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-bold text-gray-800">📋 PROJEKTY</h2>
               <span className="bg-green-100 text-green-700 px-2.5 py-1 rounded-lg text-sm font-semibold">{filteredProjects.length}</span>
@@ -152,9 +152,9 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                           : 'glass-sm hover:glass border border-gray-100'
                       } ${draggedProject?.id === project.id ? 'opacity-50' : ''}`}
                     >
-                      <div className="px-5 py-4 space-y-3.5">
+                      <div className="px-4 lg:px-5 py-3 lg:py-4 space-y-2.5 lg:space-y-3.5">
                         {/* Status Badge */}
-                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${statusInfo.color} w-fit`}>
+                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full text-xs lg:text-sm font-medium ${statusInfo.color} w-fit`}>
                           <span className="text-base">{statusInfo.emoji}</span>
                           <span>{statusInfo.cs}</span>
                         </div>
@@ -207,14 +207,14 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
             </div>
           </div>
 
-          {/* Pravá část: Detail projektu + Status Columns */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* Pravá část: Detail projektu + Status Columns (mobile: full width, desktop: 3 cols) */}
+          <div className="lg:col-span-3 space-y-4 lg:space-y-6">
             <ProjectDetail projectId={selectedProjectId} onEditProject={handleEditProject} />
 
             {/* Drag & Drop status columns */}
-            <div className="glass rounded-2xl p-5">
+            <div className="glass rounded-2xl p-4 lg:p-5">
               <h3 className="font-bold text-gray-800 mb-4">📊 Přetáhni projekt mezi fázemi</h3>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-3 overflow-x-auto pb-2">
                 {Object.entries(STATUS_LABELS).map(([key, { cs, emoji, color }]) => (
                   <div
                     key={key}
