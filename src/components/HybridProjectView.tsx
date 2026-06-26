@@ -9,14 +9,14 @@ interface HybridProjectViewProps {
   user: any
 }
 
-const STATUS_LABELS: { [key: string]: { cs: string; icon: any; bgColor: string; borderColor: string; textColor: string } } = {
-  leads: { cs: 'Příležitosti', icon: Lightbulb, bgColor: 'bg-purple-50', borderColor: 'border-purple-300', textColor: 'text-purple-700' },
-  prep: { cs: 'Příprava', icon: ClipboardList, bgColor: 'bg-blue-50', borderColor: 'border-blue-300', textColor: 'text-blue-700' },
-  purchase: { cs: 'Nákup', icon: ShoppingCart, bgColor: 'bg-amber-50', borderColor: 'border-amber-300', textColor: 'text-amber-700' },
-  execution: { cs: 'Realizace', icon: Zap, bgColor: 'bg-green-50', borderColor: 'border-green-300', textColor: 'text-green-700' },
-  revision: { cs: 'Revize', icon: CheckCircle, bgColor: 'bg-yellow-50', borderColor: 'border-yellow-300', textColor: 'text-yellow-700' },
-  distribution: { cs: 'Distribuce', icon: Truck, bgColor: 'bg-cyan-50', borderColor: 'border-cyan-300', textColor: 'text-cyan-700' },
-  service: { cs: 'Servis', icon: Wrench, bgColor: 'bg-indigo-50', borderColor: 'border-indigo-300', textColor: 'text-indigo-700' },
+const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string; iconColor: string; accentColor: string } } = {
+  leads: { cs: 'Příležitosti', icon: Lightbulb, gradient: 'from-purple-500/10 to-purple-600/5', iconColor: 'text-purple-600', accentColor: 'bg-purple-500/20' },
+  prep: { cs: 'Příprava', icon: ClipboardList, gradient: 'from-blue-500/10 to-blue-600/5', iconColor: 'text-blue-600', accentColor: 'bg-blue-500/20' },
+  purchase: { cs: 'Nákup', icon: ShoppingCart, gradient: 'from-amber-500/10 to-amber-600/5', iconColor: 'text-amber-600', accentColor: 'bg-amber-500/20' },
+  execution: { cs: 'Realizace', icon: Zap, gradient: 'from-green-500/10 to-green-600/5', iconColor: 'text-green-600', accentColor: 'bg-green-500/20' },
+  revision: { cs: 'Revize', icon: CheckCircle, gradient: 'from-yellow-500/10 to-yellow-600/5', iconColor: 'text-yellow-600', accentColor: 'bg-yellow-500/20' },
+  distribution: { cs: 'Distribuce', icon: Truck, gradient: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-600', accentColor: 'bg-cyan-500/20' },
+  service: { cs: 'Servis', icon: Wrench, gradient: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-600', accentColor: 'bg-indigo-500/20' },
 }
 
 export default function HybridProjectView({ user }: HybridProjectViewProps) {
@@ -102,40 +102,51 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
         </div>
 
         {/* Drag & Drop Kanban Board */}
-        <div className="glass rounded-2xl p-4 lg:p-5 mb-6">
-          <h2 className="font-bold text-gray-800 mb-4">📊 Přetáhni projekt mezi fázemi</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-7 gap-2 lg:gap-3">
-            {Object.entries(STATUS_LABELS).map(([key, { cs, icon: Icon, bgColor, borderColor, textColor }]) => (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Workflow</h2>
+            <p className="text-xs text-gray-500">Přetáhni projekt mezi fázemi</p>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-7 gap-2.5 lg:gap-3">
+            {Object.entries(STATUS_LABELS).map(([key, { cs, icon: Icon, gradient, iconColor, accentColor }]) => (
               <div
                 key={key}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, key)}
-                className={`rounded-xl p-3 min-h-32 border-2 border-dashed transition-all hover:shadow-md ${bgColor} ${borderColor} hover:border-opacity-100`}
+                className={`group relative bg-gradient-to-br ${gradient} backdrop-blur-sm border border-white/50 rounded-2xl p-3.5 min-h-40 transition-all duration-300 hover:border-white/80 hover:shadow-lg hover:shadow-black/5 cursor-pointer`}
               >
-                <div className={`flex items-center gap-1.5 mb-2 ${textColor}`}>
-                  <Icon className="w-4 h-4 lg:w-5 lg:h-5" />
-                  <p className="text-xs lg:text-sm font-semibold hidden lg:inline">{cs}</p>
-                </div>
-                <div className="space-y-1.5">
-                  {projects
-                    .filter(p => p.status === key)
-                    .slice(0, 2)
-                    .map(p => (
-                      <div
-                        key={p.id}
-                        className="text-xs bg-white p-1.5 rounded border border-gray-200 truncate cursor-move hover:bg-green-50"
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, p)}
-                        title={p.name}
-                      >
-                        {p.name.substring(0, 15)}
+                {/* Background accent */}
+                <div className={`absolute inset-0 rounded-2xl ${accentColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+
+                <div className="relative z-10">
+                  <div className={`flex items-center gap-2 mb-3 ${iconColor}`}>
+                    <Icon className="w-4 h-4 lg:w-5 lg:h-5 flex-shrink-0" />
+                    <p className="text-xs lg:text-sm font-semibold hidden lg:inline text-gray-900 group-hover:text-gray-700">{cs}</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    {projects
+                      .filter(p => p.status === key)
+                      .slice(0, 2)
+                      .map(p => (
+                        <div
+                          key={p.id}
+                          className="text-xs bg-white/80 backdrop-blur-sm p-2 rounded-lg border border-white/40 truncate cursor-move hover:bg-white hover:border-white transition-all duration-200 group/item"
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, p)}
+                          title={p.name}
+                        >
+                          <p className="font-medium text-gray-700 group-hover/item:text-gray-900 truncate">{p.name.substring(0, 18)}</p>
+                        </div>
+                      ))}
+                    {projects.filter(p => p.status === key).length > 2 && (
+                      <div className="text-xs text-gray-400 p-2 text-center">
+                        +{projects.filter(p => p.status === key).length - 2} more
                       </div>
-                    ))}
-                  {projects.filter(p => p.status === key).length > 2 && (
-                    <div className="text-xs text-gray-500 p-1">
-                      +{projects.filter(p => p.status === key).length - 2}
-                    </div>
-                  )}
+                    )}
+                    {projects.filter(p => p.status === key).length === 0 && (
+                      <div className="text-xs text-gray-300 p-2 text-center italic">-</div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -187,7 +198,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                 </div>
               ) : (
                 filteredProjects.map(project => {
-                  const statusInfo = STATUS_LABELS[project.status] || { cs: project.status, icon: Wrench, bgColor: 'bg-gray-50', borderColor: 'border-gray-300', textColor: 'text-gray-700' }
+                  const statusInfo = STATUS_LABELS[project.status] || { cs: project.status, icon: Wrench, gradient: 'from-gray-500/10 to-gray-600/5', iconColor: 'text-gray-600', accentColor: 'bg-gray-500/20' }
                   const StatusIcon = statusInfo.icon
                   return (
                     <button
@@ -203,9 +214,9 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                     >
                       <div className="px-4 lg:px-5 py-3 lg:py-4 space-y-2.5 lg:space-y-3.5">
                         {/* Status Badge */}
-                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium border ${statusInfo.bgColor} ${statusInfo.borderColor} ${statusInfo.textColor} w-fit`}>
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium bg-gradient-to-r ${statusInfo.gradient.replace('from-', 'from-').replace('to-', 'to-')} border border-white/20 backdrop-blur-sm ${statusInfo.iconColor} w-fit`}>
                           <StatusIcon className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
-                          <span>{statusInfo.cs}</span>
+                          <span className="text-gray-700">{statusInfo.cs}</span>
                         </div>
 
                         {/* Title & Customer */}

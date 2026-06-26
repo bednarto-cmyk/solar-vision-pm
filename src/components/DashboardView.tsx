@@ -3,14 +3,14 @@ import { TrendingUp, Target, AlertCircle, CheckCircle, Download, Lightbulb, Clip
 import * as XLSX from 'xlsx'
 import toast from 'react-hot-toast'
 
-const STATUS_LABELS: { [key: string]: { cs: string; icon: any; color: string } } = {
-  leads: { cs: 'Příležitosti', icon: Lightbulb, color: 'text-purple-700' },
-  prep: { cs: 'Příprava', icon: ClipboardList, color: 'text-blue-700' },
-  purchase: { cs: 'Nákup', icon: ShoppingCart, color: 'text-amber-700' },
-  execution: { cs: 'Realizace', icon: Zap, color: 'text-green-700' },
-  revision: { cs: 'Revize', icon: CheckCircle, color: 'text-yellow-700' },
-  distribution: { cs: 'Distribuce', icon: Truck, color: 'text-cyan-700' },
-  service: { cs: 'Servis', icon: Wrench, color: 'text-indigo-700' },
+const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string; color: string } } = {
+  leads: { cs: 'Příležitosti', icon: Lightbulb, gradient: 'from-purple-500/20 to-purple-600/10', color: 'text-purple-700' },
+  prep: { cs: 'Příprava', icon: ClipboardList, gradient: 'from-blue-500/20 to-blue-600/10', color: 'text-blue-700' },
+  purchase: { cs: 'Nákup', icon: ShoppingCart, gradient: 'from-amber-500/20 to-amber-600/10', color: 'text-amber-700' },
+  execution: { cs: 'Realizace', icon: Zap, gradient: 'from-green-500/20 to-green-600/10', color: 'text-green-700' },
+  revision: { cs: 'Revize', icon: CheckCircle, gradient: 'from-yellow-500/20 to-yellow-600/10', color: 'text-yellow-700' },
+  distribution: { cs: 'Distribuce', icon: Truck, gradient: 'from-cyan-500/20 to-cyan-600/10', color: 'text-cyan-700' },
+  service: { cs: 'Servis', icon: Wrench, gradient: 'from-indigo-500/20 to-indigo-600/10', color: 'text-indigo-700' },
 }
 
 export default function DashboardView() {
@@ -104,12 +104,12 @@ export default function DashboardView() {
 
   const overduedProjects = projects.filter(p => new Date(p.endDate) < new Date())
 
-  const projectsByStatus = Object.entries(STATUS_LABELS).map(([key, { cs, icon, color }]) => {
+  const projectsByStatus = Object.entries(STATUS_LABELS).map(([key, { cs, icon, gradient, color }]) => {
     const count = projects.filter(p => p.status === key).length
     const revenue = projects
       .filter(p => p.status === key)
       .reduce((sum, p) => sum + p.revenue, 0)
-    return { key, cs, icon, color, count, revenue }
+    return { key, cs, icon, gradient, color, count, revenue }
   })
 
   return (
@@ -172,22 +172,24 @@ export default function DashboardView() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Pipeline by Status */}
           <div className="glass rounded-2xl p-6">
-            <h2 className="font-bold text-gray-800 mb-4">📈 Pipeline podle Fází</h2>
-            <div className="space-y-3">
-              {projectsByStatus.map(({ key, cs, icon: Icon, color, count, revenue }) => (
+            <h2 className="font-bold text-gray-800 mb-5">📈 Pipeline podle Fází</h2>
+            <div className="space-y-4">
+              {projectsByStatus.map(({ key, cs, icon: Icon, gradient, color, count, revenue }) => (
                 <div key={key}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className={`flex items-center gap-2 text-sm font-medium ${color}`}>
-                      <Icon className="w-4 h-4" />
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`flex items-center gap-2 text-sm font-semibold ${color}`}>
+                      <div className={`p-1.5 rounded-lg bg-gradient-to-br ${gradient}`}>
+                        <Icon className="w-3.5 h-3.5" />
+                      </div>
                       {cs}
                     </span>
-                    <span className="text-sm text-gray-500">
-                      {count} projektů • {(revenue / 1000000).toFixed(1)}M Kč
+                    <span className="text-xs text-gray-500 font-medium">
+                      {count} • {(revenue / 1000000).toFixed(1)}M
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-100/50 rounded-full h-2.5 overflow-hidden">
                     <div
-                      className="bg-green-500 h-2 rounded-full transition-all"
+                      className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-green-500 transition-all duration-500"
                       style={{ width: `${(revenue / totalRevenue) * 100}%` }}
                     ></div>
                   </div>
@@ -200,12 +202,12 @@ export default function DashboardView() {
           <div className="glass rounded-2xl p-6">
             <h2 className="font-bold text-gray-800 mb-4">📊 Počet Projektů</h2>
             <div className="grid grid-cols-2 gap-3">
-              {projectsByStatus.map(({ key, cs, icon: Icon, color, count }) => (
-                <div key={key} className="bg-gray-50 rounded-xl p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-800 mb-2">{count}</p>
-                  <div className={`flex items-center justify-center gap-1 text-xs font-medium ${color}`}>
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{cs}</span>
+              {projectsByStatus.map(({ key, cs, icon: Icon, gradient, color, count }) => (
+                <div key={key} className={`bg-gradient-to-br ${gradient} border border-white/30 backdrop-blur-sm rounded-2xl p-4 text-center transition-all hover:border-white/50 hover:shadow-lg`}>
+                  <p className="text-3xl font-bold text-gray-800 mb-2">{count}</p>
+                  <div className={`flex items-center justify-center gap-2 text-xs font-semibold ${color}`}>
+                    <Icon className="w-4 h-4" />
+                    <span className="text-gray-700">{cs}</span>
                   </div>
                 </div>
               ))}
