@@ -26,6 +26,7 @@ export interface Project {
   }
   documents: string[]
   tasks: ProjectTask[]
+  tags: string[]
   notes: string
   createdAt: string
 }

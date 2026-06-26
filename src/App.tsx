@@ -3,7 +3,7 @@ import { Toaster } from 'react-hot-toast'
 import './index.css'
 import Navbar from './components/Navbar'
 import HybridProjectView from './components/HybridProjectView'
-import EnterpriseDashboard from './components/EnterpriseDashboard'
+import DashboardView from './components/DashboardView'
 import Contacts from './components/Contacts'
 import LoginPage from './components/LoginPage'
 
@@ -43,7 +43,7 @@ function App() {
       <div className="pt-20">
         {currentView === 'kanban' && <HybridProjectView user={user} />}
         {currentView === 'contacts' && <Contacts currentUser={user} />}
-        {currentView === 'dashboard' && <EnterpriseDashboard user={user} />}
+        {currentView === 'dashboard' && <DashboardView />}
       </div>
       <Toaster position="top-right" />
     </div>

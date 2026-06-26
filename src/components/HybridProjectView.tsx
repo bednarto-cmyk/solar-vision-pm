@@ -165,6 +165,17 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                           <p className="text-xs text-gray-500 mt-1">{project.customer}</p>
                         </div>
 
+                        {/* Tags */}
+                        {(project.tags || []).length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {project.tags.map(tag => (
+                              <span key={tag} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
                         {/* Stats */}
                         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                           <div>

@@ -50,9 +50,11 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
       revenue: 0,
       startDate: new Date().toISOString().split('T')[0],
       endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      tags: [],
       notes: '',
     }
   )
+  const [newTag, setNewTag] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -209,6 +211,63 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
               />
             </FormField>
           </div>
+
+          {/* Tagy */}
+          <FormField label="Tagy (štítky)">
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && newTag.trim()) {
+                      setFormData({
+                        ...formData,
+                        tags: [...(formData.tags || []), newTag.toLowerCase()]
+                      })
+                      setNewTag('')
+                    }
+                  }}
+                  className="flex-1 px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Přidej tag (Enter)"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (newTag.trim()) {
+                      setFormData({
+                        ...formData,
+                        tags: [...(formData.tags || []), newTag.toLowerCase()]
+                      })
+                      setNewTag('')
+                    }
+                  }}
+                  className="px-4 py-3 bg-blue-500 text-white rounded-2xl font-medium hover:bg-blue-600 transition-colors"
+                >
+                  Přidat
+                </button>
+              </div>
+              {(formData.tags || []).length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {formData.tags.map(tag => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => setFormData({
+                        ...formData,
+                        tags: (formData.tags || []).filter(t => t !== tag)
+                      })}
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors"
+                    >
+                      #{tag}
+                      <span>×</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </FormField>
 
           {/* Poznámky */}
           <FormField label="Poznámky & Detaily">
