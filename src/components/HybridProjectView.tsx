@@ -28,15 +28,17 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
   const [draggedProject, setDraggedProject] = useState<any>(null)
   const [searchQuery, setSearchQuery] = useState<string>('')
 
-  let filteredProjects = filterStatus === 'urgent'
-    ? projects.filter(p => {
+  let filteredProjects = user.role === 'admin' ? projects : projects.filter(p => p.assignedTo === user.id)
+
+  filteredProjects = filterStatus === 'urgent'
+    ? filteredProjects.filter(p => {
         if (p.isUrgentAcknowledged) return false
         const daysLeft = Math.ceil((new Date(p.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
         return (daysLeft >= 0 && daysLeft <= 7) || new Date(p.endDate) < new Date()
       })
     : filterStatus
-      ? projects.filter(p => p.status === filterStatus)
-      : projects
+      ? filteredProjects.filter(p => p.status === filterStatus)
+      : filteredProjects
 
   if (searchQuery) {
     const query = searchQuery.toLowerCase()

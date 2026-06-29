@@ -14,17 +14,23 @@ const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string;
   service: { cs: 'Servis', icon: Settings, gradient: 'from-indigo-500/20 to-indigo-600/10', color: 'text-indigo-700' },
 }
 
-export default function DashboardView() {
+interface DashboardViewProps {
+  user: any
+}
+
+export default function DashboardView({ user }: DashboardViewProps) {
   const { projects, acknowledgeUrgent } = useFirebaseProjectStore()
   const [selectedPhase, setSelectedPhase] = useState<string | null>(null)
 
-  const urgentProjects = projects.filter(p => {
+  const visibleProjects = user.role === 'admin' ? projects : projects.filter(p => p.assignedTo === user.id)
+
+  const urgentProjects = visibleProjects.filter(p => {
     if (p.isUrgentAcknowledged) return false
     const daysLeft = Math.ceil((new Date(p.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
     return daysLeft >= 0 && daysLeft <= 7
   })
 
-  const overdueProjects = projects.filter(p => {
+  const overdueProjects = visibleProjects.filter(p => {
     if (p.isUrgentAcknowledged) return false
     return new Date(p.endDate) < new Date()
   })
@@ -92,11 +98,11 @@ export default function DashboardView() {
     }
   }
 
-  const totalRevenue = projects.reduce((sum, p) => sum + p.revenue, 0)
-  const totalCost = projects.reduce((sum, p) => sum + p.cost, 0)
+  const totalRevenue = visibleProjects.reduce((sum, p) => sum + p.revenue, 0)
+  const totalCost = visibleProjects.reduce((sum, p) => sum + p.cost, 0)
   const totalProfit = totalRevenue - totalCost
-  const avgMargin = projects.length > 0
-    ? projects.reduce((sum, p) => sum + ((p.revenue - p.cost) / p.revenue || 0), 0) / projects.length * 100
+  const avgMargin = visibleProjects.length > 0
+    ? visibleProjects.reduce((sum, p) => sum + ((p.revenue - p.cost) / p.revenue || 0), 0) / visibleProjects.length * 100
     : 0
 
   const formatCurrency = (value: number) => {
@@ -108,10 +114,10 @@ export default function DashboardView() {
     .sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
     .slice(0, 5)
 
-  const overduedProjects = projects.filter(p => new Date(p.endDate) < new Date())
+  const overduedProjects = visibleProjects.filter(p => new Date(p.endDate) < new Date())
 
   const projectsByStatus = Object.entries(STATUS_LABELS).map(([key, { cs, icon, gradient, color }]) => {
-    const count = projects.filter(p => p.status === key).length
+    const count = visibleProjects.filter(p => p.status === key).length
     const revenue = projects
       .filter(p => p.status === key)
       .reduce((sum, p) => sum + p.revenue, 0)
@@ -374,7 +380,7 @@ export default function DashboardView() {
             <div className="glass rounded-2xl max-w-2xl w-full max-h-96 overflow-y-auto">
               <div className="sticky top-0 glass-sm p-6 border-b border-white/20 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">
-                  {STATUS_LABELS[selectedPhase]?.cs} ({projects.filter(p => p.status === selectedPhase).length})
+                  {STATUS_LABELS[selectedPhase]?.cs} ({visibleProjects.filter(p => p.status === selectedPhase).length})
                 </h2>
                 <button
                   onClick={() => setSelectedPhase(null)}
@@ -408,7 +414,7 @@ export default function DashboardView() {
                       </div>
                     </div>
                   ))}
-                {projects.filter(p => p.status === selectedPhase).length === 0 && (
+                {visibleProjects.filter(p => p.status === selectedPhase).length === 0 && (
                   <p className="text-center text-gray-500 py-8">Žádné projekty v této fázi</p>
                 )}
               </div>

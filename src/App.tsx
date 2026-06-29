@@ -51,7 +51,7 @@ function App() {
       <div className="pt-20">
         {currentView === 'kanban' && <HybridProjectView user={user} />}
         {currentView === 'contacts' && <Contacts currentUser={user} />}
-        {currentView === 'dashboard' && <DashboardView />}
+        {currentView === 'dashboard' && <DashboardView user={user} />}
         {currentView === 'settings' && <SettingsView />}
       </div>
       <Toaster position="top-right" />
