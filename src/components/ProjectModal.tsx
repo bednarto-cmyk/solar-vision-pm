@@ -111,13 +111,25 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
             </FormField>
 
             <FormField label="Zákazník" required>
-              <input
-                type="text"
-                value={formData.customer}
-                onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
+              <select
+                value={formData.contactId || ''}
+                onChange={(e) => {
+                  const contact = contacts.find(c => c.id === e.target.value)
+                  setFormData({
+                    ...formData,
+                    contactId: e.target.value,
+                    customer: contact ? contact.name : ''
+                  })
+                }}
                 className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Jméno zákazníka"
-              />
+              >
+                <option value="">-- Vyber zákazníka --</option>
+                {contacts.map(contact => (
+                  <option key={contact.id} value={contact.id}>
+                    {contact.name} ({contact.company})
+                  </option>
+                ))}
+              </select>
             </FormField>
 
             <FormField label="Status">
@@ -128,28 +140,6 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
               >
                 {STATUSES.map(s => (
                   <option key={s.value} value={s.value}>{s.label}</option>
-                ))}
-              </select>
-            </FormField>
-
-            <FormField label="Kontakt">
-              <select
-                value={formData.contactId || ''}
-                onChange={(e) => {
-                  const contact = contacts.find(c => c.id === e.target.value)
-                  setFormData({
-                    ...formData,
-                    contactId: e.target.value,
-                    customer: contact ? contact.name : formData.customer
-                  })
-                }}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">-- Vyber kontakt --</option>
-                {contacts.map(contact => (
-                  <option key={contact.id} value={contact.id}>
-                    {contact.name} ({contact.company})
-                  </option>
                 ))}
               </select>
             </FormField>
