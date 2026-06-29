@@ -244,7 +244,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                           </div>
                           <div>
                             <p className="text-xs text-gray-500 mb-0.5">Úkoly</p>
-                            <p className="text-sm font-semibold text-blue-600">{(project.tasks || []).length}</p>
+                            <p className="text-sm font-semibold text-blue-600">{(project.tasks || []).filter(t => !t.completed).length}</p>
                           </div>
                           {selectedProjectId === project.id && (
                             <button
