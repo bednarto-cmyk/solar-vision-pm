@@ -12,10 +12,12 @@ export default function SettingsView() {
     name: string
     email: string
     role: 'admin' | 'user'
+    annualRevenue?: number
   }>({
     name: '',
     email: '',
     role: 'user',
+    annualRevenue: 0,
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +41,7 @@ export default function SettingsView() {
         toast.success('Uživatel přidán')
       }
 
-      setFormData({ name: '', email: '', role: 'user' })
+      setFormData({ name: '', email: '', role: 'user', annualRevenue: 0 })
       setShowForm(false)
     } catch (error) {
       toast.error('Chyba při ukládání')
@@ -52,6 +54,7 @@ export default function SettingsView() {
       name: user.name,
       email: user.email,
       role: user.role,
+      annualRevenue: (user as any).annualRevenue || 0,
     })
     setEditingId(user.id)
     setShowForm(true)
@@ -60,7 +63,7 @@ export default function SettingsView() {
   const handleCancel = () => {
     setShowForm(false)
     setEditingId(null)
-    setFormData({ name: '', email: '', role: 'user' })
+    setFormData({ name: '', email: '', role: 'user', annualRevenue: 0 })
   }
 
   return (
@@ -133,6 +136,23 @@ export default function SettingsView() {
                 </select>
               </div>
 
+              {formData.role === 'user' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Roční obrat (Kč)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.annualRevenue || 0}
+                    onChange={(e) =>
+                      setFormData({ ...formData, annualRevenue: parseFloat(e.target.value) || 0 })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="1000000"
+                  />
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <button
                   type="submit"
@@ -171,6 +191,9 @@ export default function SettingsView() {
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
                     Role
                   </th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                    Roční obrat
+                  </th>
                   <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">
                     Akce
                   </th>
@@ -198,6 +221,9 @@ export default function SettingsView() {
                       >
                         {user.role === 'admin' ? 'Admin' : 'Uživatel'}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-right font-semibold text-gray-800">
+                      {user.role === 'admin' ? '—' : `${((user as any).annualRevenue || 0).toLocaleString('cs-CZ')} Kč`}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <div className="flex gap-2 justify-center">
