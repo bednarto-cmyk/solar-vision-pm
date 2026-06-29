@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { LogOut, BarChart3, LayoutGrid, Menu, X, Users, Settings } from 'lucide-react'
+import { LogOut, BarChart3, LayoutGrid, Menu, X, Users, Settings, Trophy } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 
 interface NavbarProps {
   currentView: string
-  onViewChange: (view: 'kanban' | 'dashboard' | 'contacts' | 'settings') => void
+  onViewChange: (view: 'kanban' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login') => void
   onLogout: () => void
 }
 
@@ -24,7 +24,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
   }).length
   const totalAlerts = urgentDeadlines + overdueProjects
 
-  const handleNavChange = (view: 'kanban' | 'dashboard' | 'contacts' | 'settings') => {
+  const handleNavChange = (view: 'kanban' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login') => {
     onViewChange(view)
     setIsMenuOpen(false)
   }
@@ -77,6 +77,17 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
                     {totalAlerts}
                   </span>
                 )}
+              </button>
+              <button
+                onClick={() => handleNavChange('performance')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  currentView === 'performance'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Trophy className="w-5 h-5" />
+                Performance
               </button>
               <button
                 onClick={() => handleNavChange('settings')}
@@ -154,6 +165,17 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
             >
               <BarChart3 className="w-5 h-5" />
               Dashboard
+            </button>
+            <button
+              onClick={() => handleNavChange('performance')}
+              className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-left ${
+                currentView === 'performance'
+                  ? 'bg-yellow-100 text-yellow-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Trophy className="w-5 h-5" />
+              Performance
             </button>
             <button
               onClick={() => handleNavChange('settings')}
