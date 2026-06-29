@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
+import { useFirebaseUserStore } from '../store/firebaseUserStore'
 
 interface ContactModalProps {
   contact?: any
@@ -7,15 +8,14 @@ interface ContactModalProps {
   onClose: () => void
 }
 
-const OBCHODNICI = [
-  { id: '1', name: 'Jan Novák' },
-  { id: '2', name: 'Petr Svoboda' },
-  { id: '3', name: 'Marie Kučerová' },
-]
-
 const CONTACT_TYPES = ['vedení', 'nákupčí', 'rozhodovatel', 'jiné']
 
 export default function ContactModal({ contact, onSave, onClose }: ContactModalProps) {
+  const { users, initializeUsers } = useFirebaseUserStore()
+
+  useEffect(() => {
+    initializeUsers()
+  }, [])
   const [formData, setFormData] = useState(
     contact || {
       name: '',
@@ -128,7 +128,7 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              {OBCHODNICI.map(ob => (
+              {users.map(ob => (
                 <option key={ob.id} value={ob.id}>{ob.name}</option>
               ))}
             </select>
