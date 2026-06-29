@@ -147,7 +147,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                 <button
                   type="button"
                   onClick={() => setShowContactModal(true)}
-                  className="px-4 py-3 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors flex items-center gap-2"
+                  className="flex-shrink-0 px-4 py-3 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors flex items-center gap-2"
                   title="Přidat nového zákazníka"
                 >
                   <Plus className="w-5 h-5" />
