@@ -8,7 +8,7 @@ interface ContactModalProps {
   onClose: () => void
 }
 
-const CONTACT_TYPES = ['vedení', 'nákupčí', 'rozhodovatel', 'jiné']
+const CONTACT_TYPES = ['vedení', 'nákupčí', 'rozhodovatel', 'koncový zákazník', 'jiné']
 
 export default function ContactModal({ contact, onSave, onClose }: ContactModalProps) {
   const { users, initializeUsers } = useFirebaseUserStore()
@@ -35,7 +35,12 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.name || !formData.company || !formData.email) {
+    const isEndCustomer = formData.type === 'koncový zákazník'
+    if (!formData.name || !formData.email) {
+      alert('Vyplň povinná pole: Jméno, Email')
+      return
+    }
+    if (!isEndCustomer && !formData.company) {
       alert('Vyplň povinná pole: Jméno, Společnost, Email')
       return
     }
@@ -70,17 +75,19 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Společnost *</label>
-            <input
-              type="text"
-              name="company"
-              value={formData.company}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="Název společnosti"
-            />
-          </div>
+          {formData.type !== 'koncový zákazník' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Společnost *</label>
+              <input
+                type="text"
+                name="company"
+                value={formData.company}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="Název společnosti"
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
