@@ -74,10 +74,14 @@ export default function PerformanceView() {
               <BarChart data={salesData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis dataKey="name" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
+                <YAxis
+                  stroke="#6b7280"
+                  tickFormatter={(value) => (value / 1000).toLocaleString('cs-CZ', { maximumFractionDigits: 0 }) + 'k'}
+                />
                 <Tooltip
                   contentStyle={{ backgroundColor: '#f3f4f6', border: '1px solid #d1d5db' }}
                   formatter={(value: any) => value?.toLocaleString?.('cs-CZ', { maximumFractionDigits: 0 }) || value}
+                  labelFormatter={(label) => label}
                 />
                 <Legend />
                 <Bar dataKey="revenue" fill="#10b981" name="Aktuální obrat" />
