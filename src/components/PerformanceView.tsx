@@ -7,7 +7,7 @@ export default function PerformanceView() {
   const { projects } = useFirebaseProjectStore()
   const { users } = useFirebaseUserStore()
 
-  const salespeople = users.filter(u => u.role === 'user')
+  const salespeople = users.filter(u => (u as any).annualRevenue || u.role === 'user')
 
   const salesData = salespeople.map(salesperson => {
     const salesPersonProjects = projects.filter(p => p.assignedTo === salesperson.id)

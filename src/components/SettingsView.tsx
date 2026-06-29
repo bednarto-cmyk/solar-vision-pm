@@ -136,22 +136,20 @@ export default function SettingsView() {
                 </select>
               </div>
 
-              {formData.role === 'user' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Roční obrat (Kč)
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.annualRevenue || 0}
-                    onChange={(e) =>
-                      setFormData({ ...formData, annualRevenue: parseFloat(e.target.value) || 0 })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="1000000"
-                  />
-                </div>
-              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Roční obrat (Kč) {formData.role === 'admin' && <span className="text-gray-500">(jako člen týmu)</span>}
+                </label>
+                <input
+                  type="number"
+                  value={formData.annualRevenue || 0}
+                  onChange={(e) =>
+                    setFormData({ ...formData, annualRevenue: parseFloat(e.target.value) || 0 })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="1000000"
+                />
+              </div>
 
               <div className="flex gap-2">
                 <button
@@ -223,7 +221,7 @@ export default function SettingsView() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-right font-semibold text-gray-800">
-                      {user.role === 'admin' ? '—' : `${((user as any).annualRevenue || 0).toLocaleString('cs-CZ')} Kč`}
+                      {`${((user as any).annualRevenue || 0).toLocaleString('cs-CZ')} Kč`}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <div className="flex gap-2 justify-center">
