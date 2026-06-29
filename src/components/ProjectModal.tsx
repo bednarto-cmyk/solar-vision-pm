@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, Plus } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import type { ProjectStatus } from '../store/projectStore'
 import { useContactStore } from '../store/contactStore'
 import { useFirebaseUserStore } from '../store/firebaseUserStore'
+import ContactModal from './ContactModal'
 import toast from 'react-hot-toast'
 
 interface ProjectModalProps {
@@ -34,11 +35,19 @@ const FormField = ({ label, required, children }: any) => (
 export default function ProjectModal({ project, onClose, user }: ProjectModalProps) {
   const { addProject, updateProject } = useFirebaseProjectStore()
   const { users, initializeUsers } = useFirebaseUserStore()
-  const { contacts } = useContactStore()
+  const { contacts, addContact } = useContactStore()
+  const [showContactModal, setShowContactModal] = useState(false)
 
   useEffect(() => {
     initializeUsers()
   }, [])
+
+  const handleAddContact = (data: any) => {
+    addContact(data, user.name)
+    toast.success('Zákazník přidán')
+    setShowContactModal(false)
+  }
+
   const [formData, setFormData] = useState(
     project || {
       name: '',
@@ -115,25 +124,35 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
             </FormField>
 
             <FormField label="Zákazník" required>
-              <select
-                value={formData.contactId || ''}
-                onChange={(e) => {
-                  const contact = contacts.find(c => c.id === e.target.value)
-                  setFormData({
-                    ...formData,
-                    contactId: e.target.value,
-                    customer: contact ? contact.name : ''
-                  })
-                }}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">-- Vyber zákazníka --</option>
-                {contacts.map(contact => (
-                  <option key={contact.id} value={contact.id}>
-                    {contact.name} ({contact.company})
-                  </option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <select
+                  value={formData.contactId || ''}
+                  onChange={(e) => {
+                    const contact = contacts.find(c => c.id === e.target.value)
+                    setFormData({
+                      ...formData,
+                      contactId: e.target.value,
+                      customer: contact ? contact.name : ''
+                    })
+                  }}
+                  className="flex-1 px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">-- Vyber zákazníka --</option>
+                  {contacts.map(contact => (
+                    <option key={contact.id} value={contact.id}>
+                      {contact.name} ({contact.company})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowContactModal(true)}
+                  className="px-4 py-3 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors flex items-center gap-2"
+                  title="Přidat nového zákazníka"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
             </FormField>
 
             <FormField label="Status">
@@ -303,6 +322,13 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
           </div>
         </form>
       </div>
+
+      {showContactModal && (
+        <ContactModal
+          onSave={handleAddContact}
+          onClose={() => setShowContactModal(false)}
+        />
+      )}
     </div>
   )
 }
