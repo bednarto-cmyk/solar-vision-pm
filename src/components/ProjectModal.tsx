@@ -111,8 +111,21 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-8">
-          {/* Řada 1: Název, Zákazník, Status */}
-          <div className="grid grid-cols-3 gap-6">
+          {/* Status */}
+          <FormField label="Status">
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as ProjectStatus })}
+              className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              {STATUSES.map(s => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </FormField>
+
+          {/* Řada 1: Název, Zákazník */}
+          <div className="grid grid-cols-2 gap-6">
             <FormField label="Název projektu" required>
               <input
                 type="text"
@@ -153,18 +166,6 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                   <Plus className="w-5 h-5" />
                 </button>
               </div>
-            </FormField>
-
-            <FormField label="Status">
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as ProjectStatus })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                {STATUSES.map(s => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
-                ))}
-              </select>
             </FormField>
           </div>
 
