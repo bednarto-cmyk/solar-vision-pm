@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Edit2, Trash2, Eye } from 'lucide-react'
 import { useContactStore } from '../store/contactStore'
 import { useProjectStore } from '../store/projectStore'
+import { useFirebaseUserStore } from '../store/firebaseUserStore'
 import ContactModal from './ContactModal'
 import ContactHistoryModal from './ContactHistoryModal'
 import toast from 'react-hot-toast'
@@ -10,15 +11,14 @@ interface ContactsProps {
   currentUser: any
 }
 
-const OBCHODNICI = [
-  { id: '1', name: 'Jan Novák' },
-  { id: '2', name: 'Petr Svoboda' },
-  { id: '3', name: 'Marie Kučerová' },
-]
-
 export default function Contacts({ currentUser }: ContactsProps) {
   const { contacts, addContact, updateContact, deleteContact, getContactRevenue } = useContactStore()
   const { projects } = useProjectStore()
+  const { users, initializeUsers } = useFirebaseUserStore()
+
+  useEffect(() => {
+    initializeUsers()
+  }, [])
   const [showModal, setShowModal] = useState(false)
   const [editingContact, setEditingContact] = useState<any>(null)
   const [historyContact, setHistoryContact] = useState<any>(null)
@@ -74,7 +74,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
   }
 
   const getObchodnikName = (id: string) => {
-    return OBCHODNICI.find(o => o.id === id)?.name || id
+    return users.find(u => u.id === id)?.name || id
   }
 
   return (
@@ -116,7 +116,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="">Všichni obchodníci</option>
-                {OBCHODNICI.map(ob => (
+                {users.map(ob => (
                   <option key={ob.id} value={ob.id}>{ob.name}</option>
                 ))}
               </select>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import type { ProjectStatus } from '../store/projectStore'
@@ -33,8 +33,12 @@ const FormField = ({ label, required, children }: any) => (
 
 export default function ProjectModal({ project, onClose, user }: ProjectModalProps) {
   const { addProject, updateProject } = useFirebaseProjectStore()
-  const { users } = useFirebaseUserStore()
+  const { users, initializeUsers } = useFirebaseUserStore()
   const { contacts } = useContactStore()
+
+  useEffect(() => {
+    initializeUsers()
+  }, [])
   const [formData, setFormData] = useState(
     project || {
       name: '',
