@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { X, Plus } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import type { ProjectStatus } from '../store/projectStore'
-import { useContactStore } from '../store/contactStore'
+import { useFirebaseContactStore } from '../store/firebaseContactStore'
 import { useFirebaseUserStore } from '../store/firebaseUserStore'
 import ContactModal from './ContactModal'
 import toast from 'react-hot-toast'
@@ -35,17 +35,22 @@ const FormField = ({ label, required, children }: any) => (
 export default function ProjectModal({ project, onClose, user }: ProjectModalProps) {
   const { addProject, updateProject } = useFirebaseProjectStore()
   const { users, initializeUsers } = useFirebaseUserStore()
-  const { contacts, addContact } = useContactStore()
+  const { contacts, addContact, initializeContacts } = useFirebaseContactStore()
   const [showContactModal, setShowContactModal] = useState(false)
 
   useEffect(() => {
     initializeUsers()
+    initializeContacts()
   }, [])
 
-  const handleAddContact = (data: any) => {
-    addContact(data, user.name)
-    toast.success('Zákazník přidán')
-    setShowContactModal(false)
+  const handleAddContact = async (data: any) => {
+    try {
+      await addContact(data, user.name)
+      toast.success('Zákazník přidán')
+      setShowContactModal(false)
+    } catch (error) {
+      toast.error('Chyba při přidání zákazníka')
+    }
   }
 
   const [formData, setFormData] = useState(

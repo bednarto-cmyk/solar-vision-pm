@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Edit2, Trash2, Eye } from 'lucide-react'
-import { useContactStore } from '../store/contactStore'
-import { useProjectStore } from '../store/projectStore'
+import { useFirebaseContactStore } from '../store/firebaseContactStore'
+import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import { useFirebaseUserStore } from '../store/firebaseUserStore'
 import ContactModal from './ContactModal'
 import ContactHistoryModal from './ContactHistoryModal'
@@ -12,12 +12,13 @@ interface ContactsProps {
 }
 
 export default function Contacts({ currentUser }: ContactsProps) {
-  const { contacts, addContact, updateContact, deleteContact, getContactRevenue } = useContactStore()
-  const { projects } = useProjectStore()
+  const { contacts, addContact, updateContact, deleteContact, initializeContacts } = useFirebaseContactStore()
+  const { projects } = useFirebaseProjectStore()
   const { users, initializeUsers } = useFirebaseUserStore()
 
   useEffect(() => {
     initializeUsers()
+    initializeContacts()
   }, [])
   const [showModal, setShowModal] = useState(false)
   const [editingContact, setEditingContact] = useState<any>(null)
@@ -55,22 +56,30 @@ export default function Contacts({ currentUser }: ContactsProps) {
     setShowModal(true)
   }
 
-  const handleDeleteContact = (contactId: string) => {
+  const handleDeleteContact = async (contactId: string) => {
     if (window.confirm('Opravdu chceš smazat tento kontakt?')) {
-      deleteContact(contactId, currentUser.name)
-      toast.success('Kontakt smazán')
+      try {
+        await deleteContact(contactId)
+        toast.success('Kontakt smazán')
+      } catch (error) {
+        toast.error('Chyba při mazání kontaktu')
+      }
     }
   }
 
-  const handleSaveContact = (data: any) => {
-    if (editingContact) {
-      updateContact(editingContact.id, data, currentUser.name)
-      toast.success('Kontakt aktualizován')
-    } else {
-      addContact(data, currentUser.name)
-      toast.success('Kontakt přidán')
+  const handleSaveContact = async (data: any) => {
+    try {
+      if (editingContact) {
+        await updateContact(editingContact.id, data, currentUser.name)
+        toast.success('Kontakt aktualizován')
+      } else {
+        await addContact(data, currentUser.name)
+        toast.success('Kontakt přidán')
+      }
+      setShowModal(false)
+    } catch (error) {
+      toast.error('Chyba při ukládání kontaktu')
     }
-    setShowModal(false)
   }
 
   const getObchodnikName = (id: string) => {
@@ -148,7 +157,9 @@ export default function Contacts({ currentUser }: ContactsProps) {
               </thead>
               <tbody>
                 {filteredContacts.map(contact => {
-                  const revenue = getContactRevenue(contact.id, projects)
+                  const revenue = projects
+                    .filter(p => p.contactId === contact.id)
+                    .reduce((sum, p) => sum + (p.revenue || 0), 0)
                   return (
                     <tr key={contact.id} className="border-b border-gray-200 hover:glass-sm transition-colors">
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">{contact.name}</td>
