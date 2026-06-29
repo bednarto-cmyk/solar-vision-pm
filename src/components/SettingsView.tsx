@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Plus, Trash2, Edit2 } from 'lucide-react'
-import { useUserStore, type User } from '../store/userStore'
+import { useFirebaseUserStore } from '../store/firebaseUserStore'
+import type { User } from '../store/userStore'
 import toast from 'react-hot-toast'
 
 export default function SettingsView() {
-  const { users, addUser, deleteUser, updateUser } = useUserStore()
+  const { users, addUser, deleteUser, updateUser } = useFirebaseUserStore()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formData, setFormData] = useState<{
@@ -17,7 +18,7 @@ export default function SettingsView() {
     role: 'user',
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.name || !formData.email) {
@@ -25,21 +26,25 @@ export default function SettingsView() {
       return
     }
 
-    if (editingId) {
-      updateUser(editingId, formData)
-      toast.success('Uživatel aktualizován')
-      setEditingId(null)
-    } else {
-      addUser({
-        id: Date.now().toString(),
-        ...formData,
-        createdAt: new Date().toISOString(),
-      })
-      toast.success('Uživatel přidán')
-    }
+    try {
+      if (editingId) {
+        await updateUser(editingId, formData)
+        toast.success('Uživatel aktualizován')
+        setEditingId(null)
+      } else {
+        await addUser({
+          ...formData,
+          createdAt: new Date().toISOString(),
+        })
+        toast.success('Uživatel přidán')
+      }
 
-    setFormData({ name: '', email: '', role: 'user' })
-    setShowForm(false)
+      setFormData({ name: '', email: '', role: 'user' })
+      setShowForm(false)
+    } catch (error) {
+      toast.error('Chyba při ukládání')
+      console.error(error)
+    }
   }
 
   const handleEdit = (user: User) => {
@@ -204,14 +209,18 @@ export default function SettingsView() {
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             if (
                               window.confirm(
                                 `Opravdu chceš smazat ${user.name}?`
                               )
                             ) {
-                              deleteUser(user.id)
-                              toast.success('Uživatel smazán')
+                              try {
+                                await deleteUser(user.id)
+                                toast.success('Uživatel smazán')
+                              } catch (error) {
+                                toast.error('Chyba při mazání')
+                              }
                             }
                           }}
                           className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"

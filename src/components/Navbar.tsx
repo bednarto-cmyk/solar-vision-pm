@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { LogOut, BarChart3, LayoutGrid, Menu, X, Users, Settings } from 'lucide-react'
-import { useProjectStore } from '../store/projectStore'
+import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 
 interface NavbarProps {
   currentView: string
@@ -10,7 +10,7 @@ interface NavbarProps {
 
 export default function Navbar({ currentView, onViewChange, onLogout }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { projects } = useProjectStore()
+  const { projects } = useFirebaseProjectStore()
 
   const urgentDeadlines = projects.filter(p => {
     if (p.isUrgentAcknowledged) return false

@@ -7,14 +7,21 @@ import DashboardView from './components/DashboardView'
 import Contacts from './components/Contacts'
 import SettingsView from './components/SettingsView'
 import LoginPage from './components/LoginPage'
+import { useFirebaseProjectStore } from './store/firebaseProjectStore'
+import { useFirebaseUserStore } from './store/firebaseUserStore'
 
 type View = 'kanban' | 'dashboard' | 'contacts' | 'settings' | 'login'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('login')
   const [user, setUser] = useState(null)
+  const initializeProjects = useFirebaseProjectStore((state) => state.initializeProjects)
+  const initializeUsers = useFirebaseUserStore((state) => state.initializeUsers)
 
   useEffect(() => {
+    initializeProjects()
+    initializeUsers()
+
     const savedUser = localStorage.getItem('user')
     if (savedUser) {
       setUser(JSON.parse(savedUser))

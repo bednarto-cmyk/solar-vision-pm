@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useProjectStore } from '../store/projectStore'
+import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import { TrendingUp, Target, AlertCircle, CheckCircle, Download, Sun, PencilLine, ShoppingCart, Zap, Plug, Settings, X } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import toast from 'react-hot-toast'
@@ -15,7 +15,7 @@ const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string;
 }
 
 export default function DashboardView() {
-  const { projects, acknowledgeUrgent } = useProjectStore()
+  const { projects, acknowledgeUrgent } = useFirebaseProjectStore()
   const [selectedPhase, setSelectedPhase] = useState<string | null>(null)
 
   const urgentProjects = projects.filter(p => {
@@ -250,7 +250,13 @@ export default function DashboardView() {
                             -{daysOverdue} dní
                           </div>
                           <button
-                            onClick={() => acknowledgeUrgent(p.id)}
+                            onClick={async () => {
+                              try {
+                                await acknowledgeUrgent(p.id)
+                              } catch (error) {
+                                console.error(error)
+                              }
+                            }}
                             className="text-xs font-medium px-2 py-1 bg-red-200 text-red-700 hover:bg-red-300 rounded transition-colors whitespace-nowrap"
                           >
                             Viděno
@@ -278,7 +284,13 @@ export default function DashboardView() {
                               {daysLeft} dní
                             </span>
                             <button
-                              onClick={() => acknowledgeUrgent(p.id)}
+                              onClick={async () => {
+                                try {
+                                  await acknowledgeUrgent(p.id)
+                                } catch (error) {
+                                  console.error(error)
+                                }
+                              }}
                               className="text-xs font-medium px-2 py-1 bg-orange-200 text-orange-700 hover:bg-orange-300 rounded transition-colors"
                             >
                               Viděno

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import { useProjectStore, type ProjectStatus } from '../store/projectStore'
+import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
+import type { ProjectStatus } from '../store/projectStore'
 import { useContactStore } from '../store/contactStore'
+import { useFirebaseUserStore } from '../store/firebaseUserStore'
 import toast from 'react-hot-toast'
 
 interface ProjectModalProps {
@@ -9,12 +11,6 @@ interface ProjectModalProps {
   onClose: () => void
   user: any
 }
-
-const USERS = [
-  { id: '1', name: 'Jan Novák' },
-  { id: '2', name: 'Petr Svoboda' },
-  { id: '3', name: 'Marie Kučerová' },
-]
 
 const STATUSES: { value: ProjectStatus; label: string }[] = [
   { value: 'leads', label: 'Příležitosti' },
@@ -36,7 +32,8 @@ const FormField = ({ label, required, children }: any) => (
 )
 
 export default function ProjectModal({ project, onClose, user }: ProjectModalProps) {
-  const { addProject, updateProject } = useProjectStore()
+  const { addProject, updateProject } = useFirebaseProjectStore()
+  const { users } = useFirebaseUserStore()
   const { contacts } = useContactStore()
   const [formData, setFormData] = useState(
     project || {
@@ -56,7 +53,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
   )
   const [newTag, setNewTag] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.name || !formData.customer) {
@@ -64,21 +61,26 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
       return
     }
 
-    if (project) {
-      updateProject(project.id, formData)
-      toast.success('Projekt aktualizován')
-    } else {
-      addProject({
-        ...formData,
-        id: Date.now().toString(),
-        phases: {},
-        documents: [],
-        createdAt: new Date().toISOString(),
-      })
-      toast.success('Projekt vytvořen')
-    }
+    try {
+      if (project) {
+        await updateProject(project.id, formData)
+        toast.success('Projekt aktualizován')
+      } else {
+        await addProject({
+          ...formData,
+          phases: {},
+          documents: [],
+          tasks: [],
+          createdAt: new Date().toISOString(),
+        })
+        toast.success('Projekt vytvořen')
+      }
 
-    onClose()
+      onClose()
+    } catch (error) {
+      toast.error('Chyba při ukládání projektu')
+      console.error(error)
+    }
   }
 
   return (
@@ -153,7 +155,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
                   onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
                   className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  {USERS.map(u => (
+                  {users.map(u => (
                     <option key={u.id} value={u.id}>{u.name}</option>
                   ))}
                 </select>

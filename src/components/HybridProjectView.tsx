@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Plus, Trash2, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings, Wrench } from 'lucide-react'
-import { useProjectStore } from '../store/projectStore'
+import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import ProjectDetail from './ProjectDetail'
 import ProjectModal from './ProjectModal'
 import toast from 'react-hot-toast'
@@ -20,14 +20,13 @@ const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string;
 }
 
 export default function HybridProjectView({ user }: HybridProjectViewProps) {
-  const { projects, deleteProject } = useProjectStore()
+  const { projects, deleteProject, moveProject } = useFirebaseProjectStore()
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<any>(null)
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [draggedProject, setDraggedProject] = useState<any>(null)
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const { moveProject } = useProjectStore()
 
   let filteredProjects = filterStatus === 'urgent'
     ? projects.filter(p => {
