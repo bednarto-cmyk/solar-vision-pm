@@ -5,9 +5,10 @@ import Navbar from './components/Navbar'
 import HybridProjectView from './components/HybridProjectView'
 import DashboardView from './components/DashboardView'
 import Contacts from './components/Contacts'
+import SettingsView from './components/SettingsView'
 import LoginPage from './components/LoginPage'
 
-type View = 'kanban' | 'dashboard' | 'contacts' | 'login'
+type View = 'kanban' | 'dashboard' | 'contacts' | 'settings' | 'login'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('login')
@@ -44,6 +45,7 @@ function App() {
         {currentView === 'kanban' && <HybridProjectView user={user} />}
         {currentView === 'contacts' && <Contacts currentUser={user} />}
         {currentView === 'dashboard' && <DashboardView />}
+        {currentView === 'settings' && <SettingsView />}
       </div>
       <Toaster position="top-right" />
     </div>

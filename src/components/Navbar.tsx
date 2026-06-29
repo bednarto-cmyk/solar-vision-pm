@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { LogOut, BarChart3, LayoutGrid, Menu, X, Users } from 'lucide-react'
+import { LogOut, BarChart3, LayoutGrid, Menu, X, Users, Settings } from 'lucide-react'
 import { useProjectStore } from '../store/projectStore'
 
 interface NavbarProps {
   currentView: string
-  onViewChange: (view: 'kanban' | 'dashboard' | 'contacts') => void
+  onViewChange: (view: 'kanban' | 'dashboard' | 'contacts' | 'settings') => void
   onLogout: () => void
 }
 
@@ -24,7 +24,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
   }).length
   const totalAlerts = urgentDeadlines + overdueProjects
 
-  const handleNavChange = (view: 'kanban' | 'dashboard' | 'contacts') => {
+  const handleNavChange = (view: 'kanban' | 'dashboard' | 'contacts' | 'settings') => {
     onViewChange(view)
     setIsMenuOpen(false)
   }
@@ -77,6 +77,17 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
                     {totalAlerts}
                   </span>
                 )}
+              </button>
+              <button
+                onClick={() => handleNavChange('settings')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  currentView === 'settings'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Settings className="w-5 h-5" />
+                Nastavení
               </button>
             </div>
           </div>
@@ -143,6 +154,17 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
             >
               <BarChart3 className="w-5 h-5" />
               Dashboard
+            </button>
+            <button
+              onClick={() => handleNavChange('settings')}
+              className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-left ${
+                currentView === 'settings'
+                  ? 'bg-yellow-100 text-yellow-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Settings className="w-5 h-5" />
+              Nastavení
             </button>
             <button
               onClick={onLogout}
