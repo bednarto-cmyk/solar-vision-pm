@@ -126,7 +126,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                     <p className="text-xs lg:text-sm font-semibold hidden lg:inline text-gray-900 group-hover:text-gray-700">{cs}</p>
                   </div>
                   <div className="space-y-1.5">
-                    {projects
+                    {filteredProjects
                       .filter(p => p.status === key)
                       .slice(0, 2)
                       .map(p => (
@@ -140,12 +140,12 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                           <p className="font-medium text-gray-700 group-hover/item:text-gray-900 truncate">{p.name.substring(0, 18)}</p>
                         </div>
                       ))}
-                    {projects.filter(p => p.status === key).length > 2 && (
+                    {filteredProjects.filter(p => p.status === key).length > 2 && (
                       <div className="text-xs text-gray-400 p-2 text-center">
-                        +{projects.filter(p => p.status === key).length - 2} more
+                        +{filteredProjects.filter(p => p.status === key).length - 2} more
                       </div>
                     )}
-                    {projects.filter(p => p.status === key).length === 0 && (
+                    {filteredProjects.filter(p => p.status === key).length === 0 && (
                       <div className="text-xs text-gray-300 p-2 text-center italic">-</div>
                     )}
                   </div>
