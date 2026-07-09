@@ -11,23 +11,32 @@ interface Project {
   cost: number
   revenue: number
   createdAt: string
+  endDate?: string
+  assignedTo?: string
   contactId?: string
+}
+
+interface User {
+  id: string
+  name: string
 }
 
 interface ProjectsListTableProps {
   projects: Project[]
   statusLabels: { [key: string]: { cs: string } }
+  users?: User[]
   onSelectProject: (project: Project) => void
   onChangePhase?: (projectId: string, newStatus: ProjectStatus) => void
   selectedProjectId: string | null
 }
 
-type SortField = 'createdAt' | 'name' | 'status' | 'customer' | 'revenue' | 'cost' | 'profit'
+type SortField = 'createdAt' | 'name' | 'status' | 'customer' | 'endDate' | 'assignedTo' | 'revenue' | 'cost' | 'profit'
 type SortOrder = 'asc' | 'desc'
 
 export default function ProjectsListTable({
   projects,
   statusLabels,
+  users = [],
   onSelectProject,
   onChangePhase,
   selectedProjectId,
@@ -36,6 +45,12 @@ export default function ProjectsListTable({
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
 
   const PHASES = ['leads', 'prep', 'purchase', 'execution', 'revision', 'distribution', 'service', 'completed'] as const
+
+  const getUserName = (userId?: string) => {
+    if (!userId) return '—'
+    const user = users.find(u => u.id === userId)
+    return user?.name || '—'
+  }
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -53,6 +68,11 @@ export default function ProjectsListTable({
     if (sortField === 'profit') {
       aVal = a.revenue - a.cost
       bVal = b.revenue - b.cost
+    }
+
+    if (sortField === 'assignedTo') {
+      aVal = getUserName(a.assignedTo)
+      bVal = getUserName(b.assignedTo)
     }
 
     if (typeof aVal === 'string') {
@@ -118,6 +138,22 @@ export default function ProjectsListTable({
                   className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
                 >
                   Kontakt <SortIcon field="customer" />
+                </button>
+              </th>
+              <th className="px-6 py-4 text-left">
+                <button
+                  onClick={() => handleSort('assignedTo')}
+                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
+                >
+                  Obchodník <SortIcon field="assignedTo" />
+                </button>
+              </th>
+              <th className="px-6 py-4 text-left">
+                <button
+                  onClick={() => handleSort('endDate')}
+                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
+                >
+                  Termín <SortIcon field="endDate" />
                 </button>
               </th>
               <th className="px-6 py-4 text-right">
@@ -186,6 +222,12 @@ export default function ProjectsListTable({
                   </td>
                   <td className="px-6 py-4 text-gray-700">
                     {project.customer}
+                  </td>
+                  <td className="px-6 py-4 text-gray-700 text-sm">
+                    {getUserName(project.assignedTo)}
+                  </td>
+                  <td className="px-6 py-4 text-gray-700 text-xs">
+                    {project.endDate ? formatDate(project.endDate) : '—'}
                   </td>
                   <td className="px-6 py-4 text-right font-mono text-gray-900">
                     {formatCurrency(project.revenue)}
