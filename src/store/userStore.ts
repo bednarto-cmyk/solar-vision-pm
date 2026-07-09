@@ -51,7 +51,7 @@ export const useUserStore = create<UserStore>()(
         })),
     }),
     {
-      name: 'solar-vision-users',
+      name: 'solar-vision-users-v2',
     }
   )
 )
