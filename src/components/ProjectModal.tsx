@@ -193,14 +193,12 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
             <FormField label="Výkon (kWp)">
               <input
                 type="text"
-                inputMode="decimal"
-                value={formData.power || ''}
+                value={formData.power.toString().replace('.', ',')}
                 onChange={(e) => {
-                  const value = e.target.value
-                  const normalized = value.replace(',', '.')
-                  const parsed = value === '' ? 0 : parseFloat(normalized)
-                  if (!isNaN(parsed)) {
-                    setFormData({ ...formData, power: parsed })
+                  const value = e.target.value.replace(',', '.')
+                  const num = parseFloat(value)
+                  if (value === '' || !isNaN(num)) {
+                    setFormData({ ...formData, power: value === '' ? 0 : num })
                   }
                 }}
                 className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
