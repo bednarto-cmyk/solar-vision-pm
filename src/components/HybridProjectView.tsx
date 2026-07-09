@@ -17,6 +17,7 @@ const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string;
   revision: { cs: 'Revize', icon: CheckCircle, gradient: 'from-teal-500/10 to-teal-600/5', iconColor: 'text-teal-600', accentColor: 'bg-teal-500/20' },
   distribution: { cs: 'Distribuce', icon: Plug, gradient: 'from-cyan-500/10 to-cyan-600/5', iconColor: 'text-cyan-600', accentColor: 'bg-cyan-500/20' },
   service: { cs: 'Servis', icon: Settings, gradient: 'from-indigo-500/10 to-indigo-600/5', iconColor: 'text-indigo-600', accentColor: 'bg-indigo-500/20' },
+  completed: { cs: 'Ukončeno', icon: CheckCircle, gradient: 'from-gray-500/10 to-gray-600/5', iconColor: 'text-gray-600', accentColor: 'bg-gray-500/20' },
 }
 
 export default function HybridProjectView({ user }: HybridProjectViewProps) {
@@ -88,7 +89,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
               </button>
             )}
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-7 gap-2.5 lg:gap-3">
+          <div className="grid grid-cols-4 gap-2">
             {Object.entries(STATUS_LABELS).map(([key, { cs, icon: Icon, gradient, iconColor, accentColor }]) => {
               const count = visibleProjects.filter(p => p.status === key).length
               const isActive = filterStatus === key
@@ -97,18 +98,18 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
                 <button
                   key={key}
                   onClick={() => setFilterStatus(isActive ? '' : key)}
-                  className={`group relative bg-gradient-to-br ${gradient} backdrop-blur-sm border transition-all duration-300 rounded-2xl p-4 cursor-pointer flex flex-col items-center justify-center gap-2 min-h-24 ${
+                  className={`group relative bg-gradient-to-br ${gradient} backdrop-blur-sm border transition-all duration-300 rounded-xl p-2.5 cursor-pointer flex flex-col items-center justify-center gap-1 min-h-20 ${
                     isActive
                       ? 'border-white/80 shadow-lg shadow-black/10 ring-2 ring-offset-0'
                       : 'border-white/50 hover:border-white/80 hover:shadow-lg hover:shadow-black/5'
                   }`}
                 >
-                  <div className={`absolute inset-0 rounded-2xl ${accentColor} ${isActive ? 'opacity-60' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`}></div>
+                  <div className={`absolute inset-0 rounded-xl ${accentColor} ${isActive ? 'opacity-60' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`}></div>
 
                   <div className="relative z-10 text-center">
-                    <Icon className={`w-6 h-6 mx-auto mb-2 ${iconColor}`} />
-                    <p className="text-xs font-semibold text-gray-900 hidden lg:block">{cs}</p>
-                    <p className="text-2xl font-bold text-gray-900">{count}</p>
+                    <Icon className={`w-5 h-5 mx-auto mb-0.5 ${iconColor}`} />
+                    <p className="text-xs font-semibold text-gray-900">{cs}</p>
+                    <p className="text-xl font-bold text-gray-900">{count}</p>
                   </div>
                 </button>
               )
