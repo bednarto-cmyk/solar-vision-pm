@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Plus, X, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
-import { useFirebaseUserStore } from '../store/firebaseUserStore'
+import { useUserStore } from '../store/userStore'
 import type { ProjectStatus } from '../store/projectStore'
 import ProjectDetail from './ProjectDetail'
 import ProjectModal from './ProjectModal'
@@ -25,17 +25,13 @@ const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string;
 
 export default function HybridProjectView({ user }: HybridProjectViewProps) {
   const { projects, updateProject } = useFirebaseProjectStore()
-  const { users, initializeUsers } = useFirebaseUserStore()
+  const { users } = useUserStore()
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<any>(null)
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState<string>('')
-
-  useEffect(() => {
-    initializeUsers()
-  }, [])
 
   let visibleProjects = user.role === 'admin' ? projects : projects.filter(p => p.assignedTo === user.id)
 

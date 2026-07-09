@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, Check } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
-import { useFirebaseUserStore } from '../store/firebaseUserStore'
+import { useUserStore } from '../store/userStore'
 import type { ProjectStatus } from '../store/projectStore'
 import toast from 'react-hot-toast'
 
@@ -23,15 +23,11 @@ const PHASES: { value: ProjectStatus; label: string; order: number }[] = [
 
 export default function ProjectDetail({ projectId, onEditProject }: ProjectDetailProps) {
   const { projects, addTask, updateTask, deleteTask, updateProject } = useFirebaseProjectStore()
-  const { users, initializeUsers } = useFirebaseUserStore()
+  const { users } = useUserStore()
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [notes, setNotes] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    initializeUsers()
-  }, [])
 
   const project = projectId ? projects.find(p => p.id === projectId) : null
 

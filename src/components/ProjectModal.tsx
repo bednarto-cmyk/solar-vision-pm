@@ -3,7 +3,7 @@ import { X, Plus } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import type { ProjectStatus } from '../store/projectStore'
 import { useFirebaseContactStore } from '../store/firebaseContactStore'
-import { useFirebaseUserStore } from '../store/firebaseUserStore'
+import { useUserStore } from '../store/userStore'
 import ContactModal from './ContactModal'
 import toast from 'react-hot-toast'
 
@@ -49,12 +49,11 @@ const FormField = ({ label, required, children }: any) => (
 
 export default function ProjectModal({ project, onClose, user }: ProjectModalProps) {
   const { addProject, updateProject } = useFirebaseProjectStore()
-  const { users, initializeUsers } = useFirebaseUserStore()
+  const { users } = useUserStore()
   const { contacts, addContact, initializeContacts } = useFirebaseContactStore()
   const [showContactModal, setShowContactModal] = useState(false)
 
   useEffect(() => {
-    initializeUsers()
     initializeContacts()
   }, [])
 
