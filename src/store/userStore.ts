@@ -22,22 +22,15 @@ export const useUserStore = create<UserStore>()(
       users: [
         {
           id: '1',
-          name: 'Jan Novák',
-          email: 'jan.novotny@solarvision.cz',
+          name: 'Tomáš Michal',
+          email: 'tomas.michal@solarvision.cz',
           role: 'admin',
           createdAt: new Date().toISOString(),
         },
         {
           id: '2',
-          name: 'Petr Svoboda',
-          email: 'petr.svoboda@solarvision.cz',
-          role: 'user',
-          createdAt: new Date().toISOString(),
-        },
-        {
-          id: '3',
-          name: 'Marie Kučerová',
-          email: 'marie.kucerova@solarvision.cz',
+          name: 'Tomáš Bednář',
+          email: 'tomas.bednar@solarvision.cz',
           role: 'user',
           createdAt: new Date().toISOString(),
         },
