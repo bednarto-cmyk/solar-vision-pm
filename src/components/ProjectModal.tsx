@@ -193,10 +193,12 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
             <FormField label="Výkon (kWp)">
               <input
                 type="number"
+                step="0.01"
+                min="0"
                 value={formData.power}
                 onChange={(e) => setFormData({ ...formData, power: parseFloat(e.target.value) || 0 })}
                 className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="10"
+                placeholder="10.50"
               />
             </FormField>
 
