@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Plus, X, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
+import type { ProjectStatus } from '../store/projectStore'
 import ProjectDetail from './ProjectDetail'
 import ProjectModal from './ProjectModal'
 import ProjectsListTable from './ProjectsListTable'
+import toast from 'react-hot-toast'
 
 interface HybridProjectViewProps {
   user: any
@@ -21,7 +23,7 @@ const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string;
 }
 
 export default function HybridProjectView({ user }: HybridProjectViewProps) {
-  const { projects } = useFirebaseProjectStore()
+  const { projects, updateProject } = useFirebaseProjectStore()
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
@@ -51,6 +53,16 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
     )
   }
 
+  const PHASE_LABELS: { [key: string]: string } = {
+    leads: 'Příležitosti',
+    prep: 'Příprava',
+    purchase: 'Nákup',
+    execution: 'Realizace',
+    revision: 'Revize',
+    distribution: 'Distribuce',
+    service: 'Servis',
+    completed: 'Ukončeno',
+  }
 
   const handleNewProject = () => {
     setEditingProject(null)
@@ -60,6 +72,15 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
   const handleEditProject = (project: any) => {
     setEditingProject(project)
     setIsModalOpen(true)
+  }
+
+  const handleChangePhase = async (projectId: string, newStatus: ProjectStatus) => {
+    try {
+      await updateProject(projectId, { status: newStatus })
+      toast.success(`Projekt přesunut do ${PHASE_LABELS[newStatus]}`)
+    } catch (error) {
+      toast.error('Chyba při změně fáze')
+    }
   }
 
 
@@ -138,6 +159,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
               setSelectedProjectId(project.id)
               setIsDetailModalOpen(true)
             }}
+            onChangePhase={handleChangePhase}
             selectedProjectId={selectedProjectId}
           />
         </div>

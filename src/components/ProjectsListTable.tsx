@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import type { ProjectStatus } from '../store/projectStore'
 
 interface Project {
   id: string
@@ -17,6 +18,7 @@ interface ProjectsListTableProps {
   projects: Project[]
   statusLabels: { [key: string]: { cs: string } }
   onSelectProject: (project: Project) => void
+  onChangePhase?: (projectId: string, newStatus: ProjectStatus) => void
   selectedProjectId: string | null
 }
 
@@ -27,10 +29,13 @@ export default function ProjectsListTable({
   projects,
   statusLabels,
   onSelectProject,
+  onChangePhase,
   selectedProjectId,
 }: ProjectsListTableProps) {
   const [sortField, setSortField] = useState<SortField>('createdAt')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
+
+  const PHASES = ['leads', 'prep', 'purchase', 'execution', 'revision', 'distribution', 'service', 'completed'] as const
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -163,9 +168,21 @@ export default function ProjectsListTable({
                     {project.name}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                      {statusLabels[project.status]?.cs || project.status}
-                    </span>
+                    <select
+                      value={project.status}
+                      onChange={(e) => {
+                        e.stopPropagation()
+                        onChangePhase?.(project.id, e.target.value as ProjectStatus)
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+                    >
+                      {PHASES.map(phase => (
+                        <option key={phase} value={phase}>
+                          {statusLabels[phase]?.cs || phase}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                   <td className="px-6 py-4 text-gray-700">
                     {project.customer}
