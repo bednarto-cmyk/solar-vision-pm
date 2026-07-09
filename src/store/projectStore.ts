@@ -291,7 +291,7 @@ export const useProjectStore = create<ProjectStore>()(
       },
     }),
     {
-      name: 'solar-vision-projects',
+      name: 'solar-vision-projects-v2',
     }
   )
 )
