@@ -1,0 +1,198 @@
+import { useState } from 'react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+
+interface Project {
+  id: string
+  name: string
+  customer: string
+  status: string
+  power: number
+  cost: number
+  revenue: number
+  createdAt: string
+  contactId?: string
+}
+
+interface ProjectsListTableProps {
+  projects: Project[]
+  statusLabels: { [key: string]: { cs: string } }
+  onSelectProject: (project: Project) => void
+  selectedProjectId: string | null
+}
+
+type SortField = 'createdAt' | 'name' | 'status' | 'customer' | 'revenue' | 'cost' | 'profit'
+type SortOrder = 'asc' | 'desc'
+
+export default function ProjectsListTable({
+  projects,
+  statusLabels,
+  onSelectProject,
+  selectedProjectId,
+}: ProjectsListTableProps) {
+  const [sortField, setSortField] = useState<SortField>('createdAt')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortOrder('desc')
+    }
+  }
+
+  const sortedProjects = [...projects].sort((a, b) => {
+    let aVal: any = a[sortField as keyof Project]
+    let bVal: any = b[sortField as keyof Project]
+
+    if (sortField === 'profit') {
+      aVal = a.revenue - a.cost
+      bVal = b.revenue - b.cost
+    }
+
+    if (typeof aVal === 'string') {
+      aVal = aVal.toLowerCase()
+      bVal = (bVal as string).toLowerCase()
+      return sortOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+    }
+
+    if (typeof aVal === 'number') {
+      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal
+    }
+
+    return 0
+  })
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return <div className="w-4 h-4" />
+    return sortOrder === 'asc' ? (
+      <ChevronUp className="w-4 h-4 text-blue-600" />
+    ) : (
+      <ChevronDown className="w-4 h-4 text-blue-600" />
+    )
+  }
+
+  const formatCurrency = (num: number) =>
+    num.toLocaleString('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 })
+
+  const formatDate = (date: string) => new Date(date).toLocaleDateString('cs-CZ')
+
+  return (
+    <div className="glass rounded-2xl overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-50 border-b border-gray-200">
+              <th className="px-6 py-4 text-left">
+                <button
+                  onClick={() => handleSort('createdAt')}
+                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
+                >
+                  Vytvořeno <SortIcon field="createdAt" />
+                </button>
+              </th>
+              <th className="px-6 py-4 text-left">
+                <button
+                  onClick={() => handleSort('name')}
+                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
+                >
+                  Projekt <SortIcon field="name" />
+                </button>
+              </th>
+              <th className="px-6 py-4 text-left">
+                <button
+                  onClick={() => handleSort('status')}
+                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
+                >
+                  Fáze <SortIcon field="status" />
+                </button>
+              </th>
+              <th className="px-6 py-4 text-left">
+                <button
+                  onClick={() => handleSort('customer')}
+                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
+                >
+                  Kontakt <SortIcon field="customer" />
+                </button>
+              </th>
+              <th className="px-6 py-4 text-right">
+                <button
+                  onClick={() => handleSort('revenue')}
+                  className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
+                >
+                  Obrat <SortIcon field="revenue" />
+                </button>
+              </th>
+              <th className="px-6 py-4 text-right">
+                <button
+                  onClick={() => handleSort('cost')}
+                  className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
+                >
+                  Náklad <SortIcon field="cost" />
+                </button>
+              </th>
+              <th className="px-6 py-4 text-right">
+                <button
+                  onClick={() => handleSort('profit')}
+                  className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
+                >
+                  Výnos <SortIcon field="profit" />
+                </button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedProjects.map(project => {
+              const profit = project.revenue - project.cost
+              const isSelected = selectedProjectId === project.id
+
+              return (
+                <tr
+                  key={project.id}
+                  onClick={() => onSelectProject(project)}
+                  className={`border-b border-gray-200 cursor-pointer transition-colors ${
+                    isSelected
+                      ? 'bg-blue-50 hover:bg-blue-100'
+                      : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <td className="px-6 py-4 text-gray-700 text-xs">
+                    {formatDate(project.createdAt)}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900">
+                    {project.name}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      {statusLabels[project.status]?.cs || project.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {project.customer}
+                  </td>
+                  <td className="px-6 py-4 text-right font-mono text-gray-900">
+                    {formatCurrency(project.revenue)}
+                  </td>
+                  <td className="px-6 py-4 text-right font-mono text-gray-700">
+                    {formatCurrency(project.cost)}
+                  </td>
+                  <td className={`px-6 py-4 text-right font-mono font-semibold ${
+                    profit > 0 ? 'text-green-600' : profit < 0 ? 'text-red-600' : 'text-gray-700'
+                  }`}>
+                    {formatCurrency(profit)}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {projects.length === 0 && (
+        <div className="p-8 text-center text-gray-500">
+          Žádné projekty
+        </div>
+      )}
+    </div>
+  )
+}
