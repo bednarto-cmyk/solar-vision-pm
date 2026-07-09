@@ -17,6 +17,7 @@ const PHASES: { value: ProjectStatus; label: string; order: number }[] = [
   { value: 'revision', label: 'Revize', order: 4 },
   { value: 'distribution', label: 'Distribuce', order: 5 },
   { value: 'service', label: 'Servis', order: 6 },
+  { value: 'completed' as ProjectStatus, label: 'Ukončeno', order: 7 },
 ]
 
 export default function ProjectDetail({ projectId, onEditProject }: ProjectDetailProps) {
@@ -74,6 +75,15 @@ export default function ProjectDetail({ projectId, onEditProject }: ProjectDetai
     }
   }
 
+  const handleChangePhase = async (newStatus: ProjectStatus) => {
+    try {
+      await updateProject(project.id, { status: newStatus })
+      toast.success(`Projekt přesunut do ${PHASES.find(p => p.value === newStatus)?.label}`)
+    } catch (error) {
+      toast.error('Chyba při změně fáze')
+    }
+  }
+
   const currentPhaseIndex = PHASES.findIndex(p => p.value === project.status)
   const completedPercentage = ((currentPhaseIndex + 1) / PHASES.length) * 100
 
@@ -125,8 +135,12 @@ export default function ProjectDetail({ projectId, onEditProject }: ProjectDetai
             const isCurrentOrPassed = isPassed || isActive
 
             return (
-              <div key={phase.value} className="flex items-center gap-3">
-                <div className="w-24 text-xs font-medium text-gray-700">{phase.label}</div>
+              <div
+                key={phase.value}
+                onClick={() => handleChangePhase(phase.value)}
+                className="flex items-center gap-3 cursor-pointer group hover:opacity-80 transition-opacity"
+              >
+                <div className="w-24 text-xs font-medium text-gray-700 group-hover:text-gray-900">{phase.label}</div>
                 <div className="flex-1 h-6 bg-gray-200 rounded-full overflow-hidden relative">
                   <div
                     className={`h-full rounded-full transition-all ${
