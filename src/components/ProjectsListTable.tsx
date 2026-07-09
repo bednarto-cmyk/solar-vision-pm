@@ -153,7 +153,7 @@ export default function ProjectsListTable({
                   onClick={() => handleSort('endDate')}
                   className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
                 >
-                  Termín <SortIcon field="endDate" />
+                  Termín dokončení <SortIcon field="endDate" />
                 </button>
               </th>
               <th className="px-6 py-4 text-right">
