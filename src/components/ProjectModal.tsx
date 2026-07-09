@@ -7,6 +7,21 @@ import { useFirebaseUserStore } from '../store/firebaseUserStore'
 import ContactModal from './ContactModal'
 import toast from 'react-hot-toast'
 
+const DEFAULT_FORM_DATA = (user: any) => ({
+  name: '',
+  customer: '',
+  status: 'leads' as ProjectStatus,
+  assignedTo: user.role === 'admin' ? '1' : user.id,
+  contactId: '',
+  power: 0,
+  cost: 0,
+  revenue: 0,
+  startDate: new Date().toISOString().split('T')[0],
+  endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+  tags: [],
+  notes: '',
+})
+
 interface ProjectModalProps {
   project: any
   onClose: () => void
@@ -53,23 +68,16 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
     }
   }
 
-  const [formData, setFormData] = useState(
-    project || {
-      name: '',
-      customer: '',
-      status: 'leads' as ProjectStatus,
-      assignedTo: user.role === 'admin' ? '1' : user.id,
-      contactId: '',
-      power: 0,
-      cost: 0,
-      revenue: 0,
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      tags: [],
-      notes: '',
-    }
-  )
+  const [formData, setFormData] = useState(project || DEFAULT_FORM_DATA(user))
   const [newTag, setNewTag] = useState('')
+
+  useEffect(() => {
+    if (project) {
+      setFormData(project)
+    } else {
+      setFormData(DEFAULT_FORM_DATA(user))
+    }
+  }, [project])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
