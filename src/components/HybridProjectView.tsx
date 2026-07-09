@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings } from 'lucide-react'
+import { Plus, X, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import ProjectDetail from './ProjectDetail'
 import ProjectModal from './ProjectModal'
@@ -24,6 +24,7 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
   const { projects } = useFirebaseProjectStore()
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<any>(null)
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -133,14 +134,12 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
           <ProjectsListTable
             projects={filteredProjects}
             statusLabels={STATUS_LABELS}
-            onSelectProject={(project) => setSelectedProjectId(project.id)}
+            onSelectProject={(project) => {
+              setSelectedProjectId(project.id)
+              setIsDetailModalOpen(true)
+            }}
             selectedProjectId={selectedProjectId}
           />
-        </div>
-
-        {/* Project Detail Panel */}
-        <div>
-          <ProjectDetail projectId={selectedProjectId} onEditProject={handleEditProject} />
         </div>
       </div>
 
@@ -150,6 +149,27 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
           onClose={() => setIsModalOpen(false)}
           user={user}
         />
+      )}
+
+      {isDetailModalOpen && selectedProjectId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900">Detaily projektu</h2>
+              <button
+                onClick={() => setIsDetailModalOpen(false)}
+                className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <ProjectDetail projectId={selectedProjectId} onEditProject={handleEditProject} />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
