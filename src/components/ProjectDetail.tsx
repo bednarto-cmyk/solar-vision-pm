@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, Check } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
+import { useFirebaseUserStore } from '../store/firebaseUserStore'
 import type { ProjectStatus } from '../store/projectStore'
 import toast from 'react-hot-toast'
 
@@ -22,12 +23,23 @@ const PHASES: { value: ProjectStatus; label: string; order: number }[] = [
 
 export default function ProjectDetail({ projectId, onEditProject }: ProjectDetailProps) {
   const { projects, addTask, updateTask, deleteTask, updateProject } = useFirebaseProjectStore()
+  const { users, initializeUsers } = useFirebaseUserStore()
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [notes, setNotes] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  useEffect(() => {
+    initializeUsers()
+  }, [])
+
   const project = projectId ? projects.find(p => p.id === projectId) : null
+
+  const getAssignedUserName = () => {
+    if (!project?.assignedTo) return '—'
+    const user = users.find(u => u.id === project.assignedTo)
+    return user?.name || '—'
+  }
 
   // Auto-save notes
   useEffect(() => {
@@ -121,6 +133,10 @@ export default function ProjectDetail({ projectId, onEditProject }: ProjectDetai
             <p className="text-lg font-semibold text-purple-600">
               {((((project.revenue - project.cost) / project.revenue) * 100) || 0).toFixed(0)}%
             </p>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-xs text-gray-500 mb-1">Obchodník</p>
+            <p className="text-lg font-semibold text-gray-900">{getAssignedUserName()}</p>
           </div>
         </div>
       </div>
