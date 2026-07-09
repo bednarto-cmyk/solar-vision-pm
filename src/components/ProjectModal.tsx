@@ -104,7 +104,7 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
       <div className="glass rounded-2xl shadow-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto">
         <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-blue-100 border-b-2 border-blue-200 px-8 py-6 flex items-center justify-between">
           <h2 className="text-3xl font-bold text-gray-900">
