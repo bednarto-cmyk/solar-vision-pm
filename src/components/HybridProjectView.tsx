@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 
 interface HybridProjectViewProps {
   user: any
+  showOnlyLeads?: boolean
 }
 
 const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string; iconColor: string; accentColor: string } } = {
@@ -23,7 +24,7 @@ const STATUS_LABELS: { [key: string]: { cs: string; icon: any; gradient: string;
   completed: { cs: 'Ukončeno', icon: CheckCircle, gradient: 'from-gray-500/10 to-gray-600/5', iconColor: 'text-gray-600', accentColor: 'bg-gray-500/20' },
 }
 
-export default function HybridProjectView({ user }: HybridProjectViewProps) {
+export default function HybridProjectView({ user, showOnlyLeads = false }: HybridProjectViewProps) {
   const { projects, updateProject } = useFirebaseProjectStore()
   const { users } = useUserStore()
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
@@ -34,6 +35,13 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
   const [searchQuery, setSearchQuery] = useState<string>('')
 
   let visibleProjects = user.role === 'admin' ? projects : projects.filter(p => p.assignedTo === user.id)
+
+  // Filtruj podle leads nebo bez leads
+  if (showOnlyLeads) {
+    visibleProjects = visibleProjects.filter(p => p.status === 'leads')
+  } else {
+    visibleProjects = visibleProjects.filter(p => p.status !== 'leads')
+  }
 
   let filteredProjects = visibleProjects
 
@@ -90,13 +98,15 @@ export default function HybridProjectView({ user }: HybridProjectViewProps) {
     <div className="p-4 md:p-6 min-h-screen pb-24">
       <div className="w-full">
         <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Projekty</h1>
+          <h1 className="text-3xl font-bold text-gray-800">
+            {showOnlyLeads ? '💡 Příležitosti' : '📁 Projekty v realizaci'}
+          </h1>
           <button
             onClick={handleNewProject}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors w-fit"
           >
             <Plus className="w-5 h-5" />
-            Nový Projekt
+            {showOnlyLeads ? 'Nová Příležitost' : 'Nový Projekt'}
           </button>
         </div>
 

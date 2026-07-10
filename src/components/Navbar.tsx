@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { LogOut, BarChart3, LayoutGrid, Menu, X, Users, Settings, Trophy } from 'lucide-react'
+import { LogOut, BarChart3, Lightbulb, Menu, X, Users, Settings, Trophy, FolderOpen } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 
 interface NavbarProps {
   currentView: string
-  onViewChange: (view: 'kanban' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login') => void
+  onViewChange: (view: 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login') => void
   onLogout: () => void
 }
 
@@ -24,7 +24,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
   }).length
   const totalAlerts = urgentDeadlines + overdueProjects
 
-  const handleNavChange = (view: 'kanban' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login') => {
+  const handleNavChange = (view: 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login') => {
     onViewChange(view)
     setIsMenuOpen(false)
   }
@@ -41,15 +41,26 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
 
             <div className="flex gap-4">
               <button
-                onClick={() => handleNavChange('kanban')}
+                onClick={() => handleNavChange('opportunities')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  currentView === 'kanban'
+                  currentView === 'opportunities'
                     ? 'bg-yellow-100 text-yellow-700'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                <LayoutGrid className="w-5 h-5" />
-                Projekty
+                <Lightbulb className="w-5 h-5" />
+                Příležitosti
+              </button>
+              <button
+                onClick={() => handleNavChange('projects')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  currentView === 'projects'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FolderOpen className="w-5 h-5" />
+                Projekty v realizaci
               </button>
               <button
                 onClick={() => handleNavChange('contacts')}
@@ -134,15 +145,26 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
         {isMenuOpen && (
           <div className="md:hidden mt-4 space-y-2 pb-4 border-t border-gray-200 pt-4">
             <button
-              onClick={() => handleNavChange('kanban')}
+              onClick={() => handleNavChange('opportunities')}
               className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-left ${
-                currentView === 'kanban'
+                currentView === 'opportunities'
                   ? 'bg-blue-100 text-blue-600'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              <LayoutGrid className="w-5 h-5" />
-              Projekty
+              <Lightbulb className="w-5 h-5" />
+              Příležitosti
+            </button>
+            <button
+              onClick={() => handleNavChange('projects')}
+              className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-left ${
+                currentView === 'projects'
+                  ? 'bg-blue-100 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <FolderOpen className="w-5 h-5" />
+              Projekty v realizaci
             </button>
             <button
               onClick={() => handleNavChange('contacts')}

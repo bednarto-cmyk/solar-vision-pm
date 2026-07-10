@@ -11,7 +11,7 @@ import LoginPage from './components/LoginPage'
 import { useFirebaseProjectStore } from './store/firebaseProjectStore'
 import { useFirebaseUserStore } from './store/firebaseUserStore'
 
-type View = 'kanban' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login'
+type View = 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('login')
@@ -26,14 +26,14 @@ function App() {
     const savedUser = localStorage.getItem('user')
     if (savedUser) {
       setUser(JSON.parse(savedUser))
-      setCurrentView('kanban')
+      setCurrentView('opportunities')
     }
   }, [])
 
   const handleLogin = (userData: any) => {
     localStorage.setItem('user', JSON.stringify(userData))
     setUser(userData)
-    setCurrentView('kanban')
+    setCurrentView('opportunities')
   }
 
   const handleLogout = () => {
@@ -50,7 +50,8 @@ function App() {
     <div className="min-h-screen bg-gray-100">
       <Navbar currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} />
       <div className="pt-20">
-        {currentView === 'kanban' && <HybridProjectView user={user} />}
+        {currentView === 'opportunities' && <HybridProjectView user={user} showOnlyLeads={true} />}
+        {currentView === 'projects' && <HybridProjectView user={user} showOnlyLeads={false} />}
         {currentView === 'contacts' && <Contacts currentUser={user} />}
         {currentView === 'dashboard' && <DashboardView user={user} />}
         {currentView === 'performance' && <PerformanceView />}
