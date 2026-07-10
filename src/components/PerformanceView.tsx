@@ -1,11 +1,11 @@
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
-import { useFirebaseUserStore } from '../store/firebaseUserStore'
+import { useUserStore } from '../store/userStore'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Trophy, TrendingUp } from 'lucide-react'
 
 export default function PerformanceView() {
   const { projects } = useFirebaseProjectStore()
-  const { users } = useFirebaseUserStore()
+  const { users } = useUserStore()
 
   const salespeople = users.filter(u => (u as any).annualRevenue || u.role === 'user')
 

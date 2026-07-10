@@ -7,6 +7,7 @@ export interface User {
   email: string
   role: 'admin' | 'user'
   createdAt: string
+  annualRevenue?: number
 }
 
 interface UserStore {
@@ -33,6 +34,7 @@ export const useUserStore = create<UserStore>()(
           email: 'tomas.bednar@solarvision.cz',
           role: 'user',
           createdAt: new Date().toISOString(),
+          annualRevenue: 3000000,
         },
       ],
       addUser: (user) =>
