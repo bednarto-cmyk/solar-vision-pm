@@ -181,6 +181,14 @@ export default function ProjectsListTable({
                   </th>
                   <th className="px-6 py-4 text-right">
                     <button
+                      onClick={() => handleSort('cost')}
+                      className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
+                    >
+                      Náklad <SortIcon field="cost" />
+                    </button>
+                  </th>
+                  <th className="px-6 py-4 text-right">
+                    <button
                       onClick={() => handleSort('revenue')}
                       className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
                     >
@@ -271,6 +279,9 @@ export default function ProjectsListTable({
                             </option>
                           ))}
                         </select>
+                      </td>
+                      <td className="px-6 py-4 text-right font-mono text-gray-700">
+                        {formatCurrency(project.cost)}
                       </td>
                       <td className="px-6 py-4 text-right font-mono text-gray-900">
                         {formatCurrency(project.revenue)}
