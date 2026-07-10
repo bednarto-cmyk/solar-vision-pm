@@ -140,7 +140,7 @@ export default function PerformanceView() {
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-gray-900">{person.percentage}%</p>
-                      <p className="text-xs text-gray-600">k cíli</p>
+                      <p className="text-xs text-gray-600">splněno</p>
                     </div>
                   </div>
 
