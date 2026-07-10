@@ -165,7 +165,7 @@ export default function ProjectsListTable({
                       onClick={() => handleSort('successProbability')}
                       className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
                     >
-                      Úspěšnost <SortIcon field="successProbability" />
+                      Pravděpodobnost úspěchu <SortIcon field="successProbability" />
                     </button>
                   </th>
                 </>
