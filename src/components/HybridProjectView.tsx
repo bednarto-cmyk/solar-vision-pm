@@ -99,7 +99,7 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
       <div className="w-full">
         <div className="flex flex-col md:flex-row gap-4 mb-6">
           <h1 className="text-3xl font-bold text-gray-800">
-            {showOnlyLeads ? '💡 Příležitosti' : '📁 Projekty v realizaci'}
+            {showOnlyLeads ? '💡 Příležitosti' : '📁 REALIZACE'}
           </h1>
           <button
             onClick={handleNewProject}

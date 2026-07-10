@@ -60,7 +60,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
                 }`}
               >
                 <FolderOpen className="w-5 h-5" />
-                Projekty v realizaci
+                REALIZACE
               </button>
               <button
                 onClick={() => handleNavChange('contacts')}
@@ -164,7 +164,7 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
               }`}
             >
               <FolderOpen className="w-5 h-5" />
-              Projekty v realizaci
+              REALIZACE
             </button>
             <button
               onClick={() => handleNavChange('contacts')}
