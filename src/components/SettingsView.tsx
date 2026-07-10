@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Plus, Trash2, Edit2 } from 'lucide-react'
-import { useFirebaseUserStore } from '../store/firebaseUserStore'
+import { useUserStore } from '../store/userStore'
 import type { User } from '../store/userStore'
 import toast from 'react-hot-toast'
 
 export default function SettingsView() {
-  const { users, addUser, deleteUser, updateUser } = useFirebaseUserStore()
+  const { users, addUser, deleteUser, updateUser } = useUserStore()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [formData, setFormData] = useState<{
@@ -30,11 +30,12 @@ export default function SettingsView() {
 
     try {
       if (editingId) {
-        await updateUser(editingId, formData)
+        updateUser(editingId, formData)
         toast.success('Uživatel aktualizován')
         setEditingId(null)
       } else {
-        await addUser({
+        addUser({
+          id: `user-${Date.now()}`,
           ...formData,
           createdAt: new Date().toISOString(),
         })
