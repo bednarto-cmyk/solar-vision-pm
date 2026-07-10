@@ -171,6 +171,7 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
             projects={filteredProjects}
             statusLabels={STATUS_LABELS}
             users={users}
+            showOnlyLeads={showOnlyLeads}
             onSelectProject={(project) => {
               setSelectedProjectId(project.id)
               setIsDetailModalOpen(true)

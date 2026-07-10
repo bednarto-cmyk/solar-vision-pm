@@ -25,18 +25,20 @@ interface ProjectsListTableProps {
   projects: Project[]
   statusLabels: { [key: string]: { cs: string } }
   users?: User[]
+  showOnlyLeads?: boolean
   onSelectProject: (project: Project) => void
   onChangePhase?: (projectId: string, newStatus: ProjectStatus) => void
   selectedProjectId: string | null
 }
 
-type SortField = 'createdAt' | 'name' | 'status' | 'customer' | 'endDate' | 'assignedTo' | 'revenue' | 'cost' | 'profit'
+type SortField = 'createdAt' | 'name' | 'status' | 'customer' | 'endDate' | 'assignedTo' | 'revenue' | 'cost' | 'profit' | 'offerPhase' | 'successProbability'
 type SortOrder = 'asc' | 'desc'
 
 export default function ProjectsListTable({
   projects,
   statusLabels,
   users = [],
+  showOnlyLeads = false,
   onSelectProject,
   onChangePhase,
   selectedProjectId,
@@ -121,15 +123,7 @@ export default function ProjectsListTable({
                   onClick={() => handleSort('name')}
                   className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
                 >
-                  Projekt <SortIcon field="name" />
-                </button>
-              </th>
-              <th className="px-6 py-4 text-left">
-                <button
-                  onClick={() => handleSort('status')}
-                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
-                >
-                  Fáze <SortIcon field="status" />
+                  {showOnlyLeads ? 'Příležitost' : 'Projekt'} <SortIcon field="name" />
                 </button>
               </th>
               <th className="px-6 py-4 text-left">
@@ -156,30 +150,53 @@ export default function ProjectsListTable({
                   Termín dokončení <SortIcon field="endDate" />
                 </button>
               </th>
-              <th className="px-6 py-4 text-right">
-                <button
-                  onClick={() => handleSort('revenue')}
-                  className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
-                >
-                  Obrat <SortIcon field="revenue" />
-                </button>
-              </th>
-              <th className="px-6 py-4 text-right">
-                <button
-                  onClick={() => handleSort('cost')}
-                  className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
-                >
-                  Náklad <SortIcon field="cost" />
-                </button>
-              </th>
-              <th className="px-6 py-4 text-right">
-                <button
-                  onClick={() => handleSort('profit')}
-                  className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
-                >
-                  Výnos <SortIcon field="profit" />
-                </button>
-              </th>
+              {showOnlyLeads ? (
+                <>
+                  <th className="px-6 py-4 text-left">
+                    <button
+                      onClick={() => handleSort('offerPhase')}
+                      className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
+                    >
+                      Fáze nabídky <SortIcon field="offerPhase" />
+                    </button>
+                  </th>
+                  <th className="px-6 py-4 text-left">
+                    <button
+                      onClick={() => handleSort('successProbability')}
+                      className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
+                    >
+                      Úspěšnost <SortIcon field="successProbability" />
+                    </button>
+                  </th>
+                </>
+              ) : (
+                <>
+                  <th className="px-6 py-4 text-left">
+                    <button
+                      onClick={() => handleSort('status')}
+                      className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
+                    >
+                      Fáze <SortIcon field="status" />
+                    </button>
+                  </th>
+                  <th className="px-6 py-4 text-right">
+                    <button
+                      onClick={() => handleSort('revenue')}
+                      className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
+                    >
+                      Obrat <SortIcon field="revenue" />
+                    </button>
+                  </th>
+                  <th className="px-6 py-4 text-right">
+                    <button
+                      onClick={() => handleSort('profit')}
+                      className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
+                    >
+                      Výnos <SortIcon field="profit" />
+                    </button>
+                  </th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -203,23 +220,6 @@ export default function ProjectsListTable({
                   <td className="px-6 py-4 font-medium text-gray-900">
                     {project.name}
                   </td>
-                  <td className="px-6 py-4">
-                    <select
-                      value={project.status}
-                      onChange={(e) => {
-                        e.stopPropagation()
-                        onChangePhase?.(project.id, e.target.value as ProjectStatus)
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      className="px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
-                    >
-                      {PHASES.map(phase => (
-                        <option key={phase} value={phase}>
-                          {statusLabels[phase]?.cs || phase}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
                   <td className="px-6 py-4 text-gray-700">
                     {project.customer}
                   </td>
@@ -229,17 +229,59 @@ export default function ProjectsListTable({
                   <td className="px-6 py-4 text-gray-700 text-xs">
                     {project.endDate ? formatDate(project.endDate) : '—'}
                   </td>
-                  <td className="px-6 py-4 text-right font-mono text-gray-900">
-                    {formatCurrency(project.revenue)}
-                  </td>
-                  <td className="px-6 py-4 text-right font-mono text-gray-700">
-                    {formatCurrency(project.cost)}
-                  </td>
-                  <td className={`px-6 py-4 text-right font-mono font-semibold ${
-                    profit > 0 ? 'text-green-600' : profit < 0 ? 'text-red-600' : 'text-gray-700'
-                  }`}>
-                    {formatCurrency(profit)}
-                  </td>
+                  {showOnlyLeads ? (
+                    <>
+                      <td className="px-6 py-4">
+                        <select
+                          value={(project as any).offerPhase || ''}
+                          onChange={(e) => {
+                            e.stopPropagation()
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="px-3 py-1 rounded-lg text-xs font-medium bg-blue-100 text-blue-800 border border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+                        >
+                          <option value="">Vybrat fázi</option>
+                          <option value="created">Vytvořená</option>
+                          <option value="sent">Předaná</option>
+                          <option value="accepted">Akceptovaná</option>
+                          <option value="negotiation">Jednání o SoD</option>
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 text-center font-semibold">
+                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+                          {(project as any).successProbability || 0}%
+                        </span>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-6 py-4">
+                        <select
+                          value={project.status}
+                          onChange={(e) => {
+                            e.stopPropagation()
+                            onChangePhase?.(project.id, e.target.value as ProjectStatus)
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
+                        >
+                          {PHASES.map(phase => (
+                            <option key={phase} value={phase}>
+                              {statusLabels[phase]?.cs || phase}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="px-6 py-4 text-right font-mono text-gray-900">
+                        {formatCurrency(project.revenue)}
+                      </td>
+                      <td className={`px-6 py-4 text-right font-mono font-semibold ${
+                        profit > 0 ? 'text-green-600' : profit < 0 ? 'text-red-600' : 'text-gray-700'
+                      }`}>
+                        {formatCurrency(profit)}
+                      </td>
+                    </>
+                  )}
                 </tr>
               )
             })}

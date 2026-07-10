@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type ProjectStatus = 'leads' | 'prep' | 'purchase' | 'execution' | 'revision' | 'distribution' | 'service'
+export type ProjectStatus = 'leads' | 'prep' | 'purchase' | 'execution' | 'revision' | 'distribution' | 'service' | 'completed'
+export type OfferPhase = 'created' | 'sent' | 'accepted' | 'negotiation'
 
 export interface ProjectTask {
   id: string
@@ -30,6 +31,8 @@ export interface Project {
   notes: string
   isUrgentAcknowledged?: boolean
   createdAt: string
+  offerPhase?: OfferPhase
+  successProbability?: number
 }
 
 interface ProjectStore {
