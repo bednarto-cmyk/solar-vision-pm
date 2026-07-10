@@ -124,7 +124,10 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
             )}
           </div>
           <div className="grid grid-cols-4 gap-2">
-            {Object.entries(STATUS_LABELS).map(([key, { cs, icon: Icon, gradient, iconColor, accentColor }]) => {
+            {Object.entries(STATUS_LABELS).filter(([key]) => {
+              if (showOnlyLeads) return key === 'leads'
+              return key !== 'leads'
+            }).map(([key, { cs, icon: Icon, gradient, iconColor, accentColor }]) => {
               const count = visibleProjects.filter(p => p.status === key).length
               const isActive = filterStatus === key
 
