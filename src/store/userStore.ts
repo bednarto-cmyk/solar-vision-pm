@@ -27,6 +27,7 @@ export const useUserStore = create<UserStore>()(
           email: 'tomas.michal@solarvision.cz',
           role: 'admin',
           createdAt: new Date().toISOString(),
+          annualRevenue: 5000000,
         },
         {
           id: '2',
