@@ -51,9 +51,14 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
         const daysLeft = Math.ceil((new Date(p.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
         return (daysLeft >= 0 && daysLeft <= 7) || new Date(p.endDate) < new Date()
       })
-    : filterStatus
-      ? filteredProjects.filter(p => p.status === filterStatus)
-      : filteredProjects
+    : filterStatus === 'rejected'
+      ? filteredProjects.filter(p => {
+          const offerPhase = (p as any).offerPhase || ''
+          return offerPhase.startsWith('cancelled_')
+        })
+      : filterStatus
+        ? filteredProjects.filter(p => p.status === filterStatus)
+        : filteredProjects
 
   if (searchQuery) {
     const query = searchQuery.toLowerCase()
@@ -151,6 +156,29 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
                 </button>
               )
             })}
+            {showOnlyLeads && (
+              <button
+                onClick={() => setFilterStatus(filterStatus === 'rejected' ? '' : 'rejected')}
+                className={`group relative bg-gradient-to-br from-red-500/10 to-red-600/5 backdrop-blur-sm border transition-all duration-300 rounded-xl p-2.5 cursor-pointer flex flex-col items-center justify-center gap-1 min-h-20 ${
+                  filterStatus === 'rejected'
+                    ? 'border-white/80 shadow-lg shadow-black/10 ring-2 ring-offset-0'
+                    : 'border-white/50 hover:border-white/80 hover:shadow-lg hover:shadow-black/5'
+                }`}
+              >
+                <div className={`absolute inset-0 rounded-xl bg-red-500/20 ${filterStatus === 'rejected' ? 'opacity-60' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-300`}></div>
+
+                <div className="relative z-10 text-center">
+                  <span className="text-2xl">❌</span>
+                  <p className="text-xs font-semibold text-gray-900">Odmítnuto</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {visibleProjects.filter(p => {
+                      const offerPhase = (p as any).offerPhase || ''
+                      return offerPhase.startsWith('cancelled_')
+                    }).length}
+                  </p>
+                </div>
+              </button>
+            )}
           </div>
         </div>
 

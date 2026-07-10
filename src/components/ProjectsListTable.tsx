@@ -253,6 +253,10 @@ export default function ProjectsListTable({
                           <option value="sent">Předaná</option>
                           <option value="accepted">Akceptovaná</option>
                           <option value="negotiation">Jednání o SoD</option>
+                          <option value="postponed">Odloženo</option>
+                          <option value="cancelled_cheaper">Storno - levnější konkurence</option>
+                          <option value="cancelled_better">Storno - lepší konkurence</option>
+                          <option value="cancelled_expensive">Storno - příliš drahá nabídka</option>
                         </select>
                       </td>
                       <td className="px-6 py-4 text-center font-semibold">

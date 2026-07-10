@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export type ProjectStatus = 'leads' | 'prep' | 'purchase' | 'execution' | 'revision' | 'distribution' | 'service' | 'completed'
-export type OfferPhase = 'created' | 'sent' | 'accepted' | 'negotiation'
+export type OfferPhase = 'created' | 'sent' | 'accepted' | 'negotiation' | 'postponed' | 'cancelled_cheaper' | 'cancelled_better' | 'cancelled_expensive'
 
 export interface ProjectTask {
   id: string
