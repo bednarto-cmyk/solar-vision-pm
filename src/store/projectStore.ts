@@ -72,6 +72,8 @@ export const useProjectStore = create<ProjectStore>()(
           tags: [],
           notes: 'Zájemce z webového formuláře',
           createdAt: new Date().toISOString(),
+          offerPhase: 'sent',
+          successProbability: 35,
         },
         {
           id: '3',
@@ -91,6 +93,8 @@ export const useProjectStore = create<ProjectStore>()(
           tasks: [],
           notes: 'Zajímavá klientka, druhý kontakt za týden',
           createdAt: new Date().toISOString(),
+          offerPhase: 'negotiation',
+          successProbability: 65,
         },
         // PREP
         {
