@@ -28,6 +28,7 @@ interface ProjectsListTableProps {
   showOnlyLeads?: boolean
   onSelectProject: (project: Project) => void
   onChangePhase?: (projectId: string, newStatus: ProjectStatus) => void
+  onChangeOfferPhase?: (projectId: string, newPhase: string) => void
   selectedProjectId: string | null
 }
 
@@ -41,6 +42,7 @@ export default function ProjectsListTable({
   showOnlyLeads = false,
   onSelectProject,
   onChangePhase,
+  onChangeOfferPhase,
   selectedProjectId,
 }: ProjectsListTableProps) {
   const [sortField, setSortField] = useState<SortField>('createdAt')
@@ -244,6 +246,9 @@ export default function ProjectsListTable({
                           value={(project as any).offerPhase || ''}
                           onChange={(e) => {
                             e.stopPropagation()
+                            if (e.target.value) {
+                              onChangeOfferPhase?.(project.id, e.target.value)
+                            }
                           }}
                           onClick={(e) => e.stopPropagation()}
                           className="px-3 py-1 rounded-lg text-xs font-medium bg-blue-100 text-blue-800 border border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"

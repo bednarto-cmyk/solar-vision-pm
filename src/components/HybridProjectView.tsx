@@ -98,6 +98,15 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
     }
   }
 
+  const handleChangeOfferPhase = async (projectId: string, newPhase: string) => {
+    try {
+      await updateProject(projectId, { offerPhase: newPhase as any })
+      toast.success('Fáze nabídky aktualizována')
+    } catch (error) {
+      toast.error('Chyba při změně fáze nabídky')
+    }
+  }
+
 
   return (
     <div className="p-4 md:p-6 min-h-screen pb-24">
@@ -205,6 +214,7 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
               setIsDetailModalOpen(true)
             }}
             onChangePhase={handleChangePhase}
+            onChangeOfferPhase={handleChangeOfferPhase}
             selectedProjectId={selectedProjectId}
           />
         </div>
