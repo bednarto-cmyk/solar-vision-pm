@@ -49,7 +49,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} user={user} />
-      <div className="pt-20">
+      <div className="pt-28">
         {currentView === 'opportunities' && <HybridProjectView user={user} showOnlyLeads={true} />}
         {currentView === 'projects' && <HybridProjectView user={user} showOnlyLeads={false} />}
         {currentView === 'contacts' && <Contacts currentUser={user} />}
