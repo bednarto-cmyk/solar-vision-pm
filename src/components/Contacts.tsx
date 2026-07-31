@@ -227,6 +227,7 @@ export default function Contacts({ currentUser }: ContactsProps) {
           contact={editingContact}
           onSave={handleSaveContact}
           onClose={() => setShowModal(false)}
+          currentUser={currentUser}
         />
       )}
 

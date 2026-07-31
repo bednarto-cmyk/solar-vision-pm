@@ -6,11 +6,12 @@ interface ContactModalProps {
   contact?: any
   onSave: (data: any) => void
   onClose: () => void
+  currentUser?: any
 }
 
 const CONTACT_TYPES = ['vedení', 'nákupčí', 'rozhodovatel', 'koncový zákazník', 'jiné']
 
-export default function ContactModal({ contact, onSave, onClose }: ContactModalProps) {
+export default function ContactModal({ contact, onSave, onClose, currentUser }: ContactModalProps) {
   const { users, initializeUsers } = useFirebaseUserStore()
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function ContactModal({ contact, onSave, onClose }: ContactModalP
       email: '',
       phone: '',
       type: 'nákupčí',
-      assignedTo: '1',
+      assignedTo: currentUser?.id || '1',
       notes: '',
     }
   )
