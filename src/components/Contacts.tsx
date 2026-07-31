@@ -27,11 +27,16 @@ export default function Contacts({ currentUser }: ContactsProps) {
   const [searchQuery, setSearchQuery] = useState<string>('')
 
   let baseContacts = contacts
-  if (filterObchodnik) {
-    // Pokud je vybrán konkrétní obchodník, filtruj na toho
-    baseContacts = contacts.filter(c => c.assignedTo === filterObchodnik)
+
+  // Admin vidí všechny, ostatní vidí jen svoje
+  if (currentUser.role !== 'admin') {
+    baseContacts = contacts.filter(c => c.assignedTo === currentUser.id)
   }
-  // Jinak vidí všechny (default = "Všichni obchodníci")
+
+  // Dodatečný filtr podle vybraného obchodníka (jen admin)
+  if (currentUser.role === 'admin' && filterObchodnik) {
+    baseContacts = baseContacts.filter(c => c.assignedTo === filterObchodnik)
+  }
 
   const filteredContacts = baseContacts.filter(c => {
     if (!searchQuery) return true
@@ -117,19 +122,21 @@ export default function Contacts({ currentUser }: ContactsProps) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Filtr podle Obchodníka</label>
-              <select
-                value={filterObchodnik}
-                onChange={(e) => setFilterObchodnik(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                <option value="">Všichni obchodníci</option>
-                {users.map(ob => (
-                  <option key={ob.id} value={ob.id}>{ob.name}</option>
-                ))}
-              </select>
-            </div>
+            {currentUser.role === 'admin' && (
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Filtr podle Obchodníka</label>
+                <select
+                  value={filterObchodnik}
+                  onChange={(e) => setFilterObchodnik(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">Všichni obchodníci</option>
+                  {users.map(ob => (
+                    <option key={ob.id} value={ob.id}>{ob.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2">Statistika</label>
               <div className="text-lg font-semibold text-green-600">
