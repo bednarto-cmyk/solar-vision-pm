@@ -6,9 +6,10 @@ interface NavbarProps {
   currentView: string
   onViewChange: (view: 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login') => void
   onLogout: () => void
+  user?: any
 }
 
-export default function Navbar({ currentView, onViewChange, onLogout }: NavbarProps) {
+export default function Navbar({ currentView, onViewChange, onLogout, user }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { projects } = useFirebaseProjectStore()
 
@@ -114,13 +115,18 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
             </div>
           </div>
 
-          <button
-            onClick={onLogout}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            Odhlásit
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              Odhlásit
+            </button>
+            {user && (
+              <p className="text-xs text-gray-500 px-4">{user.name}</p>
+            )}
+          </div>
         </div>
 
         {/* Mobile Layout */}
@@ -217,6 +223,10 @@ export default function Navbar({ currentView, onViewChange, onLogout }: NavbarPr
               <LogOut className="w-5 h-5" />
               Odhlásit
             </button>
+            {user && (
+              <p className="text-xs text-gray-500 px-4 py-1">{user.name}</p>
+            )}
+          </div>
           </div>
         )}
       </div>
