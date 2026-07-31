@@ -107,6 +107,14 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
     }
   }
 
+  const handleChangeSuccessProbability = async (projectId: string, probability: number) => {
+    try {
+      await updateProject(projectId, { successProbability: probability })
+      toast.success('Pravděpodobnost úspěchu aktualizována')
+    } catch (error) {
+      toast.error('Chyba při změně pravděpodobnosti úspěchu')
+    }
+  }
 
   return (
     <div className="p-4 md:p-6 min-h-screen pb-24">
@@ -215,6 +223,7 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
             }}
             onChangePhase={handleChangePhase}
             onChangeOfferPhase={handleChangeOfferPhase}
+            onChangeSuccessProbability={handleChangeSuccessProbability}
             selectedProjectId={selectedProjectId}
           />
         </div>

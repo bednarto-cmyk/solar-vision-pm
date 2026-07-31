@@ -29,6 +29,7 @@ interface ProjectsListTableProps {
   onSelectProject: (project: Project) => void
   onChangePhase?: (projectId: string, newStatus: ProjectStatus) => void
   onChangeOfferPhase?: (projectId: string, newPhase: string) => void
+  onChangeSuccessProbability?: (projectId: string, probability: number) => void
   selectedProjectId: string | null
 }
 
@@ -43,6 +44,7 @@ export default function ProjectsListTable({
   onSelectProject,
   onChangePhase,
   onChangeOfferPhase,
+  onChangeSuccessProbability,
   selectedProjectId,
 }: ProjectsListTableProps) {
   const [sortField, setSortField] = useState<SortField>('createdAt')
@@ -275,10 +277,23 @@ export default function ProjectsListTable({
                       <td className="px-6 py-4 text-right font-mono text-gray-900">
                         {formatCurrency(project.revenue)}
                       </td>
-                      <td className="px-6 py-4 text-center font-semibold">
-                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                          {(project as any).successProbability || 0}%
-                        </span>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={(project as any).successProbability || 0}
+                            onChange={(e) => {
+                              e.stopPropagation()
+                              const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
+                              onChangeSuccessProbability?.(project.id, value)
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-14 px-2 py-1 rounded-lg text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-center"
+                          />
+                          <span className="text-xs font-medium text-yellow-800">%</span>
+                        </div>
                       </td>
                     </>
                   ) : (
