@@ -9,11 +9,33 @@ export default function PerformanceView() {
 
   const salespeople = users
 
+  const getQuarterFromDate = (dateStr: string): string => {
+    const date = new Date(dateStr)
+    const month = date.getMonth() + 1
+    if (month <= 3) return 'q1'
+    if (month <= 6) return 'q2'
+    if (month <= 9) return 'q3'
+    return 'q4'
+  }
+
   const salesData = salespeople.map(salesperson => {
     const salesPersonProjects = projects.filter(p => p.assignedTo === salesperson.id)
     const totalRevenue = salesPersonProjects.reduce((sum, p) => sum + p.revenue, 0)
     const annualTarget = (salesperson as any).annualRevenue || 0
     const percentageToTarget = annualTarget > 0 ? Math.round((totalRevenue / annualTarget) * 100) : 0
+
+    const quarterlyRevenue = {
+      q1: 0,
+      q2: 0,
+      q3: 0,
+      q4: 0,
+    }
+    salesPersonProjects.forEach(p => {
+      const quarter = getQuarterFromDate(p.endDate)
+      quarterlyRevenue[quarter as keyof typeof quarterlyRevenue] += p.revenue
+    })
+
+    const quarterlyTargets = (salesperson as any).quarterlyTargets || { q1: 0, q2: 0, q3: 0, q4: 0 }
 
     return {
       name: salesperson.name,
@@ -21,11 +43,27 @@ export default function PerformanceView() {
       target: annualTarget,
       percentage: percentageToTarget,
       id: salesperson.id,
+      quarterlyRevenue,
+      quarterlyTargets,
     }
   }).sort((a, b) => b.revenue - a.revenue)
 
   const totalTeamRevenue = salesData.reduce((sum, s) => sum + s.revenue, 0)
   const totalTeamTarget = salesData.reduce((sum, s) => sum + s.target, 0)
+
+  const quarterlyTeamRevenue = {
+    q1: salesData.reduce((sum, s) => sum + s.quarterlyRevenue.q1, 0),
+    q2: salesData.reduce((sum, s) => sum + s.quarterlyRevenue.q2, 0),
+    q3: salesData.reduce((sum, s) => sum + s.quarterlyRevenue.q3, 0),
+    q4: salesData.reduce((sum, s) => sum + s.quarterlyRevenue.q4, 0),
+  }
+
+  const quarterlyTeamTarget = {
+    q1: salesData.reduce((sum, s) => sum + s.quarterlyTargets.q1, 0),
+    q2: salesData.reduce((sum, s) => sum + s.quarterlyTargets.q2, 0),
+    q3: salesData.reduce((sum, s) => sum + s.quarterlyTargets.q3, 0),
+    q4: salesData.reduce((sum, s) => sum + s.quarterlyTargets.q4, 0),
+  }
 
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316']
 
@@ -59,6 +97,37 @@ export default function PerformanceView() {
             <p className="text-3xl font-bold text-green-600">
               {totalTeamTarget > 0 ? Math.round((totalTeamRevenue / totalTeamTarget) * 100) : 0}%
             </p>
+          </div>
+        </div>
+
+        {/* Quarterly Performance */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">📊 Hodnocení podle kvartálů</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Object.entries(quarterlyTeamRevenue).map(([quarter, revenue]) => {
+              const target = quarterlyTeamTarget[quarter as keyof typeof quarterlyTeamTarget]
+              const percentage = target > 0 ? Math.round((revenue / target) * 100) : 0
+              const progressColor = percentage >= 100 ? 'bg-green-500' : percentage >= 75 ? 'bg-blue-500' : 'bg-yellow-500'
+
+              return (
+                <div key={quarter} className="glass rounded-2xl p-4">
+                  <p className="text-gray-600 text-sm font-semibold mb-3 uppercase">{quarter}</p>
+                  <p className="text-2xl font-bold text-gray-900 mb-1">
+                    {revenue.toLocaleString('cs-CZ', { maximumFractionDigits: 0 })} Kč
+                  </p>
+                  <p className="text-xs text-gray-600 mb-3">
+                    / {target.toLocaleString('cs-CZ', { maximumFractionDigits: 0 })} Kč
+                  </p>
+                  <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                    <div
+                      className={`${progressColor} h-2 rounded-full transition-all`}
+                      style={{ width: `${Math.min(percentage, 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-sm font-bold text-gray-900">{percentage}%</p>
+                </div>
+              )
+            })}
           </div>
         </div>
 
