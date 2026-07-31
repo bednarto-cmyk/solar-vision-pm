@@ -3,11 +3,16 @@ import { useUserStore } from '../store/userStore'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Trophy, TrendingUp } from 'lucide-react'
 
-export default function PerformanceView() {
+interface PerformanceViewProps {
+  user?: any
+}
+
+export default function PerformanceView({ user }: PerformanceViewProps) {
   const { projects } = useFirebaseProjectStore()
   const { users } = useUserStore()
 
-  const salespeople = users
+  const isAdmin = user?.role === 'admin'
+  const salespeople = isAdmin ? users : users.filter(u => u.id === user?.id)
 
   const getQuarterFromDate = (dateStr: string): string => {
     const date = new Date(dateStr)
@@ -229,6 +234,69 @@ export default function PerformanceView() {
           {salesData.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               Žádní obchodníci - přidej si prvního v Nastavení
+            </div>
+          )}
+        </div>
+
+        {/* Quarterly Comparison Table */}
+        <div className="glass rounded-2xl p-6 mt-8 overflow-x-auto">
+          <h2 className="text-lg font-bold text-gray-800 mb-6">📋 Detailní srovnění kvartálů</h2>
+
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 border-b-2 border-gray-200">
+                <th className="px-4 py-3 text-left font-semibold text-gray-700">Obchodník</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-700">Q1</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-700">Q2</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-700">Q3</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-700">Q4</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-700">Celkem</th>
+                <th className="px-4 py-3 text-center font-semibold text-gray-700">Splnění</th>
+              </tr>
+            </thead>
+            <tbody>
+              {salesData.map((person) => {
+                const formatQuarter = (revenue: number, target: number) => {
+                  const pct = target > 0 ? Math.round((revenue / target) * 100) : 0
+                  return `${revenue.toLocaleString('cs-CZ', { maximumFractionDigits: 0 })} Kč (${pct}%)`
+                }
+
+                return (
+                  <tr key={person.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-gray-900">{person.name}</td>
+                    <td className="px-4 py-3 text-right text-gray-700 text-xs">
+                      {formatQuarter(person.quarterlyRevenue.q1, person.quarterlyTargets.q1)}
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-700 text-xs">
+                      {formatQuarter(person.quarterlyRevenue.q2, person.quarterlyTargets.q2)}
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-700 text-xs">
+                      {formatQuarter(person.quarterlyRevenue.q3, person.quarterlyTargets.q3)}
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-700 text-xs">
+                      {formatQuarter(person.quarterlyRevenue.q4, person.quarterlyTargets.q4)}
+                    </td>
+                    <td className="px-4 py-3 text-right font-semibold text-gray-900">
+                      {person.revenue.toLocaleString('cs-CZ', { maximumFractionDigits: 0 })} Kč
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                        person.percentage >= 100 ? 'bg-green-100 text-green-800' :
+                        person.percentage >= 75 ? 'bg-blue-100 text-blue-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {person.percentage}%
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+
+          {salesData.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              Žádná data k zobrazení
             </div>
           )}
         </div>

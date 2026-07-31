@@ -54,7 +54,7 @@ function App() {
         {currentView === 'projects' && <HybridProjectView user={user} showOnlyLeads={false} />}
         {currentView === 'contacts' && <Contacts currentUser={user} />}
         {currentView === 'dashboard' && <DashboardView user={user} />}
-        {currentView === 'performance' && <PerformanceView />}
+        {currentView === 'performance' && <PerformanceView user={user} />}
         {currentView === 'settings' && <SettingsView />}
       </div>
       <Toaster position="top-right" />
