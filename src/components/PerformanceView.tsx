@@ -76,7 +76,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
   return (
     <div className="p-4 md:p-6 min-h-screen pb-24">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-6 mt-8">
           <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
             <Trophy className="w-8 h-8 text-yellow-500" />
             Performance Dashboard
