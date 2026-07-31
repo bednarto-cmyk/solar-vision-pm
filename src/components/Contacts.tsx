@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, Eye } from 'lucide-react'
 import { useFirebaseContactStore } from '../store/firebaseContactStore'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import { useFirebaseUserStore } from '../store/firebaseUserStore'
+import { useUserStore } from '../store/userStore'
 import ContactModal from './ContactModal'
 import ContactHistoryModal from './ContactHistoryModal'
 import toast from 'react-hot-toast'
@@ -14,7 +15,11 @@ interface ContactsProps {
 export default function Contacts({ currentUser }: ContactsProps) {
   const { contacts, addContact, updateContact, deleteContact, initializeContacts } = useFirebaseContactStore()
   const { projects } = useFirebaseProjectStore()
-  const { users, initializeUsers } = useFirebaseUserStore()
+  const { users: firebaseUsers, initializeUsers } = useFirebaseUserStore()
+  const { users: localUsers } = useUserStore()
+
+  // Kombinuj Firebase a lokální users, Firebase má prioritu
+  const users = firebaseUsers.length > 0 ? firebaseUsers : localUsers
 
   useEffect(() => {
     initializeUsers()
