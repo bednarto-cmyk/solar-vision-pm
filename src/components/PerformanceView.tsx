@@ -20,7 +20,8 @@ export default function PerformanceView() {
 
   const salesData = salespeople.map(salesperson => {
     const salesPersonProjects = projects.filter(p => p.assignedTo === salesperson.id)
-    const totalRevenue = salesPersonProjects.reduce((sum, p) => sum + p.revenue, 0)
+    const completedProjects = salesPersonProjects.filter(p => p.status === 'completed')
+    const totalRevenue = completedProjects.reduce((sum, p) => sum + p.revenue, 0)
     const annualTarget = (salesperson as any).annualRevenue || 0
     const percentageToTarget = annualTarget > 0 ? Math.round((totalRevenue / annualTarget) * 100) : 0
 
@@ -30,7 +31,7 @@ export default function PerformanceView() {
       q3: 0,
       q4: 0,
     }
-    salesPersonProjects.forEach(p => {
+    completedProjects.forEach(p => {
       const quarter = getQuarterFromDate(p.endDate)
       quarterlyRevenue[quarter as keyof typeof quarterlyRevenue] += p.revenue
     })
