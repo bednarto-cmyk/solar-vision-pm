@@ -227,7 +227,6 @@ export default function Navbar({ currentView, onViewChange, onLogout, user }: Na
               <p className="text-xs text-gray-500 px-4 py-1">{user.name}</p>
             )}
           </div>
-          </div>
         )}
       </div>
     </nav>
