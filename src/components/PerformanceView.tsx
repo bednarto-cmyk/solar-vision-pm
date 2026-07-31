@@ -240,7 +240,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
 
         {/* Quarterly Comparison Table */}
         <div className="glass rounded-2xl p-6 mt-8 overflow-x-auto">
-          <h2 className="text-lg font-bold text-gray-800 mb-6">📋 Detailní srovnění kvartálů</h2>
+          <h2 className="text-lg font-bold text-gray-800 mb-6">📋 Detailní kvartální srovnění</h2>
 
           <table className="w-full text-sm">
             <thead>
