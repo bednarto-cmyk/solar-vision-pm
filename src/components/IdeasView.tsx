@@ -27,11 +27,16 @@ export default function IdeasView({ user }: { user: any }) {
   const [priorityFilter, setPriorityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all')
 
   useEffect(() => {
+    console.log('IdeasView mounted, initializing ideas...')
     const unsubscribe = initializeIdeas()
     return () => {
       if (unsubscribe) unsubscribe()
     }
-  }, [])
+  }, [initializeIdeas])
+
+  useEffect(() => {
+    console.log('IdeasView ideas changed:', ideas)
+  }, [ideas])
 
   const getCreatorName = (userId: string) => {
     return users.find(u => u.id === userId)?.name || userId
