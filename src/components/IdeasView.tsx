@@ -23,8 +23,6 @@ export default function IdeasView({ user }: { user: any }) {
   })
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const [selectedParentId, setSelectedParentId] = useState<string | undefined>()
-  const [statusFilter, setStatusFilter] = useState<'all' | 'new' | 'in_progress' | 'completed'>('all')
-  const [priorityFilter, setPriorityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all')
 
   useEffect(() => {
     console.log('IdeasView mounted, initializing ideas...')
