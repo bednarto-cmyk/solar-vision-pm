@@ -31,7 +31,7 @@ export default function IdeasView({ user }: { user: any }) {
     return () => {
       if (unsubscribe) unsubscribe()
     }
-  }, [initializeIdeas])
+  }, [])
 
   const getCreatorName = (userId: string) => {
     return users.find(u => u.id === userId)?.name || userId
