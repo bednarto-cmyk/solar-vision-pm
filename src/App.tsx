@@ -11,6 +11,7 @@ import LoginPage from './components/LoginPage'
 import IdeasView from './components/IdeasView'
 import { useFirebaseProjectStore } from './store/firebaseProjectStore'
 import { useFirebaseUserStore } from './store/firebaseUserStore'
+import { useFirebaseIdeaStore } from './store/ideaStore'
 
 type View = 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'ideas' | 'contacts' | 'settings' | 'login'
 
@@ -19,10 +20,12 @@ function App() {
   const [user, setUser] = useState(null)
   const initializeProjects = useFirebaseProjectStore((state) => state.initializeProjects)
   const initializeUsers = useFirebaseUserStore((state) => state.initializeUsers)
+  const initializeIdeas = useFirebaseIdeaStore((state) => state.initializeIdeas)
 
   useEffect(() => {
     initializeProjects()
     initializeUsers()
+    initializeIdeas()
 
     const savedUser = localStorage.getItem('user')
     if (savedUser) {

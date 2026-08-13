@@ -107,12 +107,8 @@ export default function IdeasView({ user }: { user: any }) {
     setExpandedIds(newExpanded)
   }
 
-  const filteredIdeas = ideas.filter(idea => {
-    if (idea.parentId) return false // Hlavní seznam - jen top-level nápady
-    if (statusFilter !== 'all' && idea.status !== statusFilter) return false
-    if (priorityFilter !== 'all' && idea.priority !== priorityFilter) return false
-    return true
-  }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  // Jen top-level nápady, bez filtrování
+  const filteredIdeas = ideas.filter(idea => !idea.parentId)
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -133,7 +129,16 @@ export default function IdeasView({ user }: { user: any }) {
   }
 
   const renderIdeaTree = (parentId: string | null = null, depth = 0) => {
-    const children = ideas.filter(idea => idea.parentId === parentId)
+    let children = ideas.filter(idea => idea.parentId === parentId)
+
+    // Apply status and priority filters only for top-level ideas
+    if (parentId === null) {
+      children = children.filter(idea => {
+        if (statusFilter !== 'all' && idea.status !== statusFilter) return false
+        if (priorityFilter !== 'all' && idea.priority !== priorityFilter) return false
+        return true
+      }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    }
 
     return (
       <div className={depth > 0 ? 'ml-6 space-y-3 mt-3' : 'space-y-3'}>
@@ -234,36 +239,6 @@ export default function IdeasView({ user }: { user: any }) {
             <Plus className="w-5 h-5" />
             Nový Nápad
           </button>
-        </div>
-
-        {/* Filtry */}
-        <div className="glass rounded-2xl p-4 mb-6 flex flex-col md:flex-row gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Stav</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              <option value="all">Všechny</option>
-              <option value="new">Nový</option>
-              <option value="in_progress">V řešení</option>
-              <option value="completed">Vyřešeno</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Priorita</label>
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value as any)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            >
-              <option value="all">Všechny</option>
-              <option value="high">Vysoká</option>
-              <option value="medium">Střední</option>
-              <option value="low">Nízká</option>
-            </select>
-          </div>
         </div>
 
         {/* Nový nápad formulář */}
