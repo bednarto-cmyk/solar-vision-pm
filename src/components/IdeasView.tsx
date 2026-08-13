@@ -126,7 +126,7 @@ export default function IdeasView({ user }: { user: any }) {
     return labels[priority] || priority
   }
 
-  const renderIdeaTree = (parentId: string | null = null, depth = 0) => {
+  const renderIdeaTree = (parentId: string | undefined = undefined, depth = 0) => {
     const children = ideas.filter(idea => idea.parentId === parentId)
 
     return (
