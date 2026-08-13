@@ -16,16 +16,20 @@ export interface Idea {
 
 interface IdeaStore {
   ideas: Idea[]
-  initializeIdeas: () => void
+  initialized: boolean
+  initializeIdeas: () => () => void
   addIdea: (idea: Omit<Idea, 'id' | 'createdAt' | 'updatedAt'>, createdBy: string) => Promise<void>
   updateIdea: (id: string, updates: Partial<Idea>) => Promise<void>
   deleteIdea: (id: string) => Promise<void>
 }
 
-export const useFirebaseIdeaStore = create<IdeaStore>((set) => ({
+export const useFirebaseIdeaStore = create<IdeaStore>((set, get) => ({
   ideas: [],
+  initialized: false,
 
   initializeIdeas: () => {
+    if (get().initialized) return () => {}
+
     const ideasRef = collection(db, 'ideas')
     const q = query(ideasRef)
 
@@ -35,7 +39,7 @@ export const useFirebaseIdeaStore = create<IdeaStore>((set) => ({
         ...doc.data()
       })) as Idea[]
 
-      set({ ideas: ideasData })
+      set({ ideas: ideasData, initialized: true })
     }, (error) => {
       console.error('Error loading ideas:', error)
     })
