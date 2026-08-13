@@ -8,10 +8,11 @@ import PerformanceView from './components/PerformanceView'
 import Contacts from './components/Contacts'
 import SettingsView from './components/SettingsView'
 import LoginPage from './components/LoginPage'
+import IdeasView from './components/IdeasView'
 import { useFirebaseProjectStore } from './store/firebaseProjectStore'
 import { useFirebaseUserStore } from './store/firebaseUserStore'
 
-type View = 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login'
+type View = 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'ideas' | 'contacts' | 'settings' | 'login'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('login')
@@ -55,6 +56,7 @@ function App() {
         {currentView === 'contacts' && <Contacts currentUser={user} />}
         {currentView === 'dashboard' && <DashboardView user={user} />}
         {currentView === 'performance' && <PerformanceView user={user} />}
+        {currentView === 'ideas' && <IdeasView user={user} />}
         {currentView === 'settings' && <SettingsView />}
       </div>
       <Toaster position="top-right" />

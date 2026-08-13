@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { LogOut, BarChart3, Lightbulb, Menu, X, Users, Settings, Trophy, FolderOpen } from 'lucide-react'
+import { LogOut, BarChart3, Lightbulb, Menu, X, Users, Settings, Trophy, FolderOpen, Zap } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 
 interface NavbarProps {
   currentView: string
-  onViewChange: (view: 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login') => void
+  onViewChange: (view: 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'ideas' | 'contacts' | 'settings' | 'login') => void
   onLogout: () => void
   user?: any
 }
@@ -25,7 +25,7 @@ export default function Navbar({ currentView, onViewChange, onLogout, user }: Na
   }).length
   const totalAlerts = urgentDeadlines + overdueProjects
 
-  const handleNavChange = (view: 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'contacts' | 'settings' | 'login') => {
+  const handleNavChange = (view: 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'ideas' | 'contacts' | 'settings' | 'login') => {
     onViewChange(view)
     setIsMenuOpen(false)
   }
@@ -100,6 +100,17 @@ export default function Navbar({ currentView, onViewChange, onLogout, user }: Na
               >
                 <Trophy className="w-5 h-5" />
                 Performance
+              </button>
+              <button
+                onClick={() => handleNavChange('ideas')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  currentView === 'ideas'
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Zap className="w-5 h-5" />
+                Nápady
               </button>
               <button
                 onClick={() => handleNavChange('settings')}
@@ -204,6 +215,17 @@ export default function Navbar({ currentView, onViewChange, onLogout, user }: Na
             >
               <Trophy className="w-5 h-5" />
               Performance
+            </button>
+            <button
+              onClick={() => handleNavChange('ideas')}
+              className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg transition-colors text-left ${
+                currentView === 'ideas'
+                  ? 'bg-yellow-100 text-yellow-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Zap className="w-5 h-5" />
+              Nápady
             </button>
             <button
               onClick={() => handleNavChange('settings')}
