@@ -127,16 +127,7 @@ export default function IdeasView({ user }: { user: any }) {
   }
 
   const renderIdeaTree = (parentId: string | null = null, depth = 0) => {
-    let children = ideas.filter(idea => idea.parentId === parentId)
-
-    // Apply status and priority filters only for top-level ideas
-    if (parentId === null) {
-      children = children.filter(idea => {
-        if (statusFilter !== 'all' && idea.status !== statusFilter) return false
-        if (priorityFilter !== 'all' && idea.priority !== priorityFilter) return false
-        return true
-      }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    }
+    const children = ideas.filter(idea => idea.parentId === parentId)
 
     return (
       <div className={depth > 0 ? 'ml-6 space-y-3 mt-3' : 'space-y-3'}>
