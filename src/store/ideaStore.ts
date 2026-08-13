@@ -28,8 +28,12 @@ export const useFirebaseIdeaStore = create<IdeaStore>((set, get) => ({
   initialized: false,
 
   initializeIdeas: () => {
-    if (get().initialized) return () => {}
+    if (get().initialized) {
+      console.log('Ideas already initialized')
+      return () => {}
+    }
 
+    console.log('Initializing ideas from Firebase...')
     const ideasRef = collection(db, 'ideas')
     const q = query(ideasRef)
 
@@ -39,6 +43,7 @@ export const useFirebaseIdeaStore = create<IdeaStore>((set, get) => ({
         ...doc.data()
       })) as Idea[]
 
+      console.log('Ideas loaded from Firebase:', ideasData)
       set({ ideas: ideasData, initialized: true })
     }, (error) => {
       console.error('Error loading ideas:', error)
@@ -57,7 +62,9 @@ export const useFirebaseIdeaStore = create<IdeaStore>((set, get) => ({
         updatedAt: new Date().toISOString(),
       }
 
-      await addDoc(ideasRef, newIdea)
+      console.log('Adding idea to Firebase:', newIdea)
+      const docRef = await addDoc(ideasRef, newIdea)
+      console.log('Idea added with ID:', docRef.id)
     } catch (error) {
       console.error('Error adding idea:', error)
       throw error
