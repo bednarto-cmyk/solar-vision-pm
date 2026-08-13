@@ -32,7 +32,7 @@ export default function IdeasView({ user }: { user: any }) {
     return () => {
       if (unsubscribe) unsubscribe()
     }
-  }, [initializeIdeas])
+  }, [])
 
   useEffect(() => {
     console.log('IdeasView ideas changed:', ideas)
