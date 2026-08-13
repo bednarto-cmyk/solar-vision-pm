@@ -251,15 +251,6 @@ export default function IdeasView({ user }: { user: any }) {
                 rows={3}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-              <select
-                value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                <option value="low">Priorita: Nízká</option>
-                <option value="medium">Priorita: Střední</option>
-                <option value="high">Priorita: Vysoká</option>
-              </select>
               <div className="flex gap-3">
                 <button
                   onClick={handleAddIdea}
