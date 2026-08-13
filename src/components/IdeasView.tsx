@@ -136,8 +136,8 @@ export default function IdeasView({ user }: { user: any }) {
           const isExpanded = expandedIds.has(idea.id)
 
           return (
-            <div key={idea.id} className="border-l-2 border-gray-300 pl-4">
-              <div className="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow">
+            <div key={idea.id} className={`border-l-2 border-gray-300 pl-4 ${idea.status === 'completed' ? 'opacity-50' : ''}`}>
+              <div className={`bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow ${idea.status === 'completed' ? 'bg-gray-50' : ''}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
