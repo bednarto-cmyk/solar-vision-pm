@@ -1,16 +1,8 @@
 import { useState, useEffect } from 'react'
-import { X, Plus } from 'lucide-react'
+import { X, Plus, Trash2, GripVertical } from 'lucide-react'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import type { ProjectStatus } from '../store/projectStore'
-import {
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from '@dnd-kit/core'
 import toast from 'react-hot-toast'
-import DraggableTaskCard from './DraggableTaskCard'
 
 interface ProjectKanbanModalProps {
   projectId: string
@@ -31,9 +23,9 @@ const PHASES: { value: ProjectStatus; label: string; color: string }[] = [
 
 export default function ProjectKanbanModal({ projectId, onClose, user }: ProjectKanbanModalProps) {
   const { projects, addTask, updateTask, deleteTask } = useFirebaseProjectStore()
+  const [draggedTask, setDraggedTask] = useState<any>(null)
   const [newTaskTitles, setNewTaskTitles] = useState<{ [key: string]: string }>({})
 
-  // Permission check: user can access if they own it OR they're admin
   const project = projects.find(p => p.id === projectId)
   const canAccess = project && (user.role === 'admin' || project.assignedTo === user.id)
 
@@ -93,39 +85,35 @@ export default function ProjectKanbanModal({ projectId, onClose, user }: Project
     }
   }
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event
+  const handleTaskDragStart = (task: any, phase: ProjectStatus) => {
+    setDraggedTask({ ...task, fromPhase: phase })
+  }
 
-    if (!over) return
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
 
-    const [sourcePhase, sourceIndex] = active.id.toString().split('-')
-    const [destPhase] = over.id.toString().split('-')
+  const handleTaskDrop = async (toPhase: ProjectStatus) => {
+    if (!draggedTask) return
 
-    if (sourcePhase === destPhase) return
+    const { fromPhase, ...task } = draggedTask
 
-    const sourceTasksList = getTasksByPhase(sourcePhase as ProjectStatus)
-    const taskToMove = sourceTasksList[parseInt(sourceIndex)]
-
-    if (!taskToMove) return
+    if (fromPhase === toPhase) {
+      setDraggedTask(null)
+      return
+    }
 
     try {
-      await updateTask(projectId, taskToMove.id, { status: destPhase })
-      const phaseLabel = PHASES.find(p => p.value === destPhase)?.label
-      toast.success(`Podúkol přesunut do ${phaseLabel}`)
+      await updateTask(projectId, task.id, { status: toPhase })
+      toast.success(`Podúkol přesunut do ${PHASES.find(p => p.value === toPhase)?.label}`)
     } catch (error) {
       toast.error('Chyba při přesunu podúkolu')
     }
+
+    setDraggedTask(null)
   }
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  )
-
-  // ESC key handler
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -135,16 +123,16 @@ export default function ProjectKanbanModal({ projectId, onClose, user }: Project
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 bg-gray-900 z-50 overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-gray-950 z-50 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700 p-6 flex items-center justify-between flex-shrink-0">
+      <div className="bg-gradient-to-r from-gray-900 to-gray-950 border-b border-gray-800 p-6 flex items-center justify-between flex-shrink-0">
         <div>
           <h1 className="text-3xl font-bold text-white">{project.name}</h1>
-          <p className="text-gray-400 mt-1">🏢 {project.customer}</p>
+          <p className="text-gray-300 mt-1">🏢 {project.customer}</p>
         </div>
         <button
           onClick={onClose}
-          className="p-2 hover:bg-gray-700 rounded-lg transition-colors text-gray-300 hover:text-white"
+          className="p-2 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-white"
           title="Zavřít (ESC)"
         >
           <X className="w-8 h-8" />
@@ -152,70 +140,87 @@ export default function ProjectKanbanModal({ projectId, onClose, user }: Project
       </div>
 
       {/* Kanban Board */}
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        <div className="flex-1 overflow-x-auto p-6">
-          <div className="flex gap-6 h-full">
-            {PHASES.map((phase) => {
-              const phasesTasks = getTasksByPhase(phase.value)
-              return (
+      <div className="flex-1 overflow-x-auto p-6">
+        <div className="flex gap-6 h-full">
+          {PHASES.map((phase) => {
+            const phasesTasks = getTasksByPhase(phase.value)
+            return (
+              <div
+                key={phase.value}
+                className="flex-shrink-0 w-96 bg-gray-900 rounded-xl border border-gray-800 overflow-hidden flex flex-col"
+              >
+                {/* Column Header */}
+                <div className={`bg-gradient-to-r ${phase.color} border-b border-gray-800 p-4`}>
+                  <h2 className="font-bold text-white text-lg">{phase.label}</h2>
+                  <p className="text-sm text-gray-300 mt-1">{phasesTasks.length} podúkol(ů)</p>
+                </div>
+
+                {/* Tasks Container */}
                 <div
-                  key={phase.value}
-                  className="flex-shrink-0 w-96 bg-gradient-to-br rounded-xl border border-gray-700 overflow-hidden flex flex-col"
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleTaskDrop(phase.value)}
+                  className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-800/20"
                 >
-                  {/* Column Header */}
-                  <div className={`bg-gradient-to-r ${phase.color} border-b border-gray-700 p-4`}>
-                    <h2 className="font-bold text-gray-900 text-lg">{phase.label}</h2>
-                    <p className="text-sm text-gray-600 mt-1">{phasesTasks.length} podúkol(ů)</p>
-                  </div>
-
-                  {/* Tasks Container */}
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-800/30">
-                    {phasesTasks.map((task, index) => (
-                      <DraggableTaskCard
-                        key={task.id}
-                        id={`${phase.value}-${index}`}
-                        task={task}
-                        onDelete={() => handleDeleteTask(task.id)}
-                      />
-                    ))}
-
-                    {/* Add New Task */}
-                    <div className="pt-2 border-t border-gray-700/50">
-                      <input
-                        type="text"
-                        value={newTaskTitles[phase.value] || ''}
-                        onChange={(e) =>
-                          setNewTaskTitles(prev => ({
-                            ...prev,
-                            [phase.value]: e.target.value,
-                          }))
-                        }
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            handleAddTask(phase.value)
-                          }
-                        }}
-                        placeholder="➕ Nový podúkol"
-                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                      <button
-                        onClick={() => handleAddTask(phase.value)}
-                        className="w-full mt-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
-                      >
-                        <Plus className="w-4 h-4 inline mr-1" />
-                        Přidat
-                      </button>
+                  {phasesTasks.map((task) => (
+                    <div
+                      key={task.id}
+                      draggable
+                      onDragStart={() => handleTaskDragStart(task, phase.value)}
+                      className={`bg-gray-800 border border-gray-700 rounded-lg p-4 cursor-move hover:shadow-lg transition-all ${
+                        draggedTask?.id === task.id ? 'opacity-50 ring-2 ring-green-500' : ''
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <GripVertical className="w-4 h-4 text-gray-500 mt-1 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-white break-words">{task.title}</p>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteTask(task.id)}
+                          className="p-1 text-gray-500 hover:text-red-400 transition-colors flex-shrink-0"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
+                  ))}
+
+                  {/* Add New Task */}
+                  <div className="pt-2 border-t border-gray-700/50">
+                    <input
+                      type="text"
+                      value={newTaskTitles[phase.value] || ''}
+                      onChange={(e) =>
+                        setNewTaskTitles(prev => ({
+                          ...prev,
+                          [phase.value]: e.target.value,
+                        }))
+                      }
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleAddTask(phase.value)
+                        }
+                      }}
+                      placeholder="➕ Nový podúkol"
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                    <button
+                      onClick={() => handleAddTask(phase.value)}
+                      className="w-full mt-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <Plus className="w-4 h-4 inline mr-1" />
+                      Přidat
+                    </button>
                   </div>
                 </div>
-              )
-            })}
-          </div>
+              </div>
+            )
+          })}
         </div>
-      </DndContext>
+      </div>
 
-      {/* Keyboard Shortcut Info */}
-      <div className="bg-gray-800 border-t border-gray-700 px-6 py-3 text-xs text-gray-400">
+      {/* Footer */}
+      <div className="bg-gray-900 border-t border-gray-800 px-6 py-3 text-xs text-gray-400">
         Přetáhni karty mezi sloupci • <span className="text-gray-300 font-medium">ESC</span> pro zavření
       </div>
     </div>
