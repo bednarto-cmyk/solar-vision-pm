@@ -19,8 +19,8 @@ interface ProjectStore {
   deleteProject: (id: string) => Promise<void>
   moveProject: (id: string, newStatus: ProjectStatus) => Promise<void>
   getProjectsByStatus: (status: ProjectStatus) => Project[]
-  addTask: (projectId: string, taskTitle: string) => Promise<void>
-  updateTask: (projectId: string, taskId: string, completed: boolean) => Promise<void>
+  addTask: (projectId: string, taskTitle: string, status?: ProjectStatus) => Promise<void>
+  updateTask: (projectId: string, taskId: string, updates: any) => Promise<void>
   deleteTask: (projectId: string, taskId: string) => Promise<void>
   acknowledgeUrgent: (id: string) => Promise<void>
 }
@@ -62,7 +62,7 @@ export const useFirebaseProjectStore = create<ProjectStore>((set, get) => ({
     const state = get()
     return state.projects.filter((p) => p.status === status)
   },
-  addTask: async (projectId, taskTitle) => {
+  addTask: async (projectId, taskTitle, status = 'leads') => {
     const projectRef = doc(db, 'projects', projectId)
     const project = get().projects.find((p) => p.id === projectId)
     if (project) {
@@ -70,19 +70,20 @@ export const useFirebaseProjectStore = create<ProjectStore>((set, get) => ({
         id: `task-${Date.now()}`,
         title: taskTitle,
         completed: false,
+        status,
       }
       await updateDoc(projectRef, {
         tasks: [...(project.tasks || []), newTask],
       })
     }
   },
-  updateTask: async (projectId, taskId, completed) => {
+  updateTask: async (projectId, taskId, updates) => {
     const projectRef = doc(db, 'projects', projectId)
     const project = get().projects.find((p) => p.id === projectId)
     if (project) {
       await updateDoc(projectRef, {
         tasks: (project.tasks || []).map((t) =>
-          t.id === taskId ? { ...t, completed } : t
+          t.id === taskId ? { ...t, ...updates } : t
         ),
       })
     }

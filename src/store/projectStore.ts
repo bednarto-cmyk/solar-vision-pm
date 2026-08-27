@@ -8,6 +8,7 @@ export interface ProjectTask {
   id: string
   title: string
   completed: boolean
+  status?: ProjectStatus
 }
 
 export interface Project {

@@ -3,7 +3,7 @@ import { Plus, Sun, PencilLine, ShoppingCart, Zap, CheckCircle, Plug, Settings }
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import { useUserStore } from '../store/userStore'
 import type { ProjectStatus } from '../store/projectStore'
-import OpportunityKanbanModal from './OpportunityKanbanModal'
+import ProjectKanbanModal from './ProjectKanbanModal'
 import ProjectModal from './ProjectModal'
 import ProjectsListTable from './ProjectsListTable'
 import toast from 'react-hot-toast'
@@ -234,7 +234,7 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
       )}
 
       {isDetailModalOpen && selectedProjectId && (
-        <OpportunityKanbanModal projectId={selectedProjectId} onClose={() => setIsDetailModalOpen(false)} />
+        <ProjectKanbanModal projectId={selectedProjectId} onClose={() => setIsDetailModalOpen(false)} user={user} />
       )}
     </div>
   )
