@@ -31,16 +31,26 @@ const PHASES: { value: ProjectStatus; label: string; color: string }[] = [
 
 export default function ProjectKanbanModal({ projectId, onClose, user }: ProjectKanbanModalProps) {
   const { projects, addTask, updateTask, deleteTask } = useFirebaseProjectStore()
-
   const [newTaskTitles, setNewTaskTitles] = useState<{ [key: string]: string }>({})
 
-  // Admin-only access
-  if (user.role !== 'admin') {
+  // Permission check: user can access if they own it OR they're admin
+  const project = projects.find(p => p.id === projectId)
+  const canAccess = project && (user.role === 'admin' || project.assignedTo === user.id)
+
+  if (!project) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div className="text-white">Projekt nenalezen</div>
+      </div>
+    )
+  }
+
+  if (!canAccess) {
     return (
       <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
         <div className="bg-white rounded-lg p-6 max-w-md text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-2">Přístup zamítnut</h2>
-          <p className="text-gray-600 mb-4">Pouze administrátoři mají přístup k nástěnce projektů</p>
+          <p className="text-gray-600 mb-4">Nemáš přístup k tomuto projektu</p>
           <button
             onClick={onClose}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -48,15 +58,6 @@ export default function ProjectKanbanModal({ projectId, onClose, user }: Project
             Zavřít
           </button>
         </div>
-      </div>
-    )
-  }
-
-  const project = projects.find(p => p.id === projectId)
-  if (!project) {
-    return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
-        <div className="text-white">Projekt nenalezen</div>
       </div>
     )
   }
