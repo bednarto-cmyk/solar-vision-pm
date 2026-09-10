@@ -33,8 +33,6 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
   const [editingProject, setEditingProject] = useState<any>(null)
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [filterSalesperson, setFilterSalesperson] = useState<string>('')
-  const [filterOfferPhases, setFilterOfferPhases] = useState<string[]>([])
 
   let visibleProjects = user.role === 'admin' ? projects : projects.filter(p => p.assignedTo === user.id)
 
@@ -47,7 +45,6 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
 
   let filteredProjects = visibleProjects
 
-  // Filter by status/phase
   filteredProjects = filterStatus === 'urgent'
     ? filteredProjects.filter(p => {
         if (p.isUrgentAcknowledged) return false
@@ -63,20 +60,6 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
         ? filteredProjects.filter(p => p.status === filterStatus)
         : filteredProjects
 
-  // Filter by salesperson
-  if (filterSalesperson) {
-    filteredProjects = filteredProjects.filter(p => p.assignedTo === filterSalesperson)
-  }
-
-  // Filter by offer phases
-  if (filterOfferPhases.length > 0) {
-    filteredProjects = filteredProjects.filter(p => {
-      const offerPhase = (p as any).offerPhase || ''
-      return filterOfferPhases.some(phase => offerPhase.startsWith(phase))
-    })
-  }
-
-  // Search filter
   if (searchQuery) {
     const query = searchQuery.toLowerCase()
     filteredProjects = filteredProjects.filter(p =>
@@ -132,7 +115,7 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
   return (
     <div className="p-4 md:p-6 min-h-screen pb-24">
       <div className="w-full">
-        <div className="flex flex-col md:flex-row gap-4 mb-6 items-start md:items-center">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
           <h1 className="text-3xl font-bold text-gray-800">
             {showOnlyLeads ? '💡 Příležitosti' : '📁 REALIZACE'}
           </h1>
@@ -143,18 +126,6 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
             <Plus className="w-5 h-5" />
             {showOnlyLeads ? 'Nová Příležitost' : 'Nový Projekt'}
           </button>
-          <div className="flex flex-wrap gap-2 ml-auto">
-            <select
-              value={filterSalesperson}
-              onChange={(e) => setFilterSalesperson(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              <option value="">Všichni obchodníci</option>
-              {users.map(u => (
-                <option key={u.id} value={u.id}>{u.name}</option>
-              ))}
-            </select>
-          </div>
         </div>
 
         {/* Phase Filter Badges */}
@@ -234,48 +205,6 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
             className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
           />
         </div>
-
-        {/* Offer Phase Filter */}
-        {showOnlyLeads && (
-          <div className="mb-6 glass rounded-2xl shadow p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-900">Filtr fází nabídky</h3>
-              {filterOfferPhases.length > 0 && (
-                <button
-                  onClick={() => setFilterOfferPhases([])}
-                  className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
-                >
-                  Vymazat
-                </button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              {[
-                { key: 'quote', label: '📋 Nabídka' },
-                { key: 'approved', label: '✅ Schváleno' },
-                { key: 'pending', label: '⏳ Čeká na odpověď' },
-                { key: 'negotiation', label: '💬 Jednání' },
-                { key: 'cancelled', label: '❌ Zrušeno' },
-              ].map(phase => (
-                <label key={phase.key} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={filterOfferPhases.includes(phase.key)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFilterOfferPhases([...filterOfferPhases, phase.key])
-                      } else {
-                        setFilterOfferPhases(filterOfferPhases.filter(p => p !== phase.key))
-                      }
-                    }}
-                    className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-                  />
-                  <span className="text-sm text-gray-700">{phase.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Projects List Table */}
         <div className="mb-6">

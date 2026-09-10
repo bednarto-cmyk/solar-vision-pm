@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import type { ProjectStatus } from '../store/projectStore'
 
 interface Project {
@@ -49,6 +49,10 @@ export default function ProjectsListTable({
 }: ProjectsListTableProps) {
   const [sortField, setSortField] = useState<SortField>('createdAt')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
+  const [filterName, setFilterName] = useState('')
+  const [filterCustomer, setFilterCustomer] = useState('')
+  const [filterSalesperson, setFilterSalesperson] = useState('')
+  const [filterOfferPhase, setFilterOfferPhase] = useState('')
 
   const PHASES = ['leads', 'prep', 'purchase', 'execution', 'revision', 'distribution', 'service', 'completed'] as const
 
@@ -67,7 +71,17 @@ export default function ProjectsListTable({
     }
   }
 
-  const sortedProjects = [...projects].sort((a, b) => {
+  // Filter projects
+  let filtered = projects.filter(p => {
+    if (filterName && !p.name.toLowerCase().includes(filterName.toLowerCase())) return false
+    if (filterCustomer && !p.customer.toLowerCase().includes(filterCustomer.toLowerCase())) return false
+    if (filterSalesperson && p.assignedTo !== filterSalesperson) return false
+    if (filterOfferPhase && !(p as any).offerPhase?.startsWith(filterOfferPhase)) return false
+    return true
+  })
+
+  // Sort projects
+  const sortedProjects = [...filtered].sort((a, b) => {
     let aVal: any = a[sortField as keyof Project]
     let bVal: any = b[sortField as keyof Project]
 
@@ -107,6 +121,8 @@ export default function ProjectsListTable({
     num.toLocaleString('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 })
 
   const formatDate = (date: string) => new Date(date).toLocaleDateString('cs-CZ')
+
+  const hasFilters = filterName || filterCustomer || filterSalesperson || filterOfferPhase
 
   return (
     <div className="glass rounded-2xl overflow-hidden">
@@ -215,6 +231,83 @@ export default function ProjectsListTable({
                       Výnos <SortIcon field="profit" />
                     </button>
                   </th>
+                </>
+              )}
+            </tr>
+            {/* Filter Row */}
+            <tr className="bg-white border-b border-gray-200">
+              <th className="px-6 py-3"></th>
+              <th className="px-6 py-3">
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    placeholder="🔍 Filtr..."
+                    value={filterName}
+                    onChange={(e) => setFilterName(e.target.value)}
+                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  {filterName && (
+                    <button onClick={() => setFilterName('')} className="text-gray-400 hover:text-gray-600">
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </th>
+              <th className="px-6 py-3">
+                <div className="flex items-center gap-1">
+                  <input
+                    type="text"
+                    placeholder="🔍 Filtr..."
+                    value={filterCustomer}
+                    onChange={(e) => setFilterCustomer(e.target.value)}
+                    className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  {filterCustomer && (
+                    <button onClick={() => setFilterCustomer('')} className="text-gray-400 hover:text-gray-600">
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </th>
+              <th className="px-6 py-3">
+                <select
+                  value={filterSalesperson}
+                  onChange={(e) => setFilterSalesperson(e.target.value)}
+                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="">Všichni</option>
+                  {users.map(u => (
+                    <option key={u.id} value={u.id}>{u.name}</option>
+                  ))}
+                </select>
+              </th>
+              <th className="px-6 py-3"></th>
+              {showOnlyLeads ? (
+                <>
+                  <th className="px-6 py-3">
+                    <select
+                      value={filterOfferPhase}
+                      onChange={(e) => setFilterOfferPhase(e.target.value)}
+                      className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">Všechny</option>
+                      <option value="created">Vytvořená</option>
+                      <option value="sent">Předaná</option>
+                      <option value="accepted">Akceptovaná</option>
+                      <option value="negotiation">Jednání</option>
+                      <option value="postponed">Odloženo</option>
+                      <option value="cancelled">Zrušeno</option>
+                    </select>
+                  </th>
+                  <th className="px-6 py-3"></th>
+                  <th className="px-6 py-3"></th>
+                </>
+              ) : (
+                <>
+                  <th className="px-6 py-3"></th>
+                  <th className="px-6 py-3"></th>
+                  <th className="px-6 py-3"></th>
+                  <th className="px-6 py-3"></th>
                 </>
               )}
             </tr>
@@ -335,9 +428,9 @@ export default function ProjectsListTable({
         </table>
       </div>
 
-      {projects.length === 0 && (
+      {sortedProjects.length === 0 && (
         <div className="p-8 text-center text-gray-500">
-          Žádné projekty
+          {hasFilters ? 'Žádné projekty odpovídající filtrům' : 'Žádné projekty'}
         </div>
       )}
     </div>
