@@ -33,10 +33,6 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
   const [editingProject, setEditingProject] = useState<any>(null)
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [filterName, setFilterName] = useState<string>('')
-  const [filterCustomer, setFilterCustomer] = useState<string>('')
-  const [filterSalesperson, setFilterSalesperson] = useState<string>('')
-  const [filterOfferPhase, setFilterOfferPhase] = useState<string>('')
 
   let visibleProjects = user.role === 'admin' ? projects : projects.filter(p => p.assignedTo === user.id)
 
@@ -63,29 +59,6 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
       : filterStatus
         ? filteredProjects.filter(p => p.status === filterStatus)
         : filteredProjects
-
-  if (filterName) {
-    filteredProjects = filteredProjects.filter(p =>
-      p.name.toLowerCase().includes(filterName.toLowerCase())
-    )
-  }
-
-  if (filterCustomer) {
-    filteredProjects = filteredProjects.filter(p =>
-      p.customer.toLowerCase().includes(filterCustomer.toLowerCase())
-    )
-  }
-
-  if (filterSalesperson) {
-    filteredProjects = filteredProjects.filter(p => p.assignedTo === filterSalesperson)
-  }
-
-  if (filterOfferPhase) {
-    filteredProjects = filteredProjects.filter(p => {
-      const offerPhase = (p as any).offerPhase || ''
-      return offerPhase.startsWith(filterOfferPhase)
-    })
-  }
 
   if (searchQuery) {
     const query = searchQuery.toLowerCase()
@@ -153,63 +126,6 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
             <Plus className="w-5 h-5" />
             {showOnlyLeads ? 'Nová Příležitost' : 'Nový Projekt'}
           </button>
-        </div>
-
-        {/* Filters Row */}
-        <div className="mb-6 glass rounded-2xl shadow p-4">
-          <div className="grid grid-cols-4 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Název</label>
-              <input
-                type="text"
-                placeholder="Filtr..."
-                value={filterName}
-                onChange={(e) => setFilterName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Kontakt</label>
-              <input
-                type="text"
-                placeholder="Filtr..."
-                value={filterCustomer}
-                onChange={(e) => setFilterCustomer(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Obchodník</label>
-              <select
-                value={filterSalesperson}
-                onChange={(e) => setFilterSalesperson(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                <option value="">Všichni</option>
-                {users.map(u => (
-                  <option key={u.id} value={u.id}>{u.name}</option>
-                ))}
-              </select>
-            </div>
-            {showOnlyLeads && (
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Fáze nabídky</label>
-                <select
-                  value={filterOfferPhase}
-                  onChange={(e) => setFilterOfferPhase(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Všechny</option>
-                  <option value="created">Vytvořená</option>
-                  <option value="sent">Předaná</option>
-                  <option value="accepted">Akceptovaná</option>
-                  <option value="negotiation">Jednání</option>
-                  <option value="postponed">Odloženo</option>
-                  <option value="cancelled">Zrušeno</option>
-                </select>
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Phase Filter Badges */}

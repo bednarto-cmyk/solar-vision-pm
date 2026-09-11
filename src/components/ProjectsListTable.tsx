@@ -49,6 +49,10 @@ export default function ProjectsListTable({
 }: ProjectsListTableProps) {
   const [sortField, setSortField] = useState<SortField>('createdAt')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
+  const [filterName, setFilterName] = useState('')
+  const [filterCustomer, setFilterCustomer] = useState('')
+  const [filterSalesperson, setFilterSalesperson] = useState('')
+  const [filterOfferPhase, setFilterOfferPhase] = useState('')
 
   const PHASES = ['leads', 'prep', 'purchase', 'execution', 'revision', 'distribution', 'service', 'completed'] as const
 
@@ -67,8 +71,17 @@ export default function ProjectsListTable({
     }
   }
 
-  // Sort projects (already filtered in parent)
-  const sortedProjects = [...projects].sort((a, b) => {
+  // Filter projects
+  let filtered = projects.filter(p => {
+    if (filterName && !p.name.toLowerCase().includes(filterName.toLowerCase())) return false
+    if (filterCustomer && !p.customer.toLowerCase().includes(filterCustomer.toLowerCase())) return false
+    if (filterSalesperson && p.assignedTo !== filterSalesperson) return false
+    if (filterOfferPhase && !(p as any).offerPhase?.startsWith(filterOfferPhase)) return false
+    return true
+  })
+
+  // Sort projects
+  const sortedProjects = [...filtered].sort((a, b) => {
     let aVal: any = a[sortField as keyof Project]
     let bVal: any = b[sortField as keyof Project]
 
@@ -216,6 +229,69 @@ export default function ProjectsListTable({
                       Výnos <SortIcon field="profit" />
                     </button>
                   </th>
+                </>
+              )}
+            </tr>
+            {/* Filter Row */}
+            <tr className="bg-gray-100 border-b border-gray-200 h-12">
+              <th className="px-6 py-2"></th>
+              <th className="px-6 py-2">
+                <input
+                  type="text"
+                  placeholder="🔍"
+                  value={filterName}
+                  onChange={(e) => setFilterName(e.target.value)}
+                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </th>
+              <th className="px-6 py-2">
+                <input
+                  type="text"
+                  placeholder="🔍"
+                  value={filterCustomer}
+                  onChange={(e) => setFilterCustomer(e.target.value)}
+                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </th>
+              <th className="px-6 py-2">
+                <select
+                  value={filterSalesperson}
+                  onChange={(e) => setFilterSalesperson(e.target.value)}
+                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="">Všichni</option>
+                  {users.map(u => (
+                    <option key={u.id} value={u.id}>{u.name}</option>
+                  ))}
+                </select>
+              </th>
+              <th className="px-6 py-2"></th>
+              {showOnlyLeads ? (
+                <>
+                  <th className="px-6 py-2">
+                    <select
+                      value={filterOfferPhase}
+                      onChange={(e) => setFilterOfferPhase(e.target.value)}
+                      className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      <option value="">Všechny</option>
+                      <option value="created">Vytvořená</option>
+                      <option value="sent">Předaná</option>
+                      <option value="accepted">Akceptovaná</option>
+                      <option value="negotiation">Jednání</option>
+                      <option value="postponed">Odloženo</option>
+                      <option value="cancelled">Zrušeno</option>
+                    </select>
+                  </th>
+                  <th className="px-6 py-2"></th>
+                  <th className="px-6 py-2"></th>
+                </>
+              ) : (
+                <>
+                  <th className="px-6 py-2"></th>
+                  <th className="px-6 py-2"></th>
+                  <th className="px-6 py-2"></th>
+                  <th className="px-6 py-2"></th>
                 </>
               )}
             </tr>
