@@ -18,6 +18,7 @@ type View = 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'ideas'
 function App() {
   const [currentView, setCurrentView] = useState<View>('login')
   const [user, setUser] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   const initializeProjects = useFirebaseProjectStore((state) => state.initializeProjects)
   const initializeUsers = useFirebaseUserStore((state) => state.initializeUsers)
   const initializeIdeas = useFirebaseIdeaStore((state) => state.initializeIdeas)
@@ -32,6 +33,13 @@ function App() {
       setUser(JSON.parse(savedUser))
       setCurrentView('opportunities')
     }
+
+    // Timeout to show loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 3000)
+
+    return () => clearTimeout(timer)
   }, [])
 
   const handleLogin = (userData: any) => {
@@ -44,6 +52,17 @@ function App() {
     localStorage.removeItem('user')
     setUser(null)
     setCurrentView('login')
+  }
+
+  if (isLoading && !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Načítám aplikaci...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!user) {

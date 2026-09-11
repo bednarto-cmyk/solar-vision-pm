@@ -9,13 +9,23 @@ interface LoginPageProps {
 export default function LoginPage({ onLogin }: LoginPageProps) {
   const { users, initializeUsers } = useFirebaseUserStore()
   const [isInitialized, setIsInitialized] = useState(false)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     if (!isInitialized) {
       initializeUsers()
       setIsInitialized(true)
+
+      // Timeout after 10 seconds
+      const timeout = setTimeout(() => {
+        if (users.length === 0) {
+          setIsError(true)
+        }
+      }, 10000)
+
+      return () => clearTimeout(timeout)
     }
-  }, [isInitialized, initializeUsers])
+  }, [isInitialized, initializeUsers, users.length])
 
   const handleLogin = (userId: string) => {
     const user = users.find(u => u.id === userId)
@@ -35,8 +45,21 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         <h2 className="text-center text-gray-600 mb-6">Projektové řízení & CRM</h2>
 
         <div className="space-y-3">
-          {users.length === 0 ? (
-            <p className="text-center text-gray-500 text-sm py-4">Načítám uživatele...</p>
+          {isError ? (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-center text-red-700 text-sm font-medium">Chyba při načítání</p>
+              <p className="text-center text-red-600 text-xs mt-2">
+                Nelze se připojit k databázi. Zkus obnovit stránku (F5).
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full mt-3 px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+              >
+                Obnovit
+              </button>
+            </div>
+          ) : users.length === 0 ? (
+            <p className="text-center text-gray-500 text-sm py-4">⏳ Načítám uživatele...</p>
           ) : (
             users.map(user => (
               <button
