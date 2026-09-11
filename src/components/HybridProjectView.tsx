@@ -30,6 +30,7 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [isKanbanOpen, setIsKanbanOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<any>(null)
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -214,6 +215,7 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
             users={users}
             showOnlyLeads={showOnlyLeads}
             onSelectProject={(project) => {
+              setEditingProject(project)
               setSelectedProjectId(project.id)
               setIsDetailModalOpen(true)
             }}
@@ -225,16 +227,30 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
         </div>
       </div>
 
-      {isModalOpen && (
+      {(isModalOpen || isDetailModalOpen) && editingProject && (
         <ProjectModal
           project={editingProject}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false)
+            setIsDetailModalOpen(false)
+          }}
           user={user}
+          onOpenKanban={() => {
+            setIsKanbanOpen(true)
+            setIsDetailModalOpen(false)
+          }}
         />
       )}
 
-      {isDetailModalOpen && selectedProjectId && (
-        <ProjectKanbanModal projectId={selectedProjectId} onClose={() => setIsDetailModalOpen(false)} user={user} />
+      {isKanbanOpen && selectedProjectId && (
+        <ProjectKanbanModal
+          projectId={selectedProjectId}
+          onClose={() => {
+            setIsKanbanOpen(false)
+            setIsDetailModalOpen(true)
+          }}
+          user={user}
+        />
       )}
     </div>
   )

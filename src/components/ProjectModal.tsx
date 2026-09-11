@@ -26,6 +26,7 @@ interface ProjectModalProps {
   project: any
   onClose: () => void
   user: any
+  onOpenKanban?: () => void
 }
 
 const STATUSES: { value: ProjectStatus; label: string }[] = [
@@ -47,7 +48,7 @@ const FormField = ({ label, required, children }: any) => (
   </div>
 )
 
-export default function ProjectModal({ project, onClose, user }: ProjectModalProps) {
+export default function ProjectModal({ project, onClose, user, onOpenKanban }: ProjectModalProps) {
   const { addProject, updateProject } = useFirebaseProjectStore()
   const { users } = useUserStore()
   const { contacts, addContact, initializeContacts } = useFirebaseContactStore()
@@ -324,14 +325,25 @@ export default function ProjectModal({ project, onClose, user }: ProjectModalPro
           </FormField>
 
           {/* Tlačítka */}
-          <div className="flex gap-4 justify-end pt-6 border-t-2 border-gray-200">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-8 py-3 rounded-2xl bg-gray-200 text-gray-800 font-bold text-lg hover:bg-gray-300 transition-colors"
-            >
-              Zrušit
-            </button>
+          <div className="flex gap-4 justify-between pt-6 border-t-2 border-gray-200">
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-8 py-3 rounded-2xl bg-gray-200 text-gray-800 font-bold text-lg hover:bg-gray-300 transition-colors"
+              >
+                Zrušit
+              </button>
+              {project && onOpenKanban && (
+                <button
+                  type="button"
+                  onClick={onOpenKanban}
+                  className="px-8 py-3 rounded-2xl bg-purple-600 text-white font-bold text-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+                >
+                  📋 Nástěnka projektů
+                </button>
+              )}
+            </div>
             <button
               type="submit"
               className="px-8 py-3 rounded-2xl bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition-colors"
