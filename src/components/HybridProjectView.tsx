@@ -227,7 +227,7 @@ export default function HybridProjectView({ user, showOnlyLeads = false }: Hybri
         </div>
       </div>
 
-      {(isModalOpen || isDetailModalOpen) && editingProject && (
+      {(isModalOpen || isDetailModalOpen) && (
         <ProjectModal
           project={editingProject}
           onClose={() => {
