@@ -13,7 +13,7 @@ import { useFirebaseProjectStore } from './store/firebaseProjectStore'
 import { useFirebaseUserStore } from './store/firebaseUserStore'
 import { useFirebaseIdeaStore } from './store/ideaStore'
 
-type View = 'opportunities' | 'projects' | 'dashboard' | 'performance' | 'ideas' | 'contacts' | 'settings' | 'login'
+type View = 'opportunities' | 'dashboard' | 'performance' | 'ideas' | 'contacts' | 'settings' | 'login'
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('login')
@@ -74,7 +74,6 @@ function App() {
       <Navbar currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} user={user} />
       <div className="pt-28">
         {currentView === 'opportunities' && <HybridProjectView user={user} showOnlyLeads={true} />}
-        {currentView === 'projects' && <HybridProjectView user={user} showOnlyLeads={false} />}
         {currentView === 'contacts' && <Contacts currentUser={user} />}
         {currentView === 'dashboard' && <DashboardView user={user} />}
         {currentView === 'performance' && <PerformanceView user={user} />}
