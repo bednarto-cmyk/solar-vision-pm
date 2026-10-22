@@ -51,6 +51,7 @@ export default function ContactModal({ contact, currentUserId, onSave, onClose }
     }
     setAresBusy(true)
     setAresMessage(null)
+    set({ dic: '', address: '' })
     try {
       const subject = await fetchAresSubject(ico)
       set({ company: subject.name, ico: subject.ico, dic: subject.dic ?? '', address: subject.address ?? '' })
