@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X } from 'lucide-react'
 import type { Contact, ContactType } from '../types'
 import toast from 'react-hot-toast'
+import { fetchAresSubject, isValidIco } from '../utils/ares'
 
 export type ContactFormData = Omit<Contact, 'id' | 'createdAt' | 'createdBy' | 'updatedAt' | 'updatedBy'>
 
@@ -28,14 +29,45 @@ export default function ContactModal({ contact, currentUserId, onSave, onClose }
           type: contact.type,
           assignedTo: contact.assignedTo,
           notes: contact.notes,
+          ico: contact.ico ?? '',
+          dic: contact.dic ?? '',
+          address: contact.address ?? '',
         }
-      : { name: '', company: '', email: '', phone: '', type: 'nákupčí', assignedTo: currentUserId, notes: '' },
+      : { name: '', company: '', email: '', phone: '', type: 'nákupčí', assignedTo: currentUserId, notes: '', ico: '', dic: '', address: '' },
   )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [aresBusy, setAresBusy] = useState(false)
+  const [aresMessage, setAresMessage] = useState<{ text: string; ok: boolean } | null>(null)
 
   const set = (patch: Partial<ContactFormData>) => setForm(current => ({ ...current, ...patch }))
   const requiresCompany = form.type !== 'koncový zákazník'
+
+  const loadFromAres = async () => {
+    const ico = (form.ico ?? '').trim()
+    if (!isValidIco(ico)) {
+      setAresMessage({ text: 'IČO musí mít přesně 8 číslic', ok: false })
+      return
+    }
+    setAresBusy(true)
+    setAresMessage(null)
+    try {
+      const subject = await fetchAresSubject(ico)
+      set({ company: subject.name, ico: subject.ico, dic: subject.dic ?? '', address: subject.address ?? '' })
+      setAresMessage({ text: 'Údaje načteny z ARES', ok: true })
+    } catch (err) {
+      const reason = err instanceof Error ? err.message : ''
+      setAresMessage({
+        text:
+          reason === 'not-found'
+            ? 'Subjekt s tímto IČO v ARES nenalezen'
+            : 'ARES teď není dostupný, zkus to později',
+        ok: false,
+      })
+    } finally {
+      setAresBusy(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,6 +118,33 @@ export default function ContactModal({ contact, currentUserId, onSave, onClose }
             <span className="text-xs font-medium text-gray-600">Telefon</span>
             <input type="tel" className={`${inputClass} mt-1`} value={form.phone} onChange={e => set({ phone: e.target.value })} />
           </label>
+          <div className="sm:col-span-2 rounded-xl border border-gray-200 p-4 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+              <label className="block flex-1">
+                <span className="text-xs font-medium text-gray-600">IČO (firma)</span>
+                <input
+                  inputMode="numeric"
+                  maxLength={8}
+                  className={`${inputClass} mt-1`}
+                  value={form.ico ?? ''}
+                  onChange={e => set({ ico: e.target.value.replace(/\D/g, '') })}
+                  placeholder="8 číslic"
+                />
+              </label>
+              <button type="button" onClick={loadFromAres} disabled={aresBusy} className="btn-secondary whitespace-nowrap">
+                {aresBusy ? 'Načítám…' : 'Načíst z ARES'}
+              </button>
+            </div>
+            {aresMessage && (
+              <p className={`text-xs ${aresMessage.ok ? 'text-emerald-700' : 'text-red-600'}`}>{aresMessage.text}</p>
+            )}
+            {(form.dic || form.address) && (
+              <div className="text-xs text-gray-600 space-y-1">
+                {form.dic && <p>DIČ: <span className="text-gray-900">{form.dic}</span></p>}
+                {form.address && <p>Sídlo: <span className="text-gray-900">{form.address}</span></p>}
+              </div>
+            )}
+          </div>
           <label className="block sm:col-span-2">
             <span className="text-xs font-medium text-gray-600">Typ kontaktu</span>
             <select className={`${inputClass} mt-1`} value={form.type} onChange={e => set({ type: e.target.value as ContactType })}>

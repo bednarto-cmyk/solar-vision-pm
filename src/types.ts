@@ -56,4 +56,7 @@ export interface Contact {
   createdBy: string
   updatedAt: string
   updatedBy: string
+  ico?: string
+  dic?: string
+  address?: string
 }

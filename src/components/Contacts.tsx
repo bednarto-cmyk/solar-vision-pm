@@ -202,6 +202,13 @@ export default function Contacts({ currentUser }: ContactsProps) {
                     <Building2 className="w-4 h-4 text-gray-400" /> {selected.company}
                   </p>
                 )}
+                {selected.ico && (
+                  <p className="text-gray-500">
+                    IČO <span className="text-gray-900 tabular">{selected.ico}</span>
+                    {selected.dic && <> · DIČ <span className="text-gray-900 tabular">{selected.dic}</span></>}
+                  </p>
+                )}
+                {selected.address && <p className="text-gray-500">Sídlo: <span className="text-gray-900">{selected.address}</span></p>}
                 <p className="text-gray-500">
                   Obchodník: <span className="text-gray-900">{userNames[selected.assignedTo] ?? '—'}</span> · typ{' '}
                   <span className="text-gray-900">{selected.type}</span>
