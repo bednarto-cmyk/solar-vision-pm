@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { X, Plus, Kanban } from 'lucide-react'
+import { X, Plus, Kanban, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import { useFirebaseContactStore } from '../store/firebaseContactStore'
@@ -77,7 +77,7 @@ const Field = ({ label, children, className = '' }: { label: string; children: R
 )
 
 export default function ProjectModal({ project, user, onClose, onOpenBoard, suspended = false }: ProjectModalProps) {
-  const { addProject, updateProject } = useFirebaseProjectStore()
+  const { addProject, updateProject, deleteProject } = useFirebaseProjectStore()
   const { contacts, addContact, initializeContacts } = useFirebaseContactStore()
   const { users, initializeUsers } = useFirebaseUserStore()
   const [form, setForm] = useState<FormState>(() => (project ? fromProject(project) : emptyForm(user.id)))
@@ -111,6 +111,21 @@ export default function ProjectModal({ project, user, onClose, onOpenBoard, susp
   const handleContactChange = (contactId: string) => {
     const contact = contacts.find(c => c.id === contactId)
     set({ contactId, customer: contact ? contact.name : '' })
+  }
+
+  const handleDelete = async () => {
+    if (!project) return
+    if (!window.confirm(`Opravdu smazat příležitost „${project.name}“? Smažou se i její úkoly. Akci nelze vrátit.`)) return
+    setSaving(true)
+    try {
+      await deleteProject(project.id)
+      toast.success('Příležitost smazána')
+      onClose()
+    } catch (error) {
+      console.error(error)
+      toast.error('Příležitost se nepodařilo smazat')
+      setSaving(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -292,14 +307,22 @@ export default function ProjectModal({ project, user, onClose, onOpenBoard, susp
         </form>
 
         <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-t border-gray-200">
-          {project ? (
-            <button type="button" onClick={() => onOpenBoard(project.id)} className="btn-secondary">
-              <Kanban className="w-4 h-4" />
-              Nástěnka úkolů
-            </button>
-          ) : (
-            <span />
-          )}
+          <div className="flex flex-wrap gap-2">
+            {project ? (
+              <button type="button" onClick={() => onOpenBoard(project.id)} className="btn-secondary">
+                <Kanban className="w-4 h-4" />
+                Nástěnka úkolů
+              </button>
+            ) : (
+              <span />
+            )}
+            {project && user.role === 'admin' && (
+              <button type="button" onClick={handleDelete} disabled={saving} className="btn-secondary text-red-600 hover:bg-red-50">
+                <Trash2 className="w-4 h-4" />
+                Smazat
+              </button>
+            )}
+          </div>
           <div className="flex gap-2">
             <button type="button" onClick={onClose} className="btn-secondary">Zrušit</button>
             <button type="submit" form="project-form" disabled={saving} className="btn-primary">
