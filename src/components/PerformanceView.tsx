@@ -1,5 +1,5 @@
 import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
-import { useUserStore } from '../store/userStore'
+import { useFirebaseUserStore } from '../store/firebaseUserStore'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Trophy, TrendingUp } from 'lucide-react'
 import { isWon, isLost, isOpen, weightedValue, formatCzk } from '../utils/pipeline'
@@ -18,7 +18,7 @@ const percent = (part: number, whole: number) => (whole > 0 ? Math.round((part /
 
 export default function PerformanceView({ user }: PerformanceViewProps) {
   const { projects } = useFirebaseProjectStore()
-  const { users } = useUserStore()
+  const { users } = useFirebaseUserStore()
 
   const year = new Date().getFullYear()
   const salespeople = user?.role === 'admin' ? users : users.filter(u => u.id === user?.id)
@@ -66,10 +66,10 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
   }))
 
   return (
-    <div className="p-4 md:p-6 min-h-screen pb-24">
+    <div className="p-4 md:p-6 pb-24">
       <div className="max-w-7xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+          <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-3">
             <Trophy className="w-8 h-8 text-yellow-500" />
             Performance {year}
           </h1>
@@ -77,26 +77,26 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          <div className="glass rounded-2xl p-5">
+          <div className="card p-5">
             <p className="text-sm text-gray-600 mb-1">Vyhraný obrat týmu</p>
-            <p className="text-2xl font-bold text-gray-900 font-mono">{formatCzk(teamWon)}</p>
+            <p className="text-2xl font-bold text-gray-900">{formatCzk(teamWon)}</p>
           </div>
-          <div className="glass rounded-2xl p-5">
+          <div className="card p-5">
             <p className="text-sm text-gray-600 mb-1">Cílový obrat</p>
-            <p className="text-2xl font-bold text-blue-600 font-mono">{formatCzk(teamTarget)}</p>
+            <p className="text-2xl font-bold text-blue-600">{formatCzk(teamTarget)}</p>
           </div>
-          <div className="glass rounded-2xl p-5">
+          <div className="card p-5">
             <p className="text-sm text-gray-600 mb-1">Plnění cíle</p>
-            <p className="text-2xl font-bold text-green-600 font-mono">{teamPercentage}%</p>
+            <p className="text-2xl font-bold text-green-600">{teamPercentage}%</p>
           </div>
-          <div className="glass rounded-2xl p-5">
+          <div className="card p-5">
             <p className="text-sm text-gray-600 mb-1">Vážená pipeline / úspěšnost</p>
-            <p className="text-2xl font-bold text-gray-900 font-mono">{formatCzk(teamPipeline)}</p>
+            <p className="text-2xl font-bold text-gray-900">{formatCzk(teamPipeline)}</p>
             <p className="text-xs text-gray-500 mt-1">úspěšnost {teamWinRate}%</p>
           </div>
         </div>
 
-        <div className="glass rounded-2xl p-6">
+        <div className="card p-6">
           <h2 className="text-lg font-bold text-gray-800 mb-4">Kvartály – tým</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {QUARTERS.map((label, q) => {
@@ -105,8 +105,8 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
               return (
                 <div key={label} className="rounded-xl bg-gray-50 p-4">
                   <p className="text-xs font-semibold text-gray-600 uppercase">{label}</p>
-                  <p className="text-xl font-bold text-gray-900 font-mono mt-1">{formatCzk(revenue)}</p>
-                  <p className="text-xs text-gray-500 font-mono">z {formatCzk(target)}</p>
+                  <p className="text-xl font-bold text-gray-900 mt-1">{formatCzk(revenue)}</p>
+                  <p className="text-xs text-gray-500">z {formatCzk(target)}</p>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
                     <div className={`${progressColor(pct)} h-2 rounded-full`} style={{ width: `${Math.min(pct, 100)}%` }} />
                   </div>
@@ -118,7 +118,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="glass rounded-2xl p-6">
+          <div className="card p-6">
             <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
               Vyhraný obrat vs. cíl
@@ -139,7 +139,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
             </ResponsiveContainer>
           </div>
 
-          <div className="glass rounded-2xl p-6">
+          <div className="card p-6">
             <h2 className="text-lg font-bold text-gray-800 mb-4">Vážená pipeline podle obchodníka</h2>
             {teamPipeline === 0 ? (
               <p className="text-center py-16 text-gray-500">Žádná otevřená pipeline</p>
@@ -167,7 +167,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
           </div>
         </div>
 
-        <div className="glass rounded-2xl p-6">
+        <div className="card p-6">
           <h2 className="text-lg font-bold text-gray-800 mb-6">🏆 Žebříček obchodníků</h2>
           <div className="space-y-3">
             {rows.map((r, index) => {
@@ -179,7 +179,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
                       <span className="text-2xl w-8 text-center">{medal}</span>
                       <div className="min-w-0">
                         <p className="font-semibold text-gray-900 truncate">{r.name}</p>
-                        <p className="text-sm text-gray-600 font-mono">
+                        <p className="text-sm text-gray-600">
                           {formatCzk(r.won)} / {formatCzk(r.target)} · pipeline {formatCzk(r.pipeline)} ({r.openCount} otevřené)
                         </p>
                       </div>
@@ -199,7 +199,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
           {rows.length === 0 && <div className="text-center py-8 text-gray-500">Žádní obchodníci</div>}
         </div>
 
-        <div className="glass rounded-2xl p-6 overflow-x-auto">
+        <div className="card p-6 overflow-x-auto">
           <h2 className="text-lg font-bold text-gray-800 mb-6">📋 Kvartální srovnání</h2>
           <table className="w-full text-sm">
             <thead>
@@ -217,12 +217,12 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
                 <tr key={r.id} className="border-b border-gray-200 hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-900">{r.name}</td>
                   {r.quarterly.map((revenue, q) => (
-                    <td key={q} className="px-4 py-3 text-right text-gray-700 font-mono text-xs">
+                    <td key={q} className="px-4 py-3 text-right text-gray-700 text-xs">
                       {formatCzk(revenue)}
                       <span className="text-gray-500"> ({percent(revenue, r.quarterlyTargets[q])}%)</span>
                     </td>
                   ))}
-                  <td className="px-4 py-3 text-right font-semibold text-gray-900 font-mono">{formatCzk(r.won)}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-gray-900">{formatCzk(r.won)}</td>
                   <td className="px-4 py-3 text-center">
                     <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                       r.percentage >= 100 ? 'bg-green-100 text-green-800' :

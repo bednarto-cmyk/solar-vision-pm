@@ -8,4 +8,3 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 )
-// Force rebuild: Thu Jul  2 13:01:28 CEST 2026

@@ -1,422 +1,189 @@
-import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
-import type { ProjectStatus } from '../store/projectStore'
+import { useMemo, useState } from 'react'
+import { ArrowDown, ArrowUp, AlertTriangle } from 'lucide-react'
+import type { OfferPhase, Project } from '../types'
+import { OFFER_LABELS, PIPELINE_COLUMNS, formatCzk, formatDate, isOverdue, offerPhaseOf, weightedValue } from '../utils/pipeline'
 
-interface Project {
-  id: string
+export interface OpportunityFilters {
   name: string
   customer: string
-  status: string
-  power: number
-  cost: number
-  revenue: number
-  createdAt: string
-  endDate?: string
-  assignedTo?: string
-  contactId?: string
-}
-
-interface User {
-  id: string
-  name: string
+  owner: string
+  phase: string
 }
 
 interface ProjectsListTableProps {
   projects: Project[]
-  statusLabels: { [key: string]: { cs: string } }
-  users?: User[]
-  showOnlyLeads?: boolean
-  onSelectProject: (project: Project) => void
-  onChangePhase?: (projectId: string, newStatus: ProjectStatus) => void
-  onChangeOfferPhase?: (projectId: string, newPhase: string) => void
-  onChangeSuccessProbability?: (projectId: string, probability: number) => void
-  selectedProjectId: string | null
+  userNames: Record<string, string>
+  isAdmin: boolean
+  filters: OpportunityFilters
+  onFiltersChange: (filters: OpportunityFilters) => void
+  onOpen: (project: Project) => void
+  onPhaseChange: (project: Project, phase: OfferPhase) => void
+  onProbabilityChange: (project: Project, value: number) => void
+  owners: { id: string; name: string }[]
 }
 
-type SortField = 'createdAt' | 'name' | 'status' | 'customer' | 'endDate' | 'assignedTo' | 'revenue' | 'cost' | 'profit' | 'offerPhase' | 'successProbability'
-type SortOrder = 'asc' | 'desc'
+type SortKey = 'name' | 'endDate' | 'revenue' | 'weighted' | 'phase' | 'probability'
+
+const PHASE_OPTIONS = Object.entries(OFFER_LABELS) as [OfferPhase, string][]
+
+const inputClass =
+  'w-full px-2.5 py-1.5 text-xs bg-white text-gray-900 border border-gray-200 rounded-lg placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500'
 
 export default function ProjectsListTable({
   projects,
-  statusLabels,
-  users = [],
-  showOnlyLeads = false,
-  onSelectProject,
-  onChangePhase,
-  onChangeOfferPhase,
-  onChangeSuccessProbability,
-  selectedProjectId,
+  userNames,
+  isAdmin,
+  filters,
+  onFiltersChange,
+  onOpen,
+  onPhaseChange,
+  onProbabilityChange,
+  owners,
 }: ProjectsListTableProps) {
-  const [sortField, setSortField] = useState<SortField>('createdAt')
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
-  const [filterName, setFilterName] = useState('')
-  const [filterCustomer, setFilterCustomer] = useState('')
-  const [filterSalesperson, setFilterSalesperson] = useState('')
-  const [filterOfferPhase, setFilterOfferPhase] = useState('')
+  const [sortKey, setSortKey] = useState<SortKey>('endDate')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
-  const PHASES = ['leads', 'prep', 'purchase', 'execution', 'revision', 'distribution', 'service', 'completed'] as const
+  const sorted = useMemo(() => {
+    const value = (p: Project): string | number => {
+      switch (sortKey) {
+        case 'name': return p.name.toLowerCase()
+        case 'endDate': return new Date(p.endDate).getTime()
+        case 'revenue': return p.revenue
+        case 'weighted': return weightedValue(p)
+        case 'phase': return PIPELINE_COLUMNS.findIndex(c => c.phases.includes(offerPhaseOf(p)))
+        case 'probability': return p.successProbability ?? 0
+      }
+    }
+    return [...projects].sort((a, b) => {
+      const va = value(a)
+      const vb = value(b)
+      const result = va < vb ? -1 : va > vb ? 1 : 0
+      return sortDir === 'asc' ? result : -result
+    })
+  }, [projects, sortKey, sortDir])
 
-  const getUserName = (userId?: string) => {
-    if (!userId) return '—'
-    const user = users.find(u => u.id === userId)
-    return user?.name || '—'
-  }
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
-    } else {
-      setSortField(field)
-      setSortOrder('desc')
+  const toggleSort = (key: SortKey) => {
+    if (key === sortKey) setSortDir(dir => (dir === 'asc' ? 'desc' : 'asc'))
+    else {
+      setSortKey(key)
+      setSortDir('asc')
     }
   }
 
-  // Filter projects
-  let filtered = projects.filter(p => {
-    if (filterName && !p.name.toLowerCase().includes(filterName.toLowerCase())) return false
-    if (filterCustomer && !p.customer.toLowerCase().includes(filterCustomer.toLowerCase())) return false
-    if (filterSalesperson && p.assignedTo !== filterSalesperson) return false
-    if (filterOfferPhase && !(p as any).offerPhase?.startsWith(filterOfferPhase)) return false
-    return true
-  })
+  const header = (label: string, key: SortKey, align: 'left' | 'right' = 'left') => (
+    <th className={`px-4 py-3 font-semibold ${align === 'right' ? 'text-right' : 'text-left'}`}>
+      <button
+        onClick={() => toggleSort(key)}
+        className={`inline-flex items-center gap-1 hover:text-gray-900 ${align === 'right' ? 'flex-row-reverse' : ''}`}
+      >
+        {label}
+        {sortKey === key &&
+          (sortDir === 'asc' ? <ArrowUp className="w-3.5 h-3.5" /> : <ArrowDown className="w-3.5 h-3.5" />)}
+      </button>
+    </th>
+  )
 
-  // Sort projects
-  const sortedProjects = [...filtered].sort((a, b) => {
-    let aVal: any = a[sortField as keyof Project]
-    let bVal: any = b[sortField as keyof Project]
-
-    if (sortField === 'profit') {
-      aVal = a.revenue - a.cost
-      bVal = b.revenue - b.cost
-    }
-
-    if (sortField === 'assignedTo') {
-      aVal = getUserName(a.assignedTo)
-      bVal = getUserName(b.assignedTo)
-    }
-
-    if (typeof aVal === 'string') {
-      aVal = aVal.toLowerCase()
-      bVal = (bVal as string).toLowerCase()
-      return sortOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
-    }
-
-    if (typeof aVal === 'number') {
-      return sortOrder === 'asc' ? aVal - bVal : bVal - aVal
-    }
-
-    return 0
-  })
-
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return <div className="w-4 h-4" />
-    return sortOrder === 'asc' ? (
-      <ChevronUp className="w-4 h-4 text-blue-600" />
-    ) : (
-      <ChevronDown className="w-4 h-4 text-blue-600" />
-    )
-  }
-
-  const formatCurrency = (num: number) =>
-    num.toLocaleString('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 })
-
-  const formatDate = (date: string) => new Date(date).toLocaleDateString('cs-CZ')
+  const setFilter = (patch: Partial<OpportunityFilters>) => onFiltersChange({ ...filters, ...patch })
 
   return (
-    <div className="glass rounded-2xl overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="px-6 py-4 text-left">
-                <button
-                  onClick={() => handleSort('createdAt')}
-                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
-                >
-                  Vytvořeno <SortIcon field="createdAt" />
-                </button>
-              </th>
-              <th className="px-6 py-4 text-left">
-                <button
-                  onClick={() => handleSort('name')}
-                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
-                >
-                  {showOnlyLeads ? 'Příležitost' : 'Projekt'} <SortIcon field="name" />
-                </button>
-              </th>
-              <th className="px-6 py-4 text-left">
-                <button
-                  onClick={() => handleSort('customer')}
-                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
-                >
-                  Kontakt <SortIcon field="customer" />
-                </button>
-              </th>
-              <th className="px-6 py-4 text-left">
-                <button
-                  onClick={() => handleSort('assignedTo')}
-                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
-                >
-                  Obchodník <SortIcon field="assignedTo" />
-                </button>
-              </th>
-              <th className="px-6 py-4 text-left">
-                <button
-                  onClick={() => handleSort('endDate')}
-                  className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
-                >
-                  Termín dokončení <SortIcon field="endDate" />
-                </button>
-              </th>
-              {showOnlyLeads ? (
-                <>
-                  <th className="px-6 py-4 text-left">
-                    <button
-                      onClick={() => handleSort('offerPhase')}
-                      className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
-                    >
-                      Fáze nabídky <SortIcon field="offerPhase" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleSort('revenue')}
-                      className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
-                    >
-                      Obrat <SortIcon field="revenue" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-4 text-left">
-                    <button
-                      onClick={() => handleSort('successProbability')}
-                      className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
-                    >
-                      Pravděpodobnost úspěchu <SortIcon field="successProbability" />
-                    </button>
-                  </th>
-                </>
-              ) : (
-                <>
-                  <th className="px-6 py-4 text-left">
-                    <button
-                      onClick={() => handleSort('status')}
-                      className="flex items-center gap-2 font-semibold text-gray-700 hover:text-gray-900"
-                    >
-                      Fáze <SortIcon field="status" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleSort('cost')}
-                      className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
-                    >
-                      Náklad <SortIcon field="cost" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleSort('revenue')}
-                      className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
-                    >
-                      Obrat <SortIcon field="revenue" />
-                    </button>
-                  </th>
-                  <th className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleSort('profit')}
-                      className="flex items-center justify-end gap-2 font-semibold text-gray-700 hover:text-gray-900 w-full"
-                    >
-                      Výnos <SortIcon field="profit" />
-                    </button>
-                  </th>
-                </>
-              )}
+        <table className="w-full text-sm whitespace-nowrap min-w-[980px]">
+          <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+            <tr className="border-b border-gray-200">
+              {header('Příležitost', 'name')}
+              <th className="px-4 py-3 text-left font-semibold">Obchodník</th>
+              {header('Uzavření', 'endDate')}
+              {header('Fáze nabídky', 'phase')}
+              {header('Obrat', 'revenue', 'right')}
+              {header('Šance', 'probability', 'right')}
+              {header('Vážená hodnota', 'weighted', 'right')}
             </tr>
-            {/* Filter Row */}
-            <tr className="bg-gray-100 border-b border-gray-200 h-12">
-              <th className="px-6 py-2"></th>
-              <th className="px-6 py-2">
-                <input
-                  type="text"
-                  placeholder="🔍"
-                  value={filterName}
-                  onChange={(e) => setFilterName(e.target.value)}
-                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
+            <tr className="border-b border-gray-200 bg-white normal-case tracking-normal">
+              <th className="px-4 py-2">
+                <input className={inputClass} placeholder="Hledat název…" value={filters.name} onChange={e => setFilter({ name: e.target.value })} />
               </th>
-              <th className="px-6 py-2">
-                <input
-                  type="text"
-                  placeholder="🔍"
-                  value={filterCustomer}
-                  onChange={(e) => setFilterCustomer(e.target.value)}
-                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
+              <th className="px-4 py-2">
+                {isAdmin ? (
+                  <select className={inputClass} value={filters.owner} onChange={e => setFilter({ owner: e.target.value })}>
+                    <option value="">Všichni</option>
+                    {owners.map(o => (
+                      <option key={o.id} value={o.id}>{o.name}</option>
+                    ))}
+                  </select>
+                ) : null}
               </th>
-              <th className="px-6 py-2">
-                <select
-                  value={filterSalesperson}
-                  onChange={(e) => setFilterSalesperson(e.target.value)}
-                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                  <option value="">Všichni</option>
-                  {users.map(u => (
-                    <option key={u.id} value={u.id}>{u.name}</option>
+              <th className="px-4 py-2">
+                <input className={inputClass} placeholder="Zákazník…" value={filters.customer} onChange={e => setFilter({ customer: e.target.value })} />
+              </th>
+              <th className="px-4 py-2">
+                <select className={inputClass} value={filters.phase} onChange={e => setFilter({ phase: e.target.value })}>
+                  <option value="">Všechny fáze</option>
+                  {PIPELINE_COLUMNS.map(c => (
+                    <option key={c.key} value={c.key}>{c.label}</option>
                   ))}
                 </select>
               </th>
-              <th className="px-6 py-2"></th>
-              {showOnlyLeads ? (
-                <>
-                  <th className="px-6 py-2">
-                    <select
-                      value={filterOfferPhase}
-                      onChange={(e) => setFilterOfferPhase(e.target.value)}
-                      className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    >
-                      <option value="">Všechny</option>
-                      <option value="created">Vytvořená</option>
-                      <option value="sent">Předaná</option>
-                      <option value="accepted">Akceptovaná</option>
-                      <option value="negotiation">Jednání</option>
-                      <option value="postponed">Odloženo</option>
-                      <option value="cancelled">Zrušeno</option>
-                    </select>
-                  </th>
-                  <th className="px-6 py-2"></th>
-                  <th className="px-6 py-2"></th>
-                </>
-              ) : (
-                <>
-                  <th className="px-6 py-2"></th>
-                  <th className="px-6 py-2"></th>
-                  <th className="px-6 py-2"></th>
-                  <th className="px-6 py-2"></th>
-                </>
-              )}
+              <th colSpan={3} />
             </tr>
           </thead>
-          <tbody>
-            {sortedProjects.map(project => {
-              const profit = project.revenue - project.cost
-              const isSelected = selectedProjectId === project.id
 
+          <tbody className="divide-y divide-gray-100">
+            {sorted.map(project => {
+              const overdue = isOverdue(project)
               return (
-                <tr
-                  key={project.id}
-                  onClick={() => onSelectProject(project)}
-                  className={`border-b border-gray-200 cursor-pointer transition-colors ${
-                    isSelected
-                      ? 'bg-blue-50 hover:bg-blue-100'
-                      : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <td className="px-6 py-4 text-gray-700 text-xs">
-                    {formatDate(project.createdAt)}
+                <tr key={project.id} onClick={() => onOpen(project)} className="hover:bg-gray-50 cursor-pointer">
+                  <td className="px-4 py-3 whitespace-normal min-w-[220px]">
+                    <p className="font-medium text-gray-900">{project.name}</p>
+                    <p className="text-xs text-gray-500">{project.customer}</p>
                   </td>
-                  <td className="px-6 py-4 font-medium text-gray-900">
-                    {project.name}
+                  <td className="px-4 py-3 text-gray-700">{userNames[project.assignedTo] ?? '—'}</td>
+                  <td className={`px-4 py-3 tabular ${overdue ? 'text-red-600 font-medium' : 'text-gray-700'}`}>
+                    <span className="flex items-center gap-1.5">
+                      {overdue && <AlertTriangle className="w-3.5 h-3.5" />}
+                      {formatDate(project.endDate)}
+                    </span>
                   </td>
-                  <td className="px-6 py-4 text-gray-700">
-                    {project.customer}
+                  <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                    <select
+                      value={offerPhaseOf(project)}
+                      onChange={e => onPhaseChange(project, e.target.value as OfferPhase)}
+                      className="px-2.5 py-1 text-xs font-medium bg-gray-50 text-gray-800 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      {PHASE_OPTIONS.map(([value, label]) => (
+                        <option key={value} value={value}>{label}</option>
+                      ))}
+                    </select>
                   </td>
-                  <td className="px-6 py-4 text-gray-700 text-sm">
-                    {getUserName(project.assignedTo)}
+                  <td className="px-4 py-3 text-right tabular text-gray-900">{formatCzk(project.revenue)}</td>
+                  <td className="px-4 py-3 text-right" onClick={e => e.stopPropagation()}>
+                    <div className="inline-flex items-center gap-1">
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        defaultValue={project.successProbability ?? 0}
+                        key={`${project.id}-${project.successProbability ?? 0}`}
+                        onBlur={e => {
+                          const next = Math.min(100, Math.max(0, Number(e.target.value) || 0))
+                          if (next !== (project.successProbability ?? 0)) onProbabilityChange(project, next)
+                        }}
+                        className="w-16 px-2 py-1 text-xs text-right bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 tabular"
+                      />
+                      <span className="text-xs text-gray-500">%</span>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 text-gray-700 text-xs">
-                    {project.endDate ? formatDate(project.endDate) : '—'}
-                  </td>
-                  {showOnlyLeads ? (
-                    <>
-                      <td className="px-6 py-4">
-                        <select
-                          value={(project as any).offerPhase || ''}
-                          onChange={(e) => {
-                            e.stopPropagation()
-                            if (e.target.value) {
-                              onChangeOfferPhase?.(project.id, e.target.value)
-                            }
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                          className="px-3 py-1 rounded-lg text-xs font-medium bg-blue-100 text-blue-800 border border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
-                        >
-                          <option value="">Vybrat fázi</option>
-                          <option value="created">Vytvořená</option>
-                          <option value="sent">Předaná</option>
-                          <option value="accepted">Akceptovaná</option>
-                          <option value="negotiation">Jednání o SoD</option>
-                          <option value="postponed">Odloženo</option>
-                          <option value="cancelled_cheaper">Storno - levnější konkurence</option>
-                          <option value="cancelled_better">Storno - lepší konkurence</option>
-                          <option value="cancelled_expensive">Storno - příliš drahá nabídka</option>
-                        </select>
-                      </td>
-                      <td className="px-6 py-4 text-right font-mono text-gray-900">
-                        {formatCurrency(project.revenue)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1">
-                          <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={(project as any).successProbability || 0}
-                            onChange={(e) => {
-                              e.stopPropagation()
-                              const value = Math.min(100, Math.max(0, parseInt(e.target.value) || 0))
-                              onChangeSuccessProbability?.(project.id, value)
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-14 px-2 py-1 rounded-lg text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-center"
-                          />
-                          <span className="text-xs font-medium text-yellow-800">%</span>
-                        </div>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td className="px-6 py-4">
-                        <select
-                          value={project.status}
-                          onChange={(e) => {
-                            e.stopPropagation()
-                            onChangePhase?.(project.id, e.target.value as ProjectStatus)
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                          className="px-3 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
-                        >
-                          {PHASES.map(phase => (
-                            <option key={phase} value={phase}>
-                              {statusLabels[phase]?.cs || phase}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-6 py-4 text-right font-mono text-gray-700">
-                        {formatCurrency(project.cost)}
-                      </td>
-                      <td className="px-6 py-4 text-right font-mono text-gray-900">
-                        {formatCurrency(project.revenue)}
-                      </td>
-                      <td className={`px-6 py-4 text-right font-mono font-semibold ${
-                        profit > 0 ? 'text-green-600' : profit < 0 ? 'text-red-600' : 'text-gray-700'
-                      }`}>
-                        {formatCurrency(profit)}
-                      </td>
-                    </>
-                  )}
+                  <td className="px-4 py-3 text-right tabular text-emerald-700">{formatCzk(weightedValue(project))}</td>
                 </tr>
               )
             })}
           </tbody>
         </table>
       </div>
-
-      {sortedProjects.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
-          Žádné projekty
-        </div>
+      {sorted.length === 0 && (
+        <div className="p-10 text-center text-sm text-gray-500">Žádné příležitosti neodpovídají filtrům</div>
       )}
     </div>
   )
 }
+

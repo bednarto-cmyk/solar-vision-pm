@@ -8,7 +8,7 @@ import {
   doc,
 } from 'firebase/firestore'
 import { db } from '../config/firebase'
-import type { User } from './userStore'
+import type { User } from '../types'
 
 interface UserStore {
   users: User[]

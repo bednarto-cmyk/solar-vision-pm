@@ -1,363 +1,323 @@
-import { useState, useEffect } from 'react'
-import { X, Plus } from 'lucide-react'
-import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
-import type { ProjectStatus } from '../store/projectStore'
-import { useFirebaseContactStore } from '../store/firebaseContactStore'
-import { useUserStore } from '../store/userStore'
-import ContactModal from './ContactModal'
+import { useEffect, useState } from 'react'
+import { X, Plus, Kanban } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
+import { useFirebaseContactStore } from '../store/firebaseContactStore'
+import { useFirebaseUserStore } from '../store/firebaseUserStore'
+import type { OfferPhase, Project } from '../types'
+import ContactModal from './ContactModal'
+import { OFFER_LABELS, offerPhaseOf } from '../utils/pipeline'
 
-const DEFAULT_FORM_DATA = (user: any) => ({
+interface ProjectModalProps {
+  project: Project | null
+  user: any
+  onClose: () => void
+  onOpenBoard: (projectId: string) => void
+  suspended?: boolean
+}
+
+interface FormState {
+  name: string
+  contactId: string
+  customer: string
+  assignedTo: string
+  offerPhase: OfferPhase
+  successProbability: number
+  revenue: number
+  cost: number
+  power: number
+  startDate: string
+  endDate: string
+  tags: string[]
+  notes: string
+}
+
+const daysFromNow = (days: number) => new Date(Date.now() + days * 86400000).toISOString().split('T')[0]
+
+const emptyForm = (userId: string): FormState => ({
   name: '',
-  customer: '',
-  status: 'leads' as ProjectStatus,
-  assignedTo: user.role === 'admin' ? '1' : user.id,
   contactId: '',
-  power: 0,
-  cost: 0,
+  customer: '',
+  assignedTo: userId,
+  offerPhase: 'created',
+  successProbability: 50,
   revenue: 0,
+  cost: 0,
+  power: 0,
   startDate: new Date().toISOString().split('T')[0],
-  endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+  endDate: daysFromNow(30),
   tags: [],
   notes: '',
 })
 
-interface ProjectModalProps {
-  project: any
-  onClose: () => void
-  user: any
-  onOpenKanban?: () => void
-}
+const fromProject = (p: Project): FormState => ({
+  name: p.name,
+  contactId: p.contactId ?? '',
+  customer: p.customer,
+  assignedTo: p.assignedTo,
+  offerPhase: offerPhaseOf(p),
+  successProbability: p.successProbability ?? 0,
+  revenue: p.revenue,
+  cost: p.cost,
+  power: p.power,
+  startDate: p.startDate,
+  endDate: p.endDate,
+  tags: p.tags ?? [],
+  notes: p.notes ?? '',
+})
 
-const STATUSES: { value: ProjectStatus; label: string }[] = [
-  { value: 'leads', label: 'Příležitosti' },
-  { value: 'prep', label: 'Příprava' },
-  { value: 'purchase', label: 'Nákup' },
-  { value: 'execution', label: 'Realizace' },
-  { value: 'revision', label: 'Revize' },
-  { value: 'distribution', label: 'Distribuce' },
-  { value: 'service', label: 'Servis' },
-]
+const inputClass =
+  'w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-xl placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent'
 
-const FormField = ({ label, required, children }: any) => (
-  <div>
-    <label className="block text-base font-bold text-gray-900 mb-2">
-      {label} {required && <span className="text-red-500">*</span>}
-    </label>
-    {children}
-  </div>
+const Field = ({ label, children, className = '' }: { label: string; children: React.ReactNode; className?: string }) => (
+  <label className={`block ${className}`}>
+    <span className="text-xs font-medium text-gray-600">{label}</span>
+    <div className="mt-1">{children}</div>
+  </label>
 )
 
-export default function ProjectModal({ project, onClose, user, onOpenKanban }: ProjectModalProps) {
+export default function ProjectModal({ project, user, onClose, onOpenBoard, suspended = false }: ProjectModalProps) {
   const { addProject, updateProject } = useFirebaseProjectStore()
-  const { users } = useUserStore()
   const { contacts, addContact, initializeContacts } = useFirebaseContactStore()
-  const [showContactModal, setShowContactModal] = useState(false)
+  const { users, initializeUsers } = useFirebaseUserStore()
+  const [form, setForm] = useState<FormState>(() => (project ? fromProject(project) : emptyForm(user.id)))
+  const [tagDraft, setTagDraft] = useState('')
+  const [errors, setErrors] = useState<{ name?: string; contact?: string }>({})
+  const [saving, setSaving] = useState(false)
+  const [contactModalOpen, setContactModalOpen] = useState(false)
+  const isAdmin = user.role === 'admin'
 
   useEffect(() => {
     initializeContacts()
-  }, [])
-
-  const handleAddContact = async (data: any) => {
-    try {
-      await addContact(data, user.name)
-      toast.success('Zákazník přidán')
-      setShowContactModal(false)
-    } catch (error) {
-      toast.error('Chyba při přidání zákazníka')
-    }
-  }
-
-  const [formData, setFormData] = useState(project || DEFAULT_FORM_DATA(user))
-  const [newTag, setNewTag] = useState('')
+    initializeUsers()
+  }, [initializeContacts, initializeUsers])
 
   useEffect(() => {
-    if (project) {
-      setFormData(project)
-    } else {
-      setFormData(DEFAULT_FORM_DATA(user))
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !contactModalOpen && !suspended) onClose()
     }
-  }, [project])
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose, contactModalOpen, suspended])
+
+  const set = (patch: Partial<FormState>) => setForm(current => ({ ...current, ...patch }))
+
+  const addTag = () => {
+    const tag = tagDraft.trim().toLowerCase()
+    if (tag && !form.tags.includes(tag)) set({ tags: [...form.tags, tag] })
+    setTagDraft('')
+  }
+
+  const handleContactChange = (contactId: string) => {
+    const contact = contacts.find(c => c.id === contactId)
+    set({ contactId, customer: contact ? contact.name : '' })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const nextErrors: { name?: string; contact?: string } = {}
+    if (!form.name.trim()) nextErrors.name = 'Vyplň název příležitosti'
+    if (!form.customer.trim()) nextErrors.contact = 'Vyber zákazníka'
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length > 0) return
 
-    if (!formData.name || !formData.customer) {
-      toast.error('Vyplň název a zákazníka')
-      return
+    const data = {
+      name: form.name.trim(),
+      contactId: form.contactId,
+      customer: form.customer,
+      assignedTo: isAdmin ? form.assignedTo : user.id,
+      offerPhase: form.offerPhase,
+      successProbability: Math.min(100, Math.max(0, form.successProbability)),
+      revenue: form.revenue,
+      cost: form.cost,
+      power: form.power,
+      startDate: form.startDate,
+      endDate: form.endDate,
+      tags: form.tags,
+      notes: form.notes,
     }
 
+    setSaving(true)
     try {
       if (project) {
-        await updateProject(project.id, formData)
-        toast.success('Projekt aktualizován')
+        await updateProject(project.id, data)
+        toast.success('Příležitost uložena')
       } else {
-        const { contactId, ...restData } = formData
         await addProject({
-          ...restData,
-          contactId: contactId || undefined,
+          ...data,
+          status: 'leads',
           phases: {},
           documents: [],
           tasks: [],
           createdAt: new Date().toISOString(),
         })
-        toast.success('Projekt vytvořen')
+        toast.success('Příležitost vytvořena')
       }
-
       onClose()
     } catch (error) {
-      toast.error('Chyba při ukládání projektu')
       console.error(error)
+      toast.error('Příležitost se nepodařilo uložit')
+    } finally {
+      setSaving(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-      <div className="glass rounded-2xl shadow-2xl max-w-5xl w-full max-h-[92vh] overflow-y-auto">
-        <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-blue-100 border-b-2 border-blue-200 px-8 py-6 flex items-center justify-between">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {project ? '✏️ Editovat projekt' : '➕ Nový projekt'}
-          </h2>
-          <button onClick={onClose} className="p-2 hover:bg-blue-200 rounded-2xl transition-colors">
-            <X className="w-7 h-7 text-gray-600" />
+    <div className="fixed inset-0 z-[60] bg-gray-900/40 flex items-center justify-center p-4">
+      <div className="w-full max-w-3xl max-h-[92vh] bg-white rounded-3xl shadow-xl flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">{project ? 'Detail příležitosti' : 'Nová příležitost'}</h2>
+            {project && <p className="text-xs text-gray-500">{project.customer}</p>}
+          </div>
+          <button onClick={onClose} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg" aria-label="Zavřít">
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-8">
-          {/* Status */}
-          <FormField label="Status">
-            <select
-              value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as ProjectStatus })}
-              className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              {STATUSES.map(s => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
-          </FormField>
+        <form id="project-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Název příležitosti *" className="md:col-span-2">
+              <input className={inputClass} value={form.name} onChange={e => set({ name: e.target.value })} placeholder="Např. FVE + baterie – rodina Novákova" />
+              {errors.name && <p className="text-xs text-red-600 mt-1">{errors.name}</p>}
+            </Field>
 
-          {/* Řada 1: Název, Zákazník */}
-          <div className="grid grid-cols-2 gap-6">
-            <FormField label="Název projektu" required>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Např. Panely na střechu"
-              />
-            </FormField>
-
-            <FormField label="Zákazník" required>
+            <Field label="Zákazník *">
               <div className="flex gap-2">
-                <select
-                  value={formData.contactId || ''}
-                  onChange={(e) => {
-                    const contact = contacts.find(c => c.id === e.target.value)
-                    setFormData({
-                      ...formData,
-                      contactId: e.target.value,
-                      customer: contact ? contact.name : ''
-                    })
-                  }}
-                  className="flex-1 px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">-- Vyber zákazníka --</option>
-                  {contacts.map(contact => (
-                    <option key={contact.id} value={contact.id}>
-                      {contact.name} ({contact.company})
-                    </option>
+                <select className={inputClass} value={form.contactId} onChange={e => handleContactChange(e.target.value)}>
+                  <option value="">Vyber kontakt…</option>
+                  {contacts.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}{c.company ? ` · ${c.company}` : ''}</option>
                   ))}
                 </select>
-                <button
-                  type="button"
-                  onClick={() => setShowContactModal(true)}
-                  className="flex-shrink-0 px-4 py-3 bg-green-600 text-white rounded-2xl hover:bg-green-700 transition-colors flex items-center gap-2"
-                  title="Přidat nového zákazníka"
-                >
-                  <Plus className="w-5 h-5" />
+                <button type="button" onClick={() => setContactModalOpen(true)} className="btn-secondary px-3" title="Nový kontakt">
+                  <Plus className="w-4 h-4" />
                 </button>
               </div>
-            </FormField>
-          </div>
+              {errors.contact && <p className="text-xs text-red-600 mt-1">{errors.contact}</p>}
+            </Field>
 
-          {/* Řada 2: Obchodník, Výkon, Status */}
-          <div className="grid grid-cols-3 gap-6">
-            {user.role === 'admin' && (
-              <FormField label="Přiřazeno">
-                <select
-                  value={formData.assignedTo}
-                  onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-                  className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  {users.map(u => (
-                    <option key={u.id} value={u.id}>{u.name}</option>
-                  ))}
-                </select>
-              </FormField>
-            )}
+            <Field label="Obchodník">
+              <select
+                className={inputClass}
+                value={isAdmin ? form.assignedTo : user.id}
+                disabled={!isAdmin}
+                onChange={e => set({ assignedTo: e.target.value })}
+              >
+                {(isAdmin ? users : users.filter(u => u.id === user.id)).map(u => (
+                  <option key={u.id} value={u.id}>{u.name}</option>
+                ))}
+              </select>
+            </Field>
 
-            <FormField label="Výkon (kWp)">
-              <input
-                type="text"
-                value={formData.power.toString().replace('.', ',')}
-                onChange={(e) => {
-                  const value = e.target.value.replace(',', '.')
-                  const num = parseFloat(value)
-                  if (value === '' || !isNaN(num)) {
-                    setFormData({ ...formData, power: value === '' ? 0 : num })
-                  }
-                }}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="10,50"
-              />
-            </FormField>
+            <Field label="Fáze nabídky">
+              <select className={inputClass} value={form.offerPhase} onChange={e => set({ offerPhase: e.target.value as OfferPhase })}>
+                {(Object.entries(OFFER_LABELS) as [OfferPhase, string][]).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </Field>
 
-            <FormField label="Výnos (Kč)">
+            <Field label="Pravděpodobnost úspěchu (%)">
               <input
                 type="number"
-                value={formData.revenue}
-                onChange={(e) => setFormData({ ...formData, revenue: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="350000"
+                min={0}
+                max={100}
+                className={`${inputClass} tabular`}
+                value={form.successProbability}
+                onChange={e => set({ successProbability: Number(e.target.value) || 0 })}
               />
-            </FormField>
-          </div>
+            </Field>
+          </section>
 
-          {/* Řada 3: Náklady, Počáteční datum, Termín */}
-          <div className="grid grid-cols-3 gap-6">
-            <FormField label="Náklady (Kč)">
+          <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Field label="Obrat (Kč)">
+              <input type="number" min={0} className={`${inputClass} tabular`} value={form.revenue} onChange={e => set({ revenue: Number(e.target.value) || 0 })} />
+            </Field>
+            <Field label="Odhad nákladů (Kč)">
+              <input type="number" min={0} className={`${inputClass} tabular`} value={form.cost} onChange={e => set({ cost: Number(e.target.value) || 0 })} />
+            </Field>
+            <Field label="Výkon (kWp)">
               <input
                 type="number"
-                value={formData.cost}
-                onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="250000"
+                min={0}
+                step="0.01"
+                className={`${inputClass} tabular`}
+                value={form.power}
+                onChange={e => set({ power: Number(e.target.value) || 0 })}
               />
-            </FormField>
+            </Field>
+            <Field label="Předpokládané uzavření">
+              <input type="date" className={inputClass} value={form.endDate} onChange={e => set({ endDate: e.target.value })} />
+            </Field>
+          </section>
 
-            <FormField label="Počáteční datum">
-              <input
-                type="date"
-                value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </FormField>
-
-            <FormField label="Termín dokončení">
-              <input
-                type="date"
-                value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </FormField>
-          </div>
-
-          {/* Tagy */}
-          <FormField label="Tagy (štítky)">
-            <div className="space-y-2">
+          <section className="space-y-4">
+            <Field label="Štítky">
               <div className="flex gap-2">
                 <input
-                  type="text"
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && newTag.trim()) {
-                      setFormData({
-                        ...formData,
-                        tags: [...(formData.tags || []), newTag.toLowerCase()]
-                      })
-                      setNewTag('')
+                  className={inputClass}
+                  value={tagDraft}
+                  onChange={e => setTagDraft(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      addTag()
                     }
                   }}
-                  className="flex-1 px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Přidej tag (Enter)"
+                  placeholder="Např. dotace, baterie (Enter)"
                 />
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (newTag.trim()) {
-                      setFormData({
-                        ...formData,
-                        tags: [...(formData.tags || []), newTag.toLowerCase()]
-                      })
-                      setNewTag('')
-                    }
-                  }}
-                  className="px-4 py-3 bg-blue-500 text-white rounded-2xl font-medium hover:bg-blue-600 transition-colors"
-                >
-                  Přidat
-                </button>
+                <button type="button" onClick={addTag} className="btn-secondary">Přidat</button>
               </div>
-              {(formData.tags || []).length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {formData.tags.map((tag: string) => (
+              {form.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {form.tags.map(tag => (
                     <button
                       key={tag}
                       type="button"
-                      onClick={() => setFormData({
-                        ...formData,
-                        tags: (formData.tags || []).filter((t: string) => t !== tag)
-                      })}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors"
+                      onClick={() => set({ tags: form.tags.filter(t => t !== tag) })}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full hover:bg-emerald-100"
                     >
-                      #{tag}
-                      <span>×</span>
+                      #{tag} <X className="w-3 h-3" />
                     </button>
                   ))}
                 </div>
               )}
-            </div>
-          </FormField>
+            </Field>
 
-          {/* Poznámky */}
-          <FormField label="Poznámky & Detaily">
-            <textarea
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-3 text-base border-2 border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              rows={5}
-              placeholder="Přidej jakékoliv dodatečné informace o projektu..."
-            />
-          </FormField>
+            <Field label="Poznámky">
+              <textarea rows={4} className={inputClass} value={form.notes} onChange={e => set({ notes: e.target.value })} />
+            </Field>
+          </section>
+        </form>
 
-          {/* Tlačítka */}
-          <div className="flex gap-4 justify-between pt-6 border-t-2 border-gray-200">
-            <div className="flex gap-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-8 py-3 rounded-2xl bg-gray-200 text-gray-800 font-bold text-lg hover:bg-gray-300 transition-colors"
-              >
-                Zrušit
-              </button>
-              {project && onOpenKanban && (
-                <button
-                  type="button"
-                  onClick={onOpenKanban}
-                  className="px-8 py-3 rounded-2xl bg-purple-600 text-white font-bold text-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
-                >
-                  📋 Nástěnka projektů
-                </button>
-              )}
-            </div>
-            <button
-              type="submit"
-              className="px-8 py-3 rounded-2xl bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition-colors"
-            >
-              {project ? '💾 Aktualizovat' : '✅ Vytvořit'}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-t border-gray-200">
+          {project ? (
+            <button type="button" onClick={() => onOpenBoard(project.id)} className="btn-secondary">
+              <Kanban className="w-4 h-4" />
+              Nástěnka úkolů
+            </button>
+          ) : (
+            <span />
+          )}
+          <div className="flex gap-2">
+            <button type="button" onClick={onClose} className="btn-secondary">Zrušit</button>
+            <button type="submit" form="project-form" disabled={saving} className="btn-primary">
+              {saving ? 'Ukládám…' : project ? 'Uložit změny' : 'Vytvořit příležitost'}
             </button>
           </div>
-        </form>
+        </div>
       </div>
 
-      {showContactModal && (
+      {contactModalOpen && (
         <ContactModal
-          onSave={handleAddContact}
-          onClose={() => setShowContactModal(false)}
+          contact={null}
+          currentUserId={user.id}
+          onClose={() => setContactModalOpen(false)}
+          onSave={async data => {
+            await addContact(data, user.name)
+            toast.success('Kontakt přidán – vyber ho v seznamu')
+          }}
         />
       )}
     </div>

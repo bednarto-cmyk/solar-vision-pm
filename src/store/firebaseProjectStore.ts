@@ -8,7 +8,7 @@ import {
   doc,
 } from 'firebase/firestore'
 import { db } from '../config/firebase'
-import type { Project, ProjectStatus } from './projectStore'
+import type { Project, ProjectStatus } from '../types'
 
 interface ProjectStore {
   projects: Project[]

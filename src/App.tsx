@@ -1,86 +1,65 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import './index.css'
-import Navbar from './components/Navbar'
-import HybridProjectView from './components/HybridProjectView'
+import Sidebar, { type View } from './components/Sidebar'
+import OpportunitiesView from './components/OpportunitiesView'
 import DashboardView from './components/DashboardView'
 import PerformanceView from './components/PerformanceView'
 import Contacts from './components/Contacts'
 import SettingsView from './components/SettingsView'
 import LoginPage from './components/LoginPage'
-import IdeasView from './components/IdeasView'
 import { useFirebaseProjectStore } from './store/firebaseProjectStore'
 import { useFirebaseUserStore } from './store/firebaseUserStore'
-import { useFirebaseIdeaStore } from './store/ideaStore'
 
-type View = 'opportunities' | 'dashboard' | 'performance' | 'ideas' | 'contacts' | 'settings' | 'login'
+const SESSION_KEY = 'solarVisionUserId'
 
 function App() {
-  const [currentView, setCurrentView] = useState<View>('login')
-  const [user, setUser] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const initializeProjects = useFirebaseProjectStore((state) => state.initializeProjects)
-  const initializeUsers = useFirebaseUserStore((state) => state.initializeUsers)
-  const initializeIdeas = useFirebaseIdeaStore((state) => state.initializeIdeas)
+  const [view, setView] = useState<View>('dashboard')
+  const [userId, setUserId] = useState<string | null>(() => localStorage.getItem(SESSION_KEY))
+  const { users, initialized: usersReady, initializeUsers } = useFirebaseUserStore()
+  const initializeProjects = useFirebaseProjectStore(state => state.initializeProjects)
 
   useEffect(() => {
-    initializeProjects()
+    localStorage.removeItem('user')
     initializeUsers()
-    initializeIdeas()
+    initializeProjects()
+  }, [initializeUsers, initializeProjects])
 
-    const savedUser = localStorage.getItem('user')
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
-      setCurrentView('opportunities')
+  const user = usersReady ? users.find(u => u.id === userId) ?? null : null
+
+  useEffect(() => {
+    if (usersReady && userId && !user) {
+      localStorage.removeItem(SESSION_KEY)
+      setUserId(null)
     }
+  }, [usersReady, userId, user])
 
-    // Timeout to show loading state
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  const handleLogin = (userData: any) => {
-    localStorage.setItem('user', JSON.stringify(userData))
-    setUser(userData)
-    setCurrentView('opportunities')
+  const handleLogin = (id: string) => {
+    localStorage.setItem(SESSION_KEY, id)
+    setUserId(id)
+    setView('dashboard')
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('user')
-    setUser(null)
-    setCurrentView('login')
-  }
-
-  if (isLoading && !user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-gray-300 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Načítám aplikaci...</p>
-        </div>
-      </div>
-    )
+    localStorage.removeItem(SESSION_KEY)
+    setUserId(null)
   }
 
   if (!user) {
-    return <LoginPage onLogin={handleLogin} />
+    return <LoginPage onLogin={handleLogin} waitingForSession={Boolean(userId) && !usersReady} />
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} user={user} />
-      <div className="pt-28">
-        {currentView === 'opportunities' && <HybridProjectView user={user} showOnlyLeads={true} />}
-        {currentView === 'contacts' && <Contacts currentUser={user} />}
-        {currentView === 'dashboard' && <DashboardView user={user} />}
-        {currentView === 'performance' && <PerformanceView user={user} />}
-        {currentView === 'ideas' && <IdeasView user={user} />}
-        {currentView === 'settings' && <SettingsView />}
-      </div>
-      <Toaster position="top-right" />
+    <div className="min-h-screen bg-gray-50">
+      <Sidebar currentView={view} onViewChange={setView} onLogout={handleLogout} user={user} />
+      <main className="pt-14 md:pt-0 md:pl-64 min-h-screen">
+        {view === 'dashboard' && <DashboardView user={user} />}
+        {view === 'opportunities' && <OpportunitiesView user={user} />}
+        {view === 'contacts' && <Contacts currentUser={user} />}
+        {view === 'performance' && <PerformanceView user={user} />}
+        {view === 'settings' && user.role === 'admin' && <SettingsView user={user} />}
+      </main>
+      <Toaster position="top-right" toastOptions={{ style: { borderRadius: '12px', fontSize: '14px' } }} />
     </div>
   )
 }

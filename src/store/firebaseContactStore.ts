@@ -1,34 +1,25 @@
 import { create } from 'zustand'
 import { db } from '../config/firebase'
 import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from 'firebase/firestore'
+import type { Contact } from '../types'
 
-export interface Contact {
-  id: string
-  name: string
-  company: string
-  email: string
-  phone: string
-  type: 'vedení' | 'nákupčí' | 'rozhodovatel' | 'koncový zákazník' | 'jiné'
-  assignedTo: string
-  notes: string
-  createdAt: string
-  createdBy: string
-  updatedAt: string
-  updatedBy: string
-}
 
 interface ContactStore {
   contacts: Contact[]
+  initialized: boolean
   initializeContacts: () => void
   addContact: (contact: Omit<Contact, 'id' | 'createdAt' | 'createdBy' | 'updatedAt' | 'updatedBy'>, createdBy: string) => Promise<void>
   updateContact: (id: string, updates: Partial<Contact>, updatedBy: string) => Promise<void>
   deleteContact: (id: string) => Promise<void>
 }
 
-export const useFirebaseContactStore = create<ContactStore>((set) => ({
+export const useFirebaseContactStore = create<ContactStore>((set, get) => ({
   contacts: [],
+  initialized: false,
 
   initializeContacts: () => {
+    if (get().initialized) return
+    set({ initialized: true })
     const contactsRef = collection(db, 'contacts')
     const q = query(contactsRef)
 
