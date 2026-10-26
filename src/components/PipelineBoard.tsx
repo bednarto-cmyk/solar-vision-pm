@@ -8,7 +8,7 @@ import {
   formatCzk,
   initials,
   isOverdue,
-  weightedValue,
+  expectedProfit,
   formatDate,
 } from '../utils/pipeline'
 
@@ -62,7 +62,7 @@ export default function PipelineBoard({ projects, userNames, onOpen, onMove }: P
               </div>
               <p className="text-xs text-gray-500 mt-1.5 tabular">
                 {formatCzk(sum(items, p => p.revenue))}
-                <span className="text-gray-400"> · vážené {formatCzk(sum(items, weightedValue))}</span>
+                <span className="text-gray-400"> · zisk {formatCzk(sum(items, expectedProfit))}</span>
               </p>
             </header>
 

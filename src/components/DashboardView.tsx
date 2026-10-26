@@ -17,7 +17,7 @@ import {
   daysUntil,
   offerPhaseOf,
   opportunitiesFor,
-  weightedValue,
+  expectedProfit,
 } from '../utils/pipeline'
 
 interface DashboardViewProps {
@@ -36,7 +36,7 @@ export default function DashboardView({ user }: DashboardViewProps) {
   const lost = opportunities.filter(isLost)
 
   const openValue = sum(open, p => p.revenue)
-  const weighted = sum(open, weightedValue)
+  const weighted = sum(open, expectedProfit)
   const wonValue = sum(won, p => p.revenue)
   const winRate = won.length + lost.length > 0 ? Math.round((won.length / (won.length + lost.length)) * 100) : 0
 
@@ -68,7 +68,7 @@ export default function DashboardView({ user }: DashboardViewProps) {
   const exportXlsx = () => {
     try {
       const rows: (string | number)[][] = [
-        ['Příležitost', 'Zákazník', 'Obchodník', 'Fáze nabídky', 'Obrat (Kč)', 'Pravděpodobnost (%)', 'Vážená hodnota (Kč)', 'Předpokládané uzavření'],
+        ['Příležitost', 'Zákazník', 'Obchodník', 'Fáze nabídky', 'Obrat (Kč)', 'Pravděpodobnost (%)', 'Předpokládaný zisk (Kč)', 'Předpokládané uzavření'],
       ]
       opportunities.forEach(p => {
         rows.push([
@@ -78,7 +78,7 @@ export default function DashboardView({ user }: DashboardViewProps) {
           OFFER_LABELS[offerPhaseOf(p)],
           p.revenue,
           p.successProbability ?? 0,
-          Math.round(weightedValue(p)),
+          Math.round(expectedProfit(p)),
           p.endDate,
         ])
       })
@@ -92,7 +92,7 @@ export default function DashboardView({ user }: DashboardViewProps) {
 
   const kpis = [
     { label: 'Otevřené příležitosti', value: String(open.length), sub: formatCzk(openValue), icon: Target, tone: 'text-sky-600 bg-sky-50' },
-    { label: 'Vážená pipeline', value: formatCzk(weighted), sub: 'obrat × pravděpodobnost', icon: TrendingUp, tone: 'text-violet-600 bg-violet-50' },
+    { label: 'Předpokládaný zisk', value: formatCzk(weighted), sub: 'obrat − náklady', icon: TrendingUp, tone: 'text-violet-600 bg-violet-50' },
     { label: 'Vyhráno', value: formatCzk(wonValue), sub: `${won.length} ${won.length === 1 ? 'nabídka' : 'nabídek'}`, icon: Trophy, tone: 'text-emerald-600 bg-emerald-50' },
     { label: 'Úspěšnost', value: `${winRate} %`, sub: `${won.length} vyhráno · ${lost.length} ztraceno`, icon: Percent, tone: 'text-amber-600 bg-amber-50' },
   ]

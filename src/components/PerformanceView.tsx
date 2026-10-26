@@ -2,7 +2,7 @@ import { useFirebaseProjectStore } from '../store/firebaseProjectStore'
 import { useFirebaseUserStore } from '../store/firebaseUserStore'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Trophy, TrendingUp } from 'lucide-react'
-import { isWon, isLost, isOpen, weightedValue, formatCzk } from '../utils/pipeline'
+import { isWon, isLost, isOpen, expectedProfit, formatCzk } from '../utils/pipeline'
 
 interface PerformanceViewProps {
   user?: any
@@ -47,7 +47,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
         quarterlyTargets,
         wonCount: won.length,
         lostCount: lost.length,
-        pipeline: sum(open, weightedValue),
+        pipeline: sum(open, expectedProfit),
         openCount: open.length,
       }
     })
@@ -73,7 +73,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
             <Trophy className="w-8 h-8 text-yellow-500" />
             Performance {year}
           </h1>
-          <p className="text-gray-600 mt-1">Vyhrané nabídky vůči cílům a vážená hodnota otevřené pipeline</p>
+          <p className="text-gray-600 mt-1">Vyhrané nabídky vůči cílům a předpokládaný zisk otevřených příležitostí</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -90,7 +90,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
             <p className="text-2xl font-bold text-green-600">{teamPercentage}%</p>
           </div>
           <div className="card p-5">
-            <p className="text-sm text-gray-600 mb-1">Vážená pipeline / úspěšnost</p>
+            <p className="text-sm text-gray-600 mb-1">Předpokládaný zisk / úspěšnost</p>
             <p className="text-2xl font-bold text-gray-900">{formatCzk(teamPipeline)}</p>
             <p className="text-xs text-gray-500 mt-1">úspěšnost {teamWinRate}%</p>
           </div>
@@ -140,7 +140,7 @@ export default function PerformanceView({ user }: PerformanceViewProps) {
           </div>
 
           <div className="card p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Vážená pipeline podle obchodníka</h2>
+            <h2 className="text-lg font-bold text-gray-800 mb-4">Předpokládaný zisk podle obchodníka</h2>
             {teamPipeline === 0 ? (
               <p className="text-center py-16 text-gray-500">Žádná otevřená pipeline</p>
             ) : (

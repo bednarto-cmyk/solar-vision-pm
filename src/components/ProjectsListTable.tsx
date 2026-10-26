@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ArrowDown, ArrowUp, AlertTriangle } from 'lucide-react'
 import type { OfferPhase, Project } from '../types'
-import { OFFER_LABELS, PIPELINE_COLUMNS, formatCzk, formatDate, isOverdue, offerPhaseOf, weightedValue } from '../utils/pipeline'
+import { OFFER_LABELS, PIPELINE_COLUMNS, formatCzk, formatDate, isOverdue, offerPhaseOf, expectedProfit } from '../utils/pipeline'
 
 export interface OpportunityFilters {
   name: string
@@ -49,7 +49,7 @@ export default function ProjectsListTable({
         case 'name': return p.name.toLowerCase()
         case 'endDate': return new Date(p.endDate).getTime()
         case 'revenue': return p.revenue
-        case 'weighted': return weightedValue(p)
+        case 'weighted': return expectedProfit(p)
         case 'phase': return PIPELINE_COLUMNS.findIndex(c => c.phases.includes(offerPhaseOf(p)))
         case 'probability': return p.successProbability ?? 0
       }
@@ -97,7 +97,7 @@ export default function ProjectsListTable({
               {header('Fáze nabídky', 'phase')}
               {header('Obrat', 'revenue', 'right')}
               {header('Šance', 'probability', 'right')}
-              {header('Vážená hodnota', 'weighted', 'right')}
+              {header('Předpokládaný zisk', 'weighted', 'right')}
             </tr>
             <tr className="border-b border-gray-200 bg-white normal-case tracking-normal">
               <th className="px-4 py-2">
@@ -173,7 +173,7 @@ export default function ProjectsListTable({
                       <span className="text-xs text-gray-500">%</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-right tabular text-emerald-700">{formatCzk(weightedValue(project))}</td>
+                  <td className="px-4 py-3 text-right tabular text-emerald-700">{formatCzk(expectedProfit(project))}</td>
                 </tr>
               )
             })}

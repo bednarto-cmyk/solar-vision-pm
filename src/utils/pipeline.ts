@@ -15,7 +15,7 @@ export const offerPhaseOf = (p: Project): OfferPhase => p.offerPhase ?? 'created
 export const isWon = (p: Project) => offerPhaseOf(p) === 'accepted'
 export const isLost = (p: Project) => offerPhaseOf(p).startsWith('cancelled_')
 export const isOpen = (p: Project) => !isWon(p) && !isLost(p)
-export const weightedValue = (p: Project) => (p.revenue || 0) * ((p.successProbability ?? 0) / 100)
+export const expectedProfit = (p: Project) => (p.revenue || 0) - (p.cost || 0)
 
 export const opportunitiesFor = (projects: Project[], user: any) =>
   projects.filter(p => p.status === 'leads' && (user.role === 'admin' || p.assignedTo === user.id))

@@ -17,7 +17,7 @@ import {
   isOpen,
   offerPhaseOf,
   opportunitiesFor,
-  weightedValue,
+  expectedProfit,
 } from '../utils/pipeline'
 
 interface OpportunitiesViewProps {
@@ -55,7 +55,7 @@ export default function OpportunitiesView({ user }: OpportunitiesViewProps) {
 
   const openCount = base.filter(isOpen).length
   const openValue = base.filter(isOpen).reduce((total, p) => total + p.revenue, 0)
-  const weighted = base.filter(isOpen).reduce((total, p) => total + weightedValue(p), 0)
+  const weighted = base.filter(isOpen).reduce((total, p) => total + expectedProfit(p), 0)
 
   const editing = editingId && editingId !== 'new' ? projects.find(p => p.id === editingId) ?? null : null
   const modalOpen = editingId === 'new' || editing !== null
@@ -105,7 +105,7 @@ export default function OpportunitiesView({ user }: OpportunitiesViewProps) {
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Příležitosti</h1>
           <p className="text-sm text-gray-500 mt-1">
-            {openCount} otevřených · {formatCzk(openValue)} · vážená hodnota {formatCzk(weighted)}
+            {openCount} otevřených · {formatCzk(openValue)} · předpokládaný zisk {formatCzk(weighted)}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
